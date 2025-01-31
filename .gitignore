@@ -1,0 +1,10 @@
+/.metadata/
+# Eclipse workspace settings
+.metadata/
+# macOS system files
+.DS_Store
+
+
+node_modules/
+.env
+dist/
