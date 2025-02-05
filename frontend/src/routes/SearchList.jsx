@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import NavBar from "../components/Navbar";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
@@ -7,26 +7,7 @@ import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
 const App = () => {
     return (
         <>
-            {/*
-            네비게이션 바
-            <Navbar bg="light" expand="lg" className="mb-3">
-                <Container>
-                <Navbar.Brand href="#">여기놀자</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                    <Nav.Link href="#">탐색</Nav.Link>
-                    <Nav.Link href="#">캘린더</Nav.Link>
-                    </Nav>
-                    <Form className="d-flex">
-                    <Form.Control type="search" placeholder="어떤 데이트를 하고 싶으신가요?" className="me-2" />
-                    <Button variant="outline-success">검색</Button>
-                    </Form>
-                </Navbar.Collapse>
-                </Container>
-            </Navbar>
-            */}
-            <Navbar />
+            <NavBar />
 
             {/* 카테고리 필터 */}
             <Container className="mb-4">
