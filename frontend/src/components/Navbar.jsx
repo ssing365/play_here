@@ -1,6 +1,7 @@
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 
+
 const Navbar = () => {
     return (
         <nav className="flex items-center justify-between p-4 shadow-md bg-white mb-10">
