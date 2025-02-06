@@ -1,8 +1,8 @@
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
-import { Container, Row, Col, Form, FormControl, Navbar, Nav } from 'react-bootstrap';
+import { Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown } from 'react-bootstrap';
 
-const NavBar = () => {
+const TopBar = () => {
     return (
         <Navbar expand="md" bg="white" className="shadow-sm p-3 mb-4">
             <Container fluid>
@@ -13,6 +13,7 @@ const NavBar = () => {
                             <img src="/logo.png" alt="로고" className="h-8" style={{ height: '40px' }} />
                         </Link>
                     </Col>
+
                     {/* 탐색/캘린더 메뉴 (중앙) - 큰 화면에서만 표시 */}
                     <Col md={6} className="d-none d-md-flex justify-content-center">
                         <Nav className="flex-row">
@@ -32,9 +33,22 @@ const NavBar = () => {
                                 />
                                 <FaSearch className="position-absolute" style={{ right: '10px', top: '50%', transform: 'translateY(-50%)', color: '#6c757d' }} />
                             </Form>
-                            <Link to={"/mypage"}>
-                                <FaUserCircle className="h-8 w-8 text-gray-700" />
-                            </Link>
+
+                            {/* 드롭다운 메뉴 */}
+                            <Dropdown align="end">
+                                <Dropdown.Toggle variant="light" id="dropdown-user" className="border-0 p-0 bg-transparent" bsPrefix="custom-toggle">
+                                    <FaUserCircle className="h-8 w-8 text-gray-700" style={{ fontSize: '32px' }} />
+                                </Dropdown.Toggle>
+
+                                <Dropdown.Menu>
+                                    <Dropdown.Item as={Link} to="/mypage">마이페이지</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/connect-couple">커플 연결하기</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/preference">선호도 수정</Dropdown.Item>
+                                    <Dropdown.Item as={Link} to="/mypagelikes">좋아요 리스트</Dropdown.Item>
+                                    <Dropdown.Divider />
+                                    <Dropdown.Item href="#logout">로그아웃</Dropdown.Item>
+                                </Dropdown.Menu>
+                            </Dropdown>
                         </div>
                     </Col>
                 </Row>
@@ -68,4 +82,4 @@ const NavBar = () => {
     );
 };
 
-export default NavBar;
+export default TopBar;
