@@ -2,6 +2,7 @@ import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link } from "react-router-dom";
 import { Container, Row, Col, Form, FormControl, Navbar, Nav } from 'react-bootstrap';
 
+
 const NavBar = () => {
     return (
         <Navbar expand="md" bg="white" className="shadow-sm p-3 mb-4">
