@@ -6,6 +6,8 @@ import SearchList from "./routes/SearchList";
 import CoupleCodeMatch from "./routes/ConnectCouple";
 import Place from "./routes/Place";
 import MyPage from "./routes/MyPage";
+import RegisterUser from "./routes/RegisterUser"
+import RegisterPreference from "./routes/RegisterPreference"
 
 function App() {
     return (
@@ -23,6 +25,9 @@ function App() {
                 
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/connect-couple" element={<CoupleCodeMatch />} />
+
+                <Route path="/regist" element={<RegisterUser />}></Route>
+                <Route path="/preference" element={<RegisterPreference />}></Route>
             </Routes>
         </Router>
     );
