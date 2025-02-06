@@ -3,8 +3,9 @@ import Navbar from "../components/Navbar";
 import { useState } from 'react';
 import { FormControl, Button, Container, Card } from 'react-bootstrap';
 import 'bootstrap/dist/css/bootstrap.min.css';
+import { Link } from "react-router-dom";
 
-const CoupleCodeMatch = () => {
+const ConnectCouple = () => {
   const [coupleCode, setCoupleCode] = useState('AE6EWX');
   const [inputCode, setInputCode] = useState('');
 
@@ -38,11 +39,14 @@ const CoupleCodeMatch = () => {
             onChange={(e) => setInputCode(e.target.value)}
           />
           <Button variant="success" className="w-50 my-2">커플 연결하기</Button>
-          <Button variant="secondary" className="w-50 my-2">다음에하기</Button>
+          <Link to={"/"}>
+            <Button variant="secondary" className="w-50 my-2">다음에하기</Button>
+          </Link>
+          
         </Card>
       </Container>
     </div>
   );
 };
 
-export default CoupleCodeMatch;
+export default ConnectCouple;

@@ -1,14 +1,23 @@
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
+import { Link } from "react-router-dom";
 
 const Search = () => {
     return (
         <div className="flex flex-col min-h-screen">
             {/* 상단바 */}
             <Navbar />
+
+            <Link to={"/searchlist"}>
+                <b>검색결과 리스트</b>
+            </Link>
+
+            <Link to={"/place"}>
+                <b>장소 소개 페이지</b>
+            </Link>
 
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
