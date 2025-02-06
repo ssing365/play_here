@@ -1,10 +1,9 @@
 import React, { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Navbar, Nav, Form, Button } from "react-bootstrap";
-import './css/preference.css';
+import '../css/preference.css';
 
-
-const RegisterPreference = () => {
+const EditPreference = () => {
   const categories = [
     {
       title: '먹기',
@@ -97,8 +96,6 @@ const RegisterPreference = () => {
   };
 
   return (
-    // NavBar 추가하기
-
     <div className="container mt-5">
       <div className="row">
         {categories.map(category => (
@@ -118,15 +115,13 @@ const RegisterPreference = () => {
           </div>
         ))}
         <div className='col-12 col-lg-6 mb-4'>
-          <span>자신의 취향은 마이페이지에서 수정 가능합니다.</span>
+        <button className="btn btn-primary mr-2">나의 취향 수정하기</button>
           <br/>
-          <button className="btn btn-primary mr-2">선택완료</button>
-          <br/>
-          <button className="btn btn-secondary">다음에 고르기</button>
+          <button className="btn btn-secondary">돌아가기</button>
         </div>
       </div>
     </div>
   );
 };
 
-export default RegisterPreference;
+export default EditPreference;
