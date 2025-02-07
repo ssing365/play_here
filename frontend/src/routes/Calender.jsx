@@ -57,8 +57,9 @@ const Calender = () => {
     };
 
     return (
-        <Container>
+        <>
             <TopBar />
+            <Container>
             <Row className="mt-3">
                 <Col md={6} className="position-relative">
                     <h4 className="text-center">김철수 ♥ 김유리</h4>
@@ -165,7 +166,8 @@ const Calender = () => {
                     )}
                 </Col>
             </Row>
-        </Container>
+            </Container>
+        </>
     );
 };
 

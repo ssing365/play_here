@@ -1,7 +1,7 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import { Container, Navbar, Nav, Form, Button } from "react-bootstrap";
 import '../css/preference.css';
+import TopBar from '../components/TopBar';
 
 const RegisterPreference = () => {
   const categories = [
@@ -96,9 +96,9 @@ const RegisterPreference = () => {
   };
 
   return (
-    // NavBar 추가하기
-
-    <div className="container mt-5">
+    <>
+      <TopBar/>
+      <div className="container mt-5">
       <div className="row">
         {categories.map(category => (
           <div key={category.title} className="col-12 col-lg-6 mb-4">
@@ -125,6 +125,7 @@ const RegisterPreference = () => {
         </div>
       </div>
     </div>
+    </>
   );
 };
 

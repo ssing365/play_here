@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import TopBar from "../components/TopBar";
 import { Link } from "react-router-dom";
 import { useEffect, useRef, useState } from "react";
 import { Container, Row, Col, Button, Form, Card } from "react-bootstrap";
@@ -62,9 +62,6 @@ const Map = () => {
         }
     }, []);
     
-    
-    
-    
     const [places, setPlaces] = useState(initialPlaces);
 
     const addPlace = () => {
@@ -86,22 +83,15 @@ const Map = () => {
         setPlaces({ ...places, [selectedDate]: items });
     };
 
-        
-  
     return (
-        <Container>
-            <Navbar />
+        <>
+            <TopBar />
+            <Container>
+            
             <Row className="mt-3">
-                
-
             <Col md={6} className="position-relative">
             <div ref={container} style={{ width: "500px", height: "500px" }}></div>
             </Col>
-
-
-              
-              
-              
                 <Col md={6}>
                     {selectedDate && (
                         <>
@@ -173,6 +163,7 @@ const Map = () => {
                 </Col>
             </Row>
         </Container>
+        </>
     );
 };
 

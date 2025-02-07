@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Navbar, Nav, Form, Button, Row, Col } from "react-bootstrap";
+import { Container, Form, Button, Row, Col } from "react-bootstrap";
 
 const RegistUser = () => {
   const [formData, setFormData] = useState({

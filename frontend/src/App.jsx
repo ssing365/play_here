@@ -10,8 +10,9 @@ import MyPage from "./routes/MyPage";
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 
-import RegisterUser from "./routes/RegisterUser"
+import RegisterUser from "./routes/RegistUser"
 import RegisterPreference from "./routes/RegisterPreference"
+import Preference from "./routes/Preference"
 
 import Map from './routes/Map';
 
@@ -19,24 +20,25 @@ function App() {
     return (
         <Router>
             <Routes>
+                {/** 메인 */}
                 <Route path="/" element={<Search />} />
                 <Route path="/search" element={<Search />} />
+                
+                <Route path="/calender" element={<Calender />} />
+                <Route path="/map" element={<Map />} />
+
                 <Route path="/searchlist" element={<SearchList />} />
-
-
                 <Route path="/place" element={<Place />} />
 
-                <Route path="/calender" element={<Calender />} />
-
                 <Route path="/mypage" element={<MyPage />} />
+                <Route path="/editprofile" element={<EditProfile />} />
+                <Route path="/connect-couple" element={<ConnectCouple />} />
 
-                <Route path="/registerUser" element={<RegisterUser />} />
                 <Route path="/regist" element={<RegisterUser />} />
                 <Route path="/preference" element={<RegisterPreference />} />
-                <Route path="/connect-couple" element={<ConnectCouple />} />
+                <Route path="/dd" element={<Preference/>} /> {/** 디자인 회의 필요 */}
+                
                 <Route path="/mypagelikes" element={<MyPageLikes />} />
-                <Route path="/editprofile" element={<EditProfile />} />
-                <Route path="/map" element={<Map />} />
             </Routes>
         </Router>
     );

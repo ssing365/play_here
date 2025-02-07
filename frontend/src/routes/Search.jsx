@@ -11,6 +11,10 @@ const Search = () => {
             {/* 상단바 */}
             <TopBar />
 
+            <Link to={"/regist"}>
+                <b>회원가입</b>
+            </Link>
+
             <Link to={"/searchlist"}>
                 <b>검색결과 리스트</b>
             </Link>

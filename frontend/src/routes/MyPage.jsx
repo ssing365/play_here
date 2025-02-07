@@ -17,7 +17,6 @@ const MyPage = () => {
                         <Link to={"/editprofile"}>
                             <button className="edit-btn">정보수정</button>
                         </Link>
-                        
                     </div>
 
                     <div className="profile-info">
