@@ -1,9 +1,11 @@
-import React, { useState } from "react";
+
+import { useState } from "react";
 import DatePicker from "react-datepicker";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
-import { Container, Navbar, Nav, Form, Button, Row, Badge } from "react-bootstrap";
+import { Container, Button, Row, Badge } from "react-bootstrap";
 import { Calendar, X } from 'lucide-react';
+import TopBar from "../components/TopBar";
 
 const likedItems = [
   {
@@ -140,22 +142,7 @@ const MyPageLikes = () => {
   return (
     <>
       {/* 네비게이션 바 */}
-      <Navbar bg="light" expand="lg" className="mb-3">
-        <Container>
-          <Navbar.Brand href="#">여기놀자</Navbar.Brand>
-          <Navbar.Toggle aria-controls="basic-navbar-nav" />
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="me-auto">
-              <Nav.Link href="#">탐색</Nav.Link>
-              <Nav.Link href="#">캘린더</Nav.Link>
-            </Nav>
-            <Form className="d-flex">
-              <Form.Control type="search" placeholder="어떤 데이트를 하고 싶으신가요?" className="me-2" />
-              <Button variant="outline-success">검색</Button>
-            </Form>
-          </Navbar.Collapse>
-        </Container>
-      </Navbar>
+      <TopBar />
 
       {/* 페이지 제목 */}
       <Container className="mb-4">

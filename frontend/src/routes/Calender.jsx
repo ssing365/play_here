@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import TopBar from "../components/TopBar";
 import { Link } from "react-router-dom";
 import { useState } from "react";
 import { Container, Row, Col, Button, Form, Card } from "react-bootstrap";
@@ -50,7 +50,7 @@ const Calender = () => {
     return (
         <>
             {/* Header */}
-            <Navbar />
+            <TopBar />
             <Container>
                 {/* Main Content */}
                 <Row className="mt-3">

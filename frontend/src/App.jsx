@@ -3,9 +3,12 @@ import Search from "./routes/Search";
 import Calender from "./routes/Calender";
 import SearchList from "./routes/SearchList";
 
-import CoupleCodeMatch from "./routes/ConnectCouple";
+import ConnectCouple from "./routes/ConnectCouple";
+
 import Place from "./routes/Place";
 import MyPage from "./routes/MyPage";
+import MyPageLikes from "./routes/MyPageLikes";
+import EditProfile from "./routes/EditProfile";
 
 import RegisterUser from "./routes/RegisterUser"
 import RegisterPreference from "./routes/RegisterPreference"
@@ -24,13 +27,14 @@ function App() {
 
                 <Route path="/calender" element={<Calender />} />
 
-                
                 <Route path="/mypage" element={<MyPage />} />
-                <Route path="/registerUser" element={<RegisterUser />} />
-                <Route path="/connect-couple" element={<CoupleCodeMatch />} />
 
-                <Route path="/regist" element={<RegisterUser />}></Route>
-                <Route path="/preference" element={<RegisterPreference />}></Route>
+                <Route path="/registerUser" element={<RegisterUser />} />
+                <Route path="/regist" element={<RegisterUser />} />
+                <Route path="/preference" element={<RegisterPreference />} />
+                <Route path="/connect-couple" element={<ConnectCouple />} />
+                <Route path="/mypagelikes" element={<MyPageLikes />} />
+                <Route path="/editprofile" element={<EditProfile />} />
             </Routes>
         </Router>
     );

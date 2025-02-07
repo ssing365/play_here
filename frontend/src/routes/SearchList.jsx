@@ -1,4 +1,4 @@
-import NavBar from "../components/Navbar";
+import TopBar from "../components/TopBar";
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
@@ -7,7 +7,7 @@ import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
 const App = () => {
     return (
         <>
-            <NavBar />
+            <TopBar />
 
             {/* 카테고리 필터 */}
             <Container className="mb-4">

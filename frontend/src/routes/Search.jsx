@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import TopBar from "../components/TopBar";
 import Footer from "../components/Footer";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -9,7 +9,7 @@ const Search = () => {
     return (
         <div className="flex flex-col min-h-screen">
             {/* 상단바 */}
-            <Navbar />
+            <TopBar />
 
             <Link to={"/searchlist"}>
                 <b>검색결과 리스트</b>
