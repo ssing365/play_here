@@ -1,12 +1,13 @@
 import Navbar from "../components/Navbar";
-import Footer from "../components/Footer"
+import Footer from "../components/Footer";
+import WeatherCard from "../components/WeatherCard"; // WeatherCard 추가
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
 
 const Search = () => {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="d-flex flex-column min-vh-100">
             {/* 상단바 */}
             <Navbar />
 
@@ -59,6 +60,7 @@ const Search = () => {
 
                 {/* 주간 달력과 날씨 */}
                 <Row>
+                    {/* 행사 목록 (좌측 9칸) */}
                     <Col md={9}>
                         <h4>이번 주 행사</h4>
                         <div className="d-flex justify-content-between mb-2">
@@ -102,11 +104,9 @@ const Search = () => {
                         </Row>
                     </Col>
 
-                    <Col md={3}>
-                        <h4>23일 날씨</h4>
-                        <Card>
-                            <Card.Body>날씨 API 데이터 표시 영역</Card.Body>
-                        </Card>
+                    {/* 날씨 카드 추가 (우측 3칸) */}
+                    <Col md={3} className="d-flex justify-content-end">
+                        <WeatherCard />
                     </Col>
                 </Row>
             </Container>
