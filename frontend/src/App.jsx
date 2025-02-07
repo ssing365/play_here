@@ -7,7 +7,7 @@ import CoupleCodeMatch from "./routes/ConnectCouple";
 import Place from "./routes/Place";
 import MyPage from "./routes/MyPage";
 import RegisterPreference from "./routes/RegisterPreference";
-import RegistUser from "./routes/RegistUser";
+import RegisterUser from "./routes/RegisterUser";
 import MyPageLikes from "./routes/MyPageLikes";
 
 
@@ -30,7 +30,7 @@ function App() {
             
 
                 <Route path="/regist-preference" element={<RegisterPreference />} />
-                <Route path="/regist-user" element={<RegistUser />} />
+                <Route path="/regist" element={<RegisterUser />} />
                 <Route path="/mypage-likes" element={<MyPageLikes />} />
             </Routes>
         </Router>
