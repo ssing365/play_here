@@ -15,6 +15,7 @@ const Navbar = () => {
                     <Link to="/calender" className="text-gray-700 ml-18">
                         캘린더
                     </Link>
+                    
                 </div>
             </div>
             <div className="flex items-center space-x-4">
