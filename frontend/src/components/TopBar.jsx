@@ -3,7 +3,6 @@ import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal, } from 'react-bootstrap';
 
-
 const TopBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false);   // 모달 표시 상태
@@ -13,7 +12,7 @@ const TopBar = () => {
     const handleLoginToggle = () => {
         setIsLoggedIn(prevState => !prevState);
         setShowModal(false);          // 모달 닫기
-        navigate('/calender');        // 로그인 후 캘린더로 이동
+        navigate('/login');        // 로그인 페이지 이동
     };
 
     // 캘린더 클릭 시 처리
@@ -115,7 +114,6 @@ const TopBar = () => {
 
         {/* 로그인 요청 모달 */}
         <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-            
             <Modal.Body>캘린더를 이용하려면 로그인해야 합니다.</Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowModal(false)}>닫기</Button>

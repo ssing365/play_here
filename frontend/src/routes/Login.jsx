@@ -1,8 +1,7 @@
 import  { useState } from 'react';
-import { Link } from 'react-router-dom';
 // import Container_ from 'postcss/lib/container';
-import Navbar from '../components/Navbar';
-import './LogForm.css';
+import TopBar from '../components/TopBar';
+import './css/LogForm.css';
 import kkt from '../images/kakao_login_medium_narrow.png'
 import naver from '../images/btnG_완성형.png'
 import ggl from '../images/ggl_icon.png'
@@ -26,12 +25,12 @@ const Login = () => {
   };
 
   return (
-    <div className="login-container">
-    <Navbar/>
+    <>
+      <TopBar/>
+      <div className="login-container">
 
       <h2 className="login-title">로그인</h2>
       <p className="login-subtitle">특별한 하루를 만들어보세요.</p>
-      <hr style={{margin:'20px'}}/>
       <form onSubmit={handleSubmit} className="login-form">
         <input
           type="text"
@@ -100,11 +99,8 @@ const Login = () => {
           
         </div>
       </form>
-      
-        
-       
-    
     </div>
+    </>
   );
 };
 

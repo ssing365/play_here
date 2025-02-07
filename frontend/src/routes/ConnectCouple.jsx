@@ -8,7 +8,6 @@ import { Link } from "react-router-dom";
 
 import { CiShare2 } from "react-icons/ci";
 
-
 const ConnectCouple = () => {
   const [coupleCode, setCoupleCode] = useState('AE6EWX');
   const [inputCode, setInputCode] = useState('');
@@ -50,8 +49,6 @@ const ConnectCouple = () => {
               💛 커플 연결하기 💛
             </Button>
           </div>
-
-
 
           <Link to={"/"}>
             <Button variant="outline-secondary" className="w-30 mt-4">다음에하기</Button>
