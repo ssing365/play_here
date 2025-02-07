@@ -3,6 +3,7 @@ import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate } from "react-router-dom";
 import { Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal, } from 'react-bootstrap';
 
+
 const TopBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false);   // 모달 표시 상태

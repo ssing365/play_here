@@ -1,3 +1,4 @@
+
 import TopBar from "../components/TopBar";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -8,7 +9,6 @@ const App = () => {
     return (
         <>
             <TopBar />
-
             {/* 카테고리 필터 */}
             <Container className="mb-4">
                 <div className="d-flex justify-content-center">
