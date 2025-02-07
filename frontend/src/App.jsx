@@ -13,6 +13,7 @@ import EditProfile from "./routes/EditProfile";
 import RegisterUser from "./routes/RegisterUser"
 import RegisterPreference from "./routes/RegisterPreference"
 
+import Map from './routes/Map';
 
 function App() {
     return (
@@ -35,6 +36,7 @@ function App() {
                 <Route path="/connect-couple" element={<ConnectCouple />} />
                 <Route path="/mypagelikes" element={<MyPageLikes />} />
                 <Route path="/editprofile" element={<EditProfile />} />
+                <Route path="/map" element={<Map />} />
             </Routes>
         </Router>
     );

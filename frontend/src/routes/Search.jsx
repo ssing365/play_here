@@ -18,7 +18,6 @@ const Search = () => {
             <Link to={"/place"}>
                 <b>장소 소개 페이지</b>
             </Link>
-
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
                 {/* 지금 가기 좋은 곳 */}
