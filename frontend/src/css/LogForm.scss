@@ -153,7 +153,7 @@ b.loginMessage{
 .kakao__btn,
 .naver__btn {
   display: block;
-  width: 60%;
+  width: 34%;
   max-width: 680px;
   margin: 20px auto;
   height: 50px;
@@ -170,7 +170,7 @@ b.loginMessage{
   transition: 0.2s linear;
 }
 
-/* 구글 버튼 */
+/* kakao 버튼 */
 .kakao__btn {
   background: #FEE500;
   color: rgb(7, 7, 7);
@@ -182,7 +182,7 @@ b.loginMessage{
   box-shadow: 0 15px 30px rgba(243, 220, 0, 0.36);
 }
 
-/* 깃허브(네이버) 버튼 */
+/* naver 버튼 */
 .naver__btn {
   background: #03c75a;
   color: white;
@@ -193,13 +193,3 @@ b.loginMessage{
  
   box-shadow: 0 15px 30px rgba(3, 199, 90, 0.36);
 }
-
-/* 아이콘 스타일 */
-.naver__btn img,
-.kakao__btn img {
-  width: 24px;
-  height: 24px;
-  object-fit: contain;
-  vertical-align: middle;
-}
-   

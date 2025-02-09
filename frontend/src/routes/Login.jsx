@@ -2,6 +2,9 @@ import { useState } from "react";
 // import Container_ from 'postcss/lib/container';
 import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
+import KakaoLoginButton from "../components/KakaoLogin.jsx"
+import NaverLoginButton from "../components/NaverLogin.jsx"
+
 const Login = () => {
     const [loginData, setLoginData] = useState({
         username: "",
@@ -10,6 +13,8 @@ const Login = () => {
 
     return (
         <>
+            <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
+
             <TopBar />
             <div className="loginContainer">
                 
@@ -48,14 +53,13 @@ const Login = () => {
                     <p>OR</p>
                 </div>
 
-                <button className="kakao__btn">
-                  <img src="/images/btn_kakao.svg" alt="네이버" />
-                    카카오로 로그인하기
-                </button>
-                <button className="naver__btn">
-                    <img src="/images/btn_naver.svg" alt="네이버" />
-                    네이버로 로그인하기
-                </button>
+                
+                <div className="kakao__btn">
+                    <KakaoLoginButton />
+                </div>
+                <div className="naver__btn">
+                    <NaverLoginButton />
+                </div>
             </div>
         </>
     );
