@@ -1,0 +1,205 @@
+.loginContainer{
+  display:block;
+  max-width:680px;
+  width:80%;
+  margin:120px auto;
+}
+
+h3.loginTitle{
+  color:#e91e63;
+  font-size:48px;
+  letter-spacing:-3px;
+  text-align:center;
+  margin:120px 0 80px 0 ;
+  transition:.2s linear;
+}
+
+b.loginMessage{
+  display: block;
+  text-align:center;
+}
+
+.loginLinks{
+  list-style-type:none;
+  li{
+     display:inline-block;
+     margin:0 20px 0 0;
+     transition:.2s linear;
+     &:nth-child(2){
+        opacity : .6;
+        &:hover{
+           opacity : 1;
+        }
+     }
+     &:nth-child(3){
+        opacity : .6;
+        float:right;
+         &:hover{
+           opacity : 1;
+         }
+     }
+     a{
+        text-decoration:none;
+        color:#0f132a;
+        font-weight:bolder;
+        text-align:center;
+        cursor : pointer;
+     }
+   }
+}
+
+.loginForm{
+  width:100%;
+  max-width:680px;
+  margin:40px auto 10px;
+  .input__block{
+     margin:20px auto;
+     display:block;
+     position:relative;
+     &.signup-input__block{
+      &::before{
+        content:"";
+        position:absolute;
+        top:-15px;
+        left:150px;
+        display:block;
+        width:0;
+        height:0;
+        background:transparent;
+        border-left:15px solid transparent;
+        border-right:15px solid transparent;
+        border-bottom:15px solid rgba(#0f132a,.1);
+        transition:.2s linear;
+        }
+     }
+     input{
+        display:block;
+        width:70%;
+        max-width:600px;
+        height:50px;
+        margin:0 auto;
+        border-radius:8px;
+        border:none;
+        background: rgba(#0f132a,.1);
+        color : rgba(#0f132a,.9);
+        padding:0 0 0 15px;
+        font-size:14px;
+        font-family: 'Montserrat', sans-serif;
+        &:focus,
+        &:active{
+          outline:none;
+          border:none;
+          color : rgba(#0f132a,1);
+        }
+       &.repeat__password{
+         opacity : 0;
+         display : none;
+         transition:.2s linear;
+       }
+     }
+  }
+  
+  .signin__btn{
+     background:#e91e63;
+     color:white;
+     display:block;
+     width:70%;
+     max-width:680px;
+     height:50px;
+     border-radius:8px;
+     margin:0 auto;
+     border:none;
+     cursor:pointer;
+     font-size:14px;
+     font-family: 'Montserrat', sans-serif;
+     box-shadow:0 15px 30px rgba(#e91e63,.36);
+    transition:.2s linear;
+    &:hover{
+      box-shadow:0 0 0 rgba(#e91e63,.0);
+    }
+  }
+}
+
+.separator{
+  display:block;
+  margin:30px auto 10px;
+  text-align:center;
+  height:40px;
+  position:relative;
+  background:transparent;
+  color: rgba(#0f132a,.4);
+  font-size:13px;
+  width:90%;
+  max-width:680px;
+  &::before{
+    content:"";
+    position:absolute;
+    top:8px;
+    left:0;
+    background: rgba(#0f132a,.2);
+    height:1px;
+    width:45%;
+  }
+  &::after{
+    content:"";
+    position:absolute;
+    top:8px;
+    right:0;
+    background: rgba(#0f132a,.2);
+    height:1px;
+    width:45%;
+  }
+}
+.kakao__btn,
+.naver__btn {
+  display: block;
+  width: 60%;
+  max-width: 680px;
+  margin: 20px auto;
+  height: 50px;
+  cursor: pointer;
+  font-size: 14px;
+  font-family: 'Montserrat', sans-serif;
+  border-radius: 8px;
+  border: none;
+  line-height: 50px; /* 텍스트 수직 정렬 */
+  display: flex;         /* 아이콘과 텍스트를 가로로 배치 */
+  align-items: center;   /* 수직 중앙 정렬 */
+  justify-content: center; /* 가운데 정렬 */
+  gap: 10px;             /* 아이콘과 텍스트 사이 간격 */
+  transition: 0.2s linear;
+}
+
+/* 구글 버튼 */
+.kakao__btn {
+  background: #FEE500;
+  color: rgb(7, 7, 7);
+  box-shadow: 0 0 0 rgba(243, 220, 0, 0);
+  
+}
+
+.kakao__btn:hover {
+  box-shadow: 0 15px 30px rgba(243, 220, 0, 0.36);
+}
+
+/* 깃허브(네이버) 버튼 */
+.naver__btn {
+  background: #03c75a;
+  color: white;
+  box-shadow: 0 0 0 rgba(3, 199, 90, 0);
+}
+
+.naver__btn:hover {
+ 
+  box-shadow: 0 15px 30px rgba(3, 199, 90, 0.36);
+}
+
+/* 아이콘 스타일 */
+.naver__btn img,
+.kakao__btn img {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  vertical-align: middle;
+}
+   

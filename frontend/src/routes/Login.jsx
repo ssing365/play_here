@@ -1,107 +1,64 @@
-import  { useState } from 'react';
+import { useState } from "react";
 // import Container_ from 'postcss/lib/container';
-import TopBar from '../components/TopBar';
-import './css/LogForm.css';
-import kkt from '../images/kakao_login_medium_narrow.png'
-import naver from '../images/btnG_완성형.png'
-import ggl from '../images/ggl_icon.png'
+import TopBar from "../components/TopBar";
+import "../css/LogForm.scss";
 const Login = () => {
-  const [loginData, setLoginData] = useState({
-    username: '',
-    password: ''
-  });
+    const [loginData, setLoginData] = useState({
+        username: "",
+        password: "",
+    });
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setLoginData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
+    return (
+        <>
+            <TopBar />
+            <div className="loginContainer">
+                
+                <h3 className="loginTitle">로그인</h3>
+                <b className="loginMessage">여기놀자에서 특별한 하루를 만들어 보세요</b>
 
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    console.log('로그인 시도:', loginData);
-  };
+                <form action="" method="post" className="loginForm">
+                    <div className="first-input input__block first-input__block">
+                        <input
+                            type="email"
+                            placeholder="아이디"
+                            className="input"
+                            id="email"
+                        />
+                    </div>
+                    <div className="input__block">
+                        <input
+                            type="password"
+                            placeholder="비밀번호"
+                            className="input"
+                            id="password"
+                        />
+                    </div>
+                    <div className="input__block">
+                        <input
+                            type="password"
+                            placeholder="Repeat password"
+                            className="input repeat__password"
+                            id="repeat__password"
+                        />
+                    </div>
+                    <button className="signin__btn">로그인</button>
+                </form>
 
-  return (
-    <>
-      <TopBar/>
-      <div className="login-container">
+                <div className="separator">
+                    <p>OR</p>
+                </div>
 
-      <h2 className="login-title">로그인</h2>
-      <p className="login-subtitle">특별한 하루를 만들어보세요.</p>
-      <form onSubmit={handleSubmit} className="login-form">
-        <input
-          type="text"
-          name="username"
-          placeholder="아이디"
-          value={loginData.username}
-          onChange={handleChange}
-          className="login-input"
-        />
-        <input
-          type="password"
-          name="password"
-          placeholder="비밀번호"
-          value={loginData.password}
-          onChange={handleChange}
-          className="login-input"
-        />
-        
-        <button type="submit" className="login-button">
-          로그인
-        </button>
-      <label >
-        <input type="checkbox" /> 로그인 상태 유지하기
-      </label>
-        <div className="signup-link">
-          <a href="#" style={{color:'violet'}}>비밀번호를 잊으셨나요?</a> <br />
-          
-           <a href="Regist">계정이 없으신가요?</a>
-          
-        </div>
-
-        <div className="social-login">
-          
-          <button 
-            type="button"
-            
-            className="social-button naver" >
-            <img src={naver} style={{ width:'45px',height:'45px'}}className='social-button naver'
-            />
-            네이버로 로그인
-          </button>
-          
-          <button 
-            type="button"
-            className="social-button kakao"  >
-            <img src={kkt} style={{ width:'45px',height:'45px', position: 'relative',
-              
-            }}
-          className='icons'/>
-            카카오로 로그인
-          </button>
-          <button 
-            type="button"
-            className="social-button google">
-              <img src={ggl} style={{ width:'50px',height:'49px', 
-                }}
-          className='icons'/>
-            구글로 로그인
-          </button>
-          
-         <script >
-           function validate(){
-
-           }
-         </script>
-          
-        </div>
-      </form>
-    </div>
-    </>
-  );
+                <button className="kakao__btn">
+                  <img src="/images/btn_kakao.svg" alt="네이버" />
+                    카카오로 로그인하기
+                </button>
+                <button className="naver__btn">
+                    <img src="/images/btn_naver.svg" alt="네이버" />
+                    네이버로 로그인하기
+                </button>
+            </div>
+        </>
+    );
 };
 
 export default Login;

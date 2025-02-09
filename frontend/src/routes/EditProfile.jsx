@@ -1,5 +1,5 @@
 import TopBar from "../components/TopBar";
-import "./css/MyPage.css"; // CSS 파일 import
+import "../css/MyPage.css"; // CSS 파일 import
 import { FaUserCircle } from "react-icons/fa";
 import 'bootstrap/dist/css/bootstrap.min.css';
 
