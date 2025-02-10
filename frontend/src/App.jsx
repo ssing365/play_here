@@ -9,6 +9,7 @@ import MyPage from "./routes/MyPage";
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 import MyPageLikes from "./routes/MyPageLikes";
+import RegistUser from "./routes/RegistComponents/RegistUser"
 
 
 function App() {
@@ -31,6 +32,7 @@ function App() {
 
                 <Route path="/regist-preference" element={<RegisterPreference />} />
                 <Route path="/regist" element={<RegisterUser />} />
+                <Route path="/regist-user" element={<RegistUser />} />
                 <Route path="/mypage-likes" element={<MyPageLikes />} />
             </Routes>
         </Router>

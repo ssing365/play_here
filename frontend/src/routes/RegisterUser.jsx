@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Navbar, Nav, Form, Button, Row, Col } from "react-bootstrap";
-
+import axios from "axios";
 const RegisterUser = () => {
   const [formData, setFormData] = useState({
     user_id: "",
@@ -24,15 +24,45 @@ const RegisterUser = () => {
   const [errors, setErrors] = useState({});
   //비밀번호 확인 메세지
   const [passwordMatch, setPasswordMatch] = useState("");
-  //detailAddress 포커스하기
+  //아이디 중복여부 버튼 클릭여부 확인
+  const [isUserIdChecked, setIsUserIdChecked] = useState(false);
+  //중복확인여부 버튼 클릭 후 메세지
+  const [userIdMessage, setUserIdMessage] = useState("");
+
+  //우편번호 검색 완료 후 detailAddress 포커스하기
   const detailAddressRef = useRef(null);
 
   useEffect(() => {
+    if (!window.daum || !window.daum.Postcode) {
     const script = document.createElement("script");
     script.src = "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
     script.async = true;
     document.body.appendChild(script);
+    }
   }, []);
+
+  //GPT 추가
+  useEffect(() => {
+    if (formData.confirmPassword) {
+      setPasswordMatch(
+        formData.password === formData.confirmPassword
+          ? "비밀번호가 일치합니다."
+          : "비밀번호가 일치하지 않습니다."
+      );
+    } else {
+      setPasswordMatch(""); // 빈 문자열로 초기화
+    }
+  }, [formData.password, formData.confirmPassword]);
+  
+  //GPT 추가
+  useEffect(() => {
+    return () => {
+      if (preview) {
+        URL.revokeObjectURL(preview);
+      }
+    };
+  }, [preview]);
+
 
   const execDaumPostcode = () => {
     new window.daum.Postcode({
@@ -68,12 +98,13 @@ const RegisterUser = () => {
                   // 주소변수와 참고항목 변수 합치기 
                   addr += extraAddr;
                   } 
-
-                setFormData({
-                  ...formData,
+                
+                //바뀐 부분
+                setFormData((prevFormData) => ({
+                  ...prevFormData,
                   postcode: data.zonecode,
                   address: addr
-                });
+                }));
                 
                 // detailAddressRef.current을 사용하여 포커스를 설정합니다.
                 detailAddressRef.current.focus();
@@ -86,14 +117,16 @@ const RegisterUser = () => {
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
+    setIsUserIdChecked(false); // 아이디가 변경되면 중복확인 상태를 초기화
 
     //id 형식 실시간 검증하기 
+    //바뀐 부분
     if (name === 'user_id'){
       if(!/^[a-zA-Z0-9]{6,20}$/.test(value)) {
-        setErrors({
-          ...errors,
+        setErrors((prevErrors)=>({
+          ...prevErrors,
           user_id: '아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.',
-        });
+        }));
       } else {
         const newErrors = { ...errors };
         delete newErrors.user_id;
@@ -103,10 +136,10 @@ const RegisterUser = () => {
 
     //password 형식 실시간 검증하기
     if (name === 'password'){
-      if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_]).{8,20}$/.test(value)) {
+      if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(value)) {
         setErrors({
           ...errors,
-          password: '비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 모두 사용해야 합니다.',
+          password: '비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 모두 사용해야 하며 공백을 포함할 수 없습니다.',
         });
       } else {
         const newErrors = {...errors };
@@ -124,6 +157,8 @@ const RegisterUser = () => {
       }
     }
 
+
+
   };
 
   const handleFileChange = (e) => {
@@ -134,16 +169,70 @@ const RegisterUser = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    if (formData.password !== formData.confirmPassword) {
-      alert("비밀번호 칸과 비밀번호 확인에 입력한 비밀번호가 서로 다릅니다.");
+  
+    // 필수 입력 필드 검증
+    const requiredFields = ['user_id', 'password', 'confirmPassword', 'name', 'nickname', 'email'];
+    for (const field of requiredFields) {
+      if (!formData[field].trim()) {
+        alert(`"${field}" 항목을 입력해 주세요.`);
+        return;
+      }
+    }
+  
+    // 기존 검증 로직 유지
+    // 아이디 중복확인 여부 체크
+    if (!isUserIdChecked) {
+      alert("아이디 중복확인을 진행해 주세요.");
       return;
     }
-    // Process form submission
+    // 아이디 형식 재검증
+    if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
+      alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
+      return;
+    }
+    // 비밀번호 형식 재검증
+    if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(formData.password)) {
+      alert("비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다.");
+      return;
+    }
+    //비밀번호와 비밀번호 확인 일치 여부 검증
+    if (formData.password !== formData.confirmPassword) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
+  
+    // FormData 변환 후 서버로 전송
     const formDataToSubmit = new FormData();
     for (const key in formData) {
       formDataToSubmit.append(key, formData[key]);
     }
-    // Add code to handle file upload and form submission
+  
+    console.log("폼 제출 성공", formDataToSubmit);
+  };
+
+  //아이디 중복확인 절차(ajax 활용)
+  const checkUserId = async () => {
+    if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
+      setUserIdMessage("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
+      return;
+    }
+
+    try {
+      //추후 코드 수정 및 백엔드 작업 필요 - user 테이블 id  selcect 문으로 조회
+      //결과 0이면 id 사용가능. 1이면 사용불가 
+      const response = await axios.get(`/api/idcheck.do`, {params:{ user_id: formData.user_id }});
+      if (response.data.result === 1) {
+        setUserIdMessage("중복된 아이디 입니다. 다른 아이디를 사용해주세요.");
+        setIsUserIdChecked(false);
+      } else {
+        setUserIdMessage("사용가능한 아이디 입니다.");
+        setIsUserIdChecked(true);
+      }
+    } catch (error) {
+      console.error("Error checking user ID:", error);
+      setUserIdMessage("서버 오류로 인해 아이디 중복 확인을 할 수 없습니다. 잠시 후 다시 시도해 주세요.");
+      setIsUserIdChecked(false);
+    }
   };
 
   return (
@@ -158,26 +247,43 @@ const RegisterUser = () => {
                 <Form.Group controlId="formUserId" className="mb-3">
                   <Form.Label>아이디 <span className="text-danger">*</span></Form.Label>
                   <div className="d-flex">
-                    <Form.Control
-                      type="text"
-                      placeholder="아이디"
-                      name="user_id"
-                      value={formData.user_id}
-                      onChange={handleChange}
-                      style={{ flex: '1 1 auto' }}
-                      required
-                    />
-                    {/* 아이디 중복확인 */}
-                    <Button variant="outline-secondary" className="ms-2" style={{ whiteSpace: 'nowrap' }}>
-                      중복확인
+                  <Form.Control
+                    type="text"
+                    placeholder="아이디"
+                    name="user_id"
+                    value={formData.user_id}
+                    onChange={handleChange}
+                    style={{ flex: '1 1 auto' }}
+                    required
+                  />
+                  {/* 아이디 중복확인 */}
+                  <Button
+                    variant="outline-secondary"
+                    className="ms-2"
+                    style={{ whiteSpace: 'nowrap' }}
+                    onClick={checkUserId}
+                    disabled={!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id) || isUserIdChecked}
+                  >
+                    중복확인
                     </Button>
                   </div>
                   {/* 아이디 실시간 검증 */}
-                  {errors.user_id && (
+                  {/*{errors.user_id && (
                     <Form.Text className="text-danger">
                       {errors.user_id}
                     </Form.Text>
-                  )}
+                  )}*/}
+
+                  {userIdMessage && (
+                      <Form.Text className={userIdMessage === "사용가능한 아이디 입니다." ? "text-success" : "text-danger"}>
+                        {userIdMessage}
+                      </Form.Text>
+                    )}
+                    {errors.user_id && (
+                      <Form.Text className="text-danger">
+                        {errors.user_id}
+                      </Form.Text>
+                    )}
                 </Form.Group>
 
                 {/* 비밀번호 */}
