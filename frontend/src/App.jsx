@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import Search from "./routes/Search";
 import Calender from "./routes/Calender";
 import SearchList from "./routes/SearchList";
@@ -19,7 +19,8 @@ function App() {
         <Router>
             <Routes>
                 {/** 메인, 장소 */}
-                <Route path="/" element={<Search />} />
+                {/* 기본 경로를 /home으로 리디렉션 */}
+                <Route path="/" element={<Navigate to="/search" />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/searchlist" element={<SearchList />} />
                 <Route path="/place" element={<Place />} />

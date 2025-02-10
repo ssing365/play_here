@@ -1,19 +1,17 @@
 import TopBar from "../components/TopBar";
 import Footer from "../components/Footer";
+import WeatherCard from "../components/WeatherCard"; // WeatherCard 추가
 
+import '../index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const Search = () => {
     return (
-        <div className="flex flex-col min-h-screen">
+        <div className="d-flex flex-column min-vh-100">
             {/* 상단바 */}
             <TopBar />
-
-            <Link to={"/regist"}>
-                <b>회원가입</b>
-            </Link>
 
             <Link to={"/searchlist"}>
                 <b>검색결과 리스트</b>
@@ -25,7 +23,7 @@ const Search = () => {
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
                 {/* 지금 가기 좋은 곳 */}
-                <h3>지금 가기 좋은 곳</h3>
+                <h4>지금 가기 좋은 곳 (or 선호도 기반 추천지)</h4>
                 <div className="d-flex gap-2 mb-3">
                     <Button variant="primary">식당 & 카페</Button>
                     <Button variant="secondary">가볼만한 곳</Button>
@@ -35,35 +33,36 @@ const Search = () => {
                 <Row className="mb-4">
                     <Col>
                         <Card>
-                            <Card.Img src="/place1.jpg" />
+                            <Card.Img src="/images/main3.png" />
                         </Card>
                     </Col>
                     <Col>
                         <Card>
-                            <Card.Img src="/place2.jpg" />
+                            <Card.Img src="/images/main4.png" />
                         </Card>
                     </Col>
                     <Col>
                         <Card>
-                            <Card.Img src="/place3.jpg" />
+                            <Card.Img src="/images/main5.png" />
                         </Card>
                     </Col>
                 </Row>
 
                 {/* 중간 섹션 */}
-                <h3>제주도 서귀포 좋아요 베스트 5</h3>
                 <Carousel className="mb-4">
-                    <Carousel.Item>
+                    <Carousel.Item> 
+                    <h4>여기놀자 좋아요 베스트 5</h4>
                         <img
                             className="d-block w-100"
-                            src="/jeju1.jpg"
+                            src="/images/main1.png"
                             alt="제주 감귤농장"
                         />
                     </Carousel.Item>
                     <Carousel.Item>
+                    <h4>여놀 선정 데이트 장소 5</h4>
                         <img
                             className="d-block w-100"
-                            src="/jeju2.jpg"
+                            src="/images/main2.png"
                             alt="제주 해변"
                         />
                     </Carousel.Item>
@@ -71,6 +70,7 @@ const Search = () => {
 
                 {/* 주간 달력과 날씨 */}
                 <Row>
+                    {/* 행사 목록 (좌측 9칸) */}
                     <Col md={9}>
                         <h4>이번 주 행사</h4>
                         <div className="d-flex justify-content-between mb-2">
@@ -114,11 +114,9 @@ const Search = () => {
                         </Row>
                     </Col>
 
-                    <Col md={3}>
-                        <h4>23일 날씨</h4>
-                        <Card>
-                            <Card.Body>날씨 API 데이터 표시 영역</Card.Body>
-                        </Card>
+                    {/* 날씨 카드 추가 (우측 3칸) */}
+                    <Col md={3} className="d-flex justify-content-end">
+                        <WeatherCard />
                     </Col>
                 </Row>
             </Container>

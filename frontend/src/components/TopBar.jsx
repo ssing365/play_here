@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { FaUserCircle, FaSearch } from "react-icons/fa";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation  } from "react-router-dom";
 import { Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal, } from 'react-bootstrap';
 
 const TopBar = () => {
@@ -23,6 +23,8 @@ const TopBar = () => {
         }
     };
 
+    const location = useLocation();
+
     return (
         <>
         <Navbar expand="md" bg="white" className="shadow-sm p-3 mb-4">
@@ -38,10 +40,14 @@ const TopBar = () => {
                     {/* 탐색/캘린더 메뉴 (중앙) - 큰 화면에서만 표시 */}
                     <Col md={6} className="d-none d-md-flex justify-content-center">
                         <Nav className="flex-row">
-                            <Nav.Link as={Link} to="/search" className="text-gray-700 mx-3">탐색</Nav.Link>
+                            <Nav.Link as={Link} 
+                                to="/search" 
+                                className={`text-gray-700 mx-3 
+                                    ${location.pathname === "/search"? "fw-bold text-primary" : ""}`} 
+                            >탐색</Nav.Link>
                             <Nav.Link as={Link} 
                                 to="/calender" 
-                                className="text-gray-700 mx-3"
+                                className={`text-gray-700 mx-3 ${location.pathname === "/calender" ? "fw-bold text-primary" : ""}`} 
                                 onClick={handleCalendarClick}
                             >캘린더</Nav.Link>
                         </Nav>

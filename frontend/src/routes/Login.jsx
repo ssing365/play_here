@@ -4,6 +4,7 @@ import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
 import KakaoLoginButton from "../components/KakaoLogin.jsx"
 import NaverLoginButton from "../components/NaverLogin.jsx"
+import { Link } from "react-router-dom";
 
 const Login = () => {
     const [loginData, setLoginData] = useState({
@@ -48,6 +49,17 @@ const Login = () => {
                     </div>
                     <button className="signin__btn">로그인</button>
                 </form>
+
+                <Link to={'/find_pwd'}>
+                    <span className="find_pwd">
+                        비밀번호 찾기
+                    </span>
+                </Link>
+                <Link to={'/regist'}>
+                    <span className="regist">    
+                        회원가입
+                    </span>  
+                </Link>    
 
                 <div className="separator">
                     <p>OR</p>
