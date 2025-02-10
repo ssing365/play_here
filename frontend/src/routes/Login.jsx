@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 // import Container_ from 'postcss/lib/container';
 import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
@@ -12,6 +12,25 @@ const Login = () => {
         password: "",
     });
 
+    const idRef = useRef(null);
+    const passwordRef = useRef(null);
+
+    const formValidate = (e) => {
+        e.preventDefault(); // 폼 기본 제출 동작 방지
+
+        if (idRef.current.value === '') {
+            alert("아이디를 입력해주세요.");
+            idRef.current.focus();
+            return;
+        }
+
+        if (passwordRef.current.value === '') {
+            alert("비밀번호를 입력해주세요.");
+            passwordRef.current.focus();
+            return;
+        }
+    };
+
     return (
         <>
             <script src="https://developers.kakao.com/sdk/js/kakao.js"></script>
@@ -22,13 +41,12 @@ const Login = () => {
                 <h3 className="loginTitle">로그인</h3>
                 <b className="loginMessage">여기놀자에서 특별한 하루를 만들어 보세요</b>
 
-                <form action="" method="post" className="loginForm">
+                <form action="" method="post" className="loginForm" onSubmit={formValidate}>
                     <div className="first-input input__block first-input__block">
                         <input
-                            type="email"
                             placeholder="아이디"
                             className="input"
-                            id="email"
+                            ref={idRef}
                         />
                     </div>
                     <div className="input__block">
@@ -36,18 +54,10 @@ const Login = () => {
                             type="password"
                             placeholder="비밀번호"
                             className="input"
-                            id="password"
+                            ref={passwordRef}
                         />
                     </div>
-                    <div className="input__block">
-                        <input
-                            type="password"
-                            placeholder="Repeat password"
-                            className="input repeat__password"
-                            id="repeat__password"
-                        />
-                    </div>
-                    <button className="signin__btn">로그인</button>
+                    <input type="submit" className="signin__btn" value="로그인" />
                 </form>
 
                 <Link to={'/find_pwd'}>

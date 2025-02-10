@@ -33,7 +33,7 @@ const TopBar = () => {
                     {/* 로고 (좌측) */}
                     <Col xs={6} md={2} className="text-md-start text-center mb-2 mb-md-0">
                         <Link to={"/"}>
-                            <img src="/logo.png" alt="로고" className="h-8" style={{ height: '40px' }} />
+                            <img src="/images/logo.png" alt="로고" className="h-8" style={{ width:'145px', height: '80px' }} />
                         </Link>
                     </Col>
 
@@ -83,7 +83,10 @@ const TopBar = () => {
                                 </Dropdown>
                             ):(
                                 // 비로그인 상태일 때: 로그인 버튼
-                                <Button variant="primary" onClick={handleLoginToggle}>
+                                <Button variant="primary" onClick={handleLoginToggle}
+                                    style={{backgroundColor:"#E91E63",
+                                        borderColor:"#E91E63"
+                                    }}>
                                     로그인
                                 </Button>
                             )}

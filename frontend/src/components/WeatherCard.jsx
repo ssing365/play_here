@@ -73,7 +73,7 @@ const WeatherCard = () => {
     return (
         <Card className="mx-auto shadow-sm rounded-4 p-3 text-center" style={{ width: "300px" }}>
             {/* 제목 */}
-            <h6 className="text-muted">날씨</h6>
+            <b>오늘 날씨</b>
 
             {/* 현재 날씨 아이콘과 기온 */}
             <Image src={weather.icon} alt={weather.condition} width={70} className="mx-auto" />
