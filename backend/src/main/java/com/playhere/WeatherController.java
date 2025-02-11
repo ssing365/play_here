@@ -1,4 +1,4 @@
-package com.playhere.backend;
+package com.playhere;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;

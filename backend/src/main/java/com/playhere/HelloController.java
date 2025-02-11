@@ -1,4 +1,4 @@
-package com.playhere.backend;
+package com.playhere;
 
 import org.springframework.web.bind.annotation.RestController;
 
