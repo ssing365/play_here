@@ -1,18 +1,18 @@
-package com.example.demo;
+package com.playhere.backend;
 
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class HelloController {
-	
+@Controller
+public class MainController {
 	@GetMapping("/")
     public String hello() {
-        return "Hello from Spring Boot!";
+        return "index.html";
     }
 
     @GetMapping("/api/hi")
     public String hi() {
         return "Hi from Spring Boot~~!!";
     }
+	
 }
