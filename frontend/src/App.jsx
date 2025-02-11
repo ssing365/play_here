@@ -32,7 +32,6 @@ function App() {
 
                 <Route path="/regist-preference" element={<RegisterPreference />} />
                 <Route path="/regist" element={<RegisterUser />} />
-                <Route path="/regist-user" element={<RegistUser />} />
                 <Route path="/mypage-likes" element={<MyPageLikes />} />
             </Routes>
         </Router>

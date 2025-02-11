@@ -12,7 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 import com.playhere.member.IMemberService;
 
 @RestController
-@RequestMapping("/api")
 public class RegistIdCheck {
 
 	@Autowired

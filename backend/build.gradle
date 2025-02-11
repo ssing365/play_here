@@ -35,6 +35,8 @@ dependencies {
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.mybatis.spring.boot:mybatis-spring-boot-starter-test:3.0.4'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	//.env를 활용하기 위한 의존성 추가
+	implementation group: 'io.github.cdimascio', name: 'dotenv-java', version: '3.0.2'
 }
 
 tasks.named('test') {

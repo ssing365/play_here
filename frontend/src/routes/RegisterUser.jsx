@@ -220,7 +220,9 @@ const RegisterUser = () => {
     try {
       //추후 코드 수정 및 백엔드 작업 필요 - user 테이블 id  selcect 문으로 조회
       //결과 0이면 id 사용가능. 1이면 사용불가 
-      const response = await axios.get(`/api/idcheck.do`, {params:{ user_id: formData.user_id }});
+      
+      const response = await axios.get(`http://localhost:8586/idcheck.do?`, {params:{ user_id: formData.user_id }});
+      console.log(response.data)
       if (response.data.result === 1) {
         setUserIdMessage("중복된 아이디 입니다. 다른 아이디를 사용해주세요.");
         setIsUserIdChecked(false);
