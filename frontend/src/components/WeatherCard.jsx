@@ -9,7 +9,7 @@ const WeatherCard = () => {
     useEffect(() => {
         const fetchWeather = async () => {
             try {
-                const response = await fetch("/api/weather/today");
+                const response = await fetch("http://localhost:8586/api/weather/today");
                 const data = await response.json();
 
                 if (data.response.body.items.item) {

@@ -8,11 +8,13 @@ import MyPage from "./routes/MyPage";
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 import Login from "./routes/Login";
-import RegisterUser from "./routes/RegistUser"
-import RegisterPreference from "./routes/RegisterPreference"
 import Preference from "./routes/Preference"
 
 import Map from './routes/Map';
+import RegisterPreference from "./routes/RegisterPreference";
+import RegisterUser from "./routes/RegisterUser";
+import RegistUser from "./routes/RegistComponents/RegistUser"
+
 
 function App() {
     return (
