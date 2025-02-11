@@ -104,7 +104,7 @@ const Calender = () => {
                                 <h5 className="mb-0">방문지 리스트</h5>
                                 <Link to="/map" state={{month:month, selectedDate:selectedDate}}>
                                     <Button variant="outline-success" className="ms-3 border-0">지도 보기</Button>
-                                </Link>s
+                                </Link>
                             </div>
 
                             <DragDropContext onDragEnd={onDragEnd}>
