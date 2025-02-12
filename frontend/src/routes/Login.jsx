@@ -1,33 +1,46 @@
-import { useState, useRef } from "react";
+import { useRef } from "react";
 // import Container_ from 'postcss/lib/container';
 import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
 import KakaoLoginButton from "../components/KakaoLogin.jsx"
 import NaverLoginButton from "../components/NaverLogin.jsx"
 import { Link } from "react-router-dom";
+import axios from "axios";
 
 const Login = () => {
-    const [loginData, setLoginData] = useState({
-        username: "",
-        password: "",
-    });
-
     const idRef = useRef(null);
     const passwordRef = useRef(null);
 
-    const formValidate = (e) => {
-        e.preventDefault(); // 폼 기본 제출 동작 방지
+    const formValidate = async (e) => {
+        e.preventDefault();
 
-        if (idRef.current.value === '') {
+        const userId = idRef.current.value;
+        const password = passwordRef.current.value;
+
+        if (userId === '') {
             alert("아이디를 입력해주세요.");
             idRef.current.focus();
             return;
         }
 
-        if (passwordRef.current.value === '') {
+        if (password === '') {
             alert("비밀번호를 입력해주세요.");
             passwordRef.current.focus();
             return;
+        }
+
+        try {
+            const response = await axios.post('http://localhost:8586/api/login', { userId, password });
+            
+            if (response.data === 'success') {
+                alert('로그인 성공!');
+                window.location.href = '/calender';
+            } else {
+                alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+            }
+        } catch (error) {
+            console.error('로그인 오류:', error);
+            alert('서버 오류가 발생했습니다.');
         }
     };
 

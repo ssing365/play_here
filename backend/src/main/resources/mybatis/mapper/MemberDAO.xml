@@ -8,4 +8,8 @@
 	<select id="idcheck" parameterType="java.lang.String" resultType="int">
 		SELECT COUNT(*) FROM member WHERE user_id = #{userId}
 	</select>
+	
+	<select id="login" resultType="com.playhere.member.MemberDTO">
+        SELECT * FROM member WHERE user_id = #{userId} AND password = #{password}
+    </select>
 </mapper>
