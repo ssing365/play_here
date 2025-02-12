@@ -1,38 +1,45 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import Search from "./routes/Search";
 import Calender from "./routes/Calender";
 import SearchList from "./routes/SearchList";
-
-import CoupleCodeMatch from "./routes/ConnectCouple";
+import ConnectCouple from "./routes/ConnectCouple";
 import Place from "./routes/Place";
 import MyPage from "./routes/MyPage";
+import MyPageLikes from "./routes/MyPageLikes";
+import EditProfile from "./routes/EditProfile";
+import Login from "./routes/Login";
+
+import Map from './routes/Map';
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
-import MyPageLikes from "./routes/MyPageLikes";
-import RegistUser from "./routes/RegistComponents/RegistUser"
-
 
 function App() {
     return (
         <Router>
             <Routes>
-                <Route path="/" element={<Search />} />
+                {/** 메인, 장소 */}
+                {/* 기본 경로를 /home으로 리디렉션 */}
+                <Route path="/" element={<Navigate to="/search" />} />
                 <Route path="/search" element={<Search />} />
                 <Route path="/searchlist" element={<SearchList />} />
-
-
                 <Route path="/place" element={<Place />} />
-
-                <Route path="/calender" element={<Calender />} />
-
                 
-                <Route path="/mypage" element={<MyPage />} />
-                <Route path="/connect-couple" element={<CoupleCodeMatch />} />
-            
+                {/** 지도, 캘린더 */}
+                <Route path="/calender" element={<Calender />} />
+                <Route path="/map" element={<Map />} />
 
-                <Route path="/regist-preference" element={<RegisterPreference />} />
+                {/** 마이페이지 관련 */}
+                <Route path="/mypage" element={<MyPage />} />
+                <Route path="/editprofile" element={<EditProfile />} />
+                <Route path="/connect-couple" element={<ConnectCouple />} />
+                <Route path="/mypagelikes" element={<MyPageLikes />} />
+
+                {/** 회원가입, 로그인 */}
+                <Route path="/Login" element={<Login/>} />
                 <Route path="/regist" element={<RegisterUser />} />
-                <Route path="/mypage-likes" element={<MyPageLikes />} />
+                
+                {/** 선호도 관련 */}
+                <Route path="/preference" element={<RegisterPreference />} />
             </Routes>
         </Router>
     );

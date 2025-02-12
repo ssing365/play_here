@@ -1,5 +1,9 @@
-import NavBar from "../components/Navbar";
+
 import axios from "axios";
+
+
+import TopBar from "../components/TopBar";
+
 
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
@@ -89,8 +93,7 @@ const App = () => {
     }
     return (
         <>
-            <NavBar />
-
+            <TopBar />
             {/* 카테고리 필터 */}
             <Container className="mb-4">
                 <div className="d-flex justify-content-center">

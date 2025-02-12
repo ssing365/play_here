@@ -1,11 +1,13 @@
 import { useEffect, useState } from "react";
 import { Button, Card, Container, Row, Col} from "react-bootstrap";
 import { Heart, Share, MapPin } from "lucide-react";
-import NavBar from "../components/Navbar";
+
 import axios from "axios";
 import { useLocation } from "react-router-dom";
 
 const { kakao} = window;
+import TopBar from "../components/TopBar";
+
 
 function Place() {
     const [view, setView] = useState("explore");
@@ -68,7 +70,7 @@ function Place() {
     return (
         <>
             {/* 헤더 */}
-            <NavBar />
+            <TopBar />
             <Container fluid className="bg-light min-vh-100">
                 {/* 본문 */}
                 <Container className="mt-4">

@@ -10,12 +10,12 @@ public class MainController {
         return "index.html";
     }
 
+
    /*@GetMapping("/api/hi")
     public String hi() {
         return "Hi from Spring Boot~~!!";
     }
     */
-	
 	
 	
 }
