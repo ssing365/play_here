@@ -1,21 +1,33 @@
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 // import Container_ from 'postcss/lib/container';
 import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
 import KakaoLoginButton from "../components/KakaoLogin.jsx"
 import NaverLoginButton from "../components/NaverLogin.jsx"
-import { Link } from "react-router-dom";
+import { Link, useNavigate, } from "react-router-dom";
 import axios from "axios";
 
 const Login = () => {
     const idRef = useRef(null);
     const passwordRef = useRef(null);
+    const rememberMeRef = useRef(null);
+    const navigate = useNavigate();  
 
+    // ✅ 1. 페이지 로드 시 localStorage에서 아이디 불러오기
+    useEffect(() => {
+        const savedId = localStorage.getItem("savedUserId");
+        if (savedId) {
+            idRef.current.value = savedId;
+            rememberMeRef.current.checked = true;  // 체크박스 자동 체크
+        }
+    }, []);
+
+    // ✅ 2. 로그인 처리 및 아이디 저장
     const formValidate = async (e) => {
         e.preventDefault();
-
         const userId = idRef.current.value;
         const password = passwordRef.current.value;
+        const rememberMe = rememberMeRef.current.checked;
 
         if (userId === '') {
             alert("아이디를 입력해주세요.");
@@ -34,15 +46,17 @@ const Login = () => {
             , { userId, password }
             , { withCredentials: true });
 
-            console.log(response);
-            
             if (response.data === 'success') {
                 alert('로그인 성공!');
-                console.log(response.data);
-                // console.log('현재 쿠키:', document.cookie); 
-                /* JWT 토큰을 HttpOnly 옵션을 사용하여 쿠키에 저장하고 있기 때문에, 
-                클라이언트 자바스크립트에서 직접 토큰 값을 읽어올 수 없습니다. */
-                window.location.href = '/search';                
+                
+                // ✅ 3. 아이디 저장 또는 삭제
+                if (rememberMe) {
+                    localStorage.setItem("savedUserId", userId);  // 아이디 저장
+                } else {
+                    localStorage.removeItem("savedUserId");       // 저장된 아이디 삭제
+                }
+
+                window.location.href = '/';                
             } 
         } catch (error) {
             if (error.response && error.response.status === 401) {
@@ -80,14 +94,23 @@ const Login = () => {
                             ref={passwordRef}
                         />
                     </div>
+                    <div className="remember">
+                        <input type="checkbox" id="rememberMe" ref={rememberMeRef}/>
+                        <label htmlFor="rememberMe" style={{ marginLeft: '8px' }}>아이디 저장</label>
+                    </div>
                     <input type="submit" className="signin__btn" value="로그인" />
                 </form>
 
-                <Link to={'/find_pwd'}>
-                    <span className="find_pwd">
+                <div className="find-me">
+                    <span className="find-id" onClick={()=> navigate('/find-id')}>
+                            아이디 찾기
+                    </span>
+                    /
+                    <span className="find-pwd" onClick={()=> navigate('/find-pwd')}>
                         비밀번호 찾기
                     </span>
-                </Link>
+                </div>
+                
                 <Link to={'/regist'}>
                     <span className="regist">    
                         회원가입

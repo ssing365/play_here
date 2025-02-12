@@ -59,7 +59,7 @@ const TopBar = () => {
 
     return (
         <>
-        <Navbar expand="md" bg="white" className="shadow-sm p-3 mb-4">
+        <Navbar expand="md" bg="white" className="shadow-sm p-1 mb-4">
             <Container fluid>
                 <Row className="w-100 align-items-center">
                     {/* 로고 (좌측) */}
