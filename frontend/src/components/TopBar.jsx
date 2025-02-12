@@ -1,18 +1,50 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation  } from "react-router-dom";
 import { Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal, } from 'react-bootstrap';
+import axios from 'axios';
 
 const TopBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false);   // 모달 표시 상태
-    const navigate = useNavigate();    
+    const navigate = useNavigate();  
+    
+    // 로그인 상태 확인
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await axios.get('http://localhost:8586/api/check-auth', { withCredentials: true });
+                console.log(response);
+                setIsLoggedIn(true);
+            } catch (error) {
+                if (error.response && error.response.status === 401) {
+                    console.log(error);
+                    setIsLoggedIn(false);
+                } else {
+                    console.error('로그인 오류:', error);
+                    alert('서버 오류가 발생했습니다.');
+                }
+            }
+        };
+        checkAuth();
+    }, []);
 
-    // 로그인/로그아웃 토글 함수 (테스트용)
-    const handleLoginToggle = () => {
-        setIsLoggedIn(prevState => !prevState);
-        setShowModal(false);          // 모달 닫기
-        navigate('/login');        // 로그인 페이지 이동
+    // 로그아웃 함수
+    const handleLoginToggle = async () => {
+        try {
+            // 로그아웃 API 호출 (withCredentials 옵션을 사용하여 쿠키 포함)
+            const response = await axios.post('http://localhost:8586/api/logout', {}, { withCredentials: true });
+            if (response.data === 'logout success') {
+                // 로그인 상태 토글 및 UI 업데이트
+                setIsLoggedIn(false);
+                setShowModal(false);
+                navigate('/login');
+                alert('로그아웃 되었습니다.');
+            }
+        } catch (error) {
+            console.error('로그아웃 오류:', error);
+            alert('로그아웃 처리 중 오류가 발생했습니다.');
+        }
     };
 
     // 캘린더 클릭 시 처리
@@ -78,12 +110,12 @@ const TopBar = () => {
                                         <Dropdown.Item as={Link} to="/preference">선호도 수정</Dropdown.Item>
                                         <Dropdown.Item as={Link} to="/mypagelikes">좋아요 리스트</Dropdown.Item>
                                         <Dropdown.Divider />
-                                        <Dropdown.Item href="#logout" onClick={handleLoginToggle}>로그아웃</Dropdown.Item>
+                                        <Dropdown.Item onClick={handleLoginToggle}>로그아웃</Dropdown.Item>
                                     </Dropdown.Menu>
                                 </Dropdown>
                             ):(
                                 // 비로그인 상태일 때: 로그인 버튼
-                                <Button variant="primary" onClick={handleLoginToggle}
+                                <Button variant="primary" onClick={() => navigate('/login')}
                                     style={{backgroundColor:"#E91E63",
                                         borderColor:"#E91E63"
                                     }}>
@@ -126,7 +158,7 @@ const TopBar = () => {
             <Modal.Body>캘린더를 이용하려면 로그인해야 합니다.</Modal.Body>
             <Modal.Footer>
                 <Button variant="secondary" onClick={() => setShowModal(false)}>닫기</Button>
-                <Button variant="primary" onClick={handleLoginToggle}>로그인하기</Button>
+                <Button variant="primary" onClick={() => navigate('/login')}>로그인하기</Button>
             </Modal.Footer>
         </Modal>
         </>

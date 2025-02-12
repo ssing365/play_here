@@ -30,17 +30,27 @@ const Login = () => {
         }
 
         try {
-            const response = await axios.post('http://localhost:8586/api/login', { userId, password });
+            const response = await axios.post('http://localhost:8586/api/login'
+            , { userId, password }
+            , { withCredentials: true });
+
+            console.log(response);
             
             if (response.data === 'success') {
                 alert('로그인 성공!');
-                window.location.href = '/calender';
-            } else {
-                alert('아이디 또는 비밀번호가 올바르지 않습니다.');
-            }
+                console.log(response.data);
+                // console.log('현재 쿠키:', document.cookie); 
+                /* JWT 토큰을 HttpOnly 옵션을 사용하여 쿠키에 저장하고 있기 때문에, 
+                클라이언트 자바스크립트에서 직접 토큰 값을 읽어올 수 없습니다. */
+                window.location.href = '/search';                
+            } 
         } catch (error) {
-            console.error('로그인 오류:', error);
-            alert('서버 오류가 발생했습니다.');
+            if (error.response && error.response.status === 401) {
+                alert('아이디 또는 비밀번호가 올바르지 않습니다.');
+            } else {
+                console.error('로그인 오류:', error);
+                alert('서버 오류가 발생했습니다.');
+            }
         }
     };
 
@@ -88,7 +98,6 @@ const Login = () => {
                     <p>OR</p>
                 </div>
 
-                
                 <div className="kakao__btn">
                     <KakaoLoginButton />
                 </div>

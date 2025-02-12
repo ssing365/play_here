@@ -13,7 +13,6 @@ import Map from './routes/Map';
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 
-
 function App() {
     return (
         <Router>
