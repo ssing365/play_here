@@ -6,6 +6,7 @@ import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
 import { Link } from "react-router-dom";
 
 const Search = () => {
+
     return (
         <div className="flex flex-col min-h-screen">
             {/* 상단바 */}

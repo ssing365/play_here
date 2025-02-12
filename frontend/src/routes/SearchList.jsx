@@ -1,10 +1,92 @@
 import NavBar from "../components/Navbar";
+import axios from "axios";
 
 import "bootstrap/dist/css/bootstrap.min.css";
+import { useEffect, useState } from "react";
 import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
 
 //!! npm install react-bootstrap bootstrap 해야됨 !!
 const App = () => {
+
+    const [places, setPlaces] = useState([]);
+    const [categories, setCategories] = useState([]);
+
+    useEffect(()=>{
+
+        const fetchPlace = async() =>{
+
+            try {
+        const response = await axios.get("http://localhost:8586/placeList.do");
+        console.log(response.data);
+        setPlaces(response.data);  // 받아온 데이터를 상태에 저장
+
+      } catch (error) {
+        console.error("Error fetching places:", error);
+      }
+        }
+        fetchPlace();
+    },[]);    
+    
+    let Tag = [];
+    
+    for(let i=0; i<places.length;i++){
+
+        let cateTag = [];
+        if (places[i].categories) {
+
+            for(let j=0;j<places[i].categories.length;j++){
+                cateTag.push(
+                    <Badge
+                    bg="light"
+                    text="dark"
+                    className="me-1"
+                    >
+                        {places[i].categories[j]}
+                    </Badge>
+                )
+            }
+        }
+        Tag.push(
+            <div className="mb-4">
+                    <Row>
+                        <Col md={4}>
+                            <div className="position-relative">
+                                <img
+                                    src={places[i].image}
+                                    alt="장소 이미지"
+                                    className="rounded w-100 h-auto"
+                                    style={{ objectFit: "cover" }}
+                                />
+                                <div className="position-absolute top-0 start-0 m-2">
+                                    <Badge bg="dark" className="opacity-75">
+                                        검색
+                                    </Badge>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col md={8}>
+                            <div className="h-100 d-flex flex-column justify-content-center">
+                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h5 className="mb-1" onClick={()=>window.location.href=`/place?id=${places[i].place_id}`}>{places[i].place_name}</h5>
+                                        <div className="text-muted small">
+                                            {places[i].location} 
+                                        </div>
+
+                                        <div className="text-muted small mb-2">
+                                            {cateTag}
+                                        </div>
+                                    </div>
+                                    <Button variant="outline-danger" size="sm">
+                                        ♥ 좋아요
+                                    </Button>
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
+                </div>
+        )
+    }
     return (
         <>
             <NavBar />
@@ -95,60 +177,7 @@ const App = () => {
 
             {/* 결과 리스트 */}
             <Container>
-                <div className="mb-4">
-                    <Row>
-                        <Col md={4}>
-                            <div className="position-relative">
-                                <img
-                                    src="https://image.toast.com/aaaaaqx/catchtable/shopmenu/smROLHx_6mjlRTyatx4bSkA/mrolhx_6mjlrtyatx4bska_2491910562504681.png"
-                                    alt="장소 이미지"
-                                    className="rounded w-100 h-auto"
-                                    style={{ objectFit: "cover" }}
-                                />
-                                <div className="position-absolute top-0 start-0 m-2">
-                                    <Badge bg="dark" className="opacity-75">
-                                        검색
-                                    </Badge>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col md={8}>
-                            <div className="h-100 d-flex flex-column justify-content-center">
-                                <div className="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h5 className="mb-1">연남토마</h5>
-                                        <div className="text-muted small mb-2">
-                                            <Badge
-                                                bg="light"
-                                                text="dark"
-                                                className="me-1"
-                                            >
-                                                클린컨텐츠
-                                            </Badge>
-                                            <Badge
-                                                bg="light"
-                                                text="dark"
-                                                className="me-1"
-                                            >
-                                                코리안
-                                            </Badge>
-                                            <Badge bg="light" text="dark">
-                                                피자파스타
-                                            </Badge>
-                                        </div>
-                                        <div className="text-muted small">
-                                            ⭐ 4.3 (30) · 마포구 연남동 · 13km ·
-                                            11,000원 대
-                                        </div>
-                                    </div>
-                                    <Button variant="outline-danger" size="sm">
-                                        ♥ 좋아요
-                                    </Button>
-                                </div>
-                            </div>
-                        </Col>
-                    </Row>
-                </div>
+                {Tag}
             </Container>
         </>
     );

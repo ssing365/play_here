@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.playhere.place.IPlaceService">
+	<select id="list" resultType="com.playhere.place.PlaceDTO">
+		SELECT p.*, 
+       LISTAGG(pr.sub_cate, ',') AS categories
+		FROM place p
+		LEFT JOIN place_preference pp ON p.place_id = pp.place_id
+		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
+		GROUP BY p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
+		         p.dayoff, p.call, p.Link, p.image, p.longitude, p.latitude, 
+		         p.placename_onmap, p.regist_date, p.edit_date
+
+		 
+	</select>
+	
+	<select id="view" resultType="com.playhere.place.PlaceDTO">
+		SELECT p.*, 
+       LISTAGG(pr.sub_cate, ',') AS categories
+		FROM place p
+		LEFT JOIN place_preference pp ON p.place_id = pp.place_id
+		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
+		WHERE p.place_id = #{PlaceId}
+		GROUP BY p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
+		         p.dayoff, p.call, p.Link, p.image, p.longitude, p.latitude, 
+		         p.placename_onmap, p.regist_date, p.edit_date
+	</select>
+</mapper>

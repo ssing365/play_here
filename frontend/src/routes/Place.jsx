@@ -1,11 +1,70 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Card, Container, Row, Col} from "react-bootstrap";
 import { Heart, Share, MapPin } from "lucide-react";
 import NavBar from "../components/Navbar";
+import axios from "axios";
+import { useLocation } from "react-router-dom";
+
+const { kakao} = window;
 
 function Place() {
     const [view, setView] = useState("explore");
+    const [place, setPlace] = useState([]);
+    const location = useLocation();
 
+    const queryParams = new URLSearchParams(location.search);
+    const placeId = queryParams.get('id');
+
+    useEffect(()=>{
+
+        const fetchPlace = async() =>{
+
+        try {
+            const response = await axios.get(`http://localhost:8586/placeView.do?id=${placeId}`);
+            console.log(response.data);
+            setPlace(response.data[0]);  // 받아온 데이터를 상태에 저장
+            
+        } catch (error) {
+            console.error("Error fetching place:", error);
+        }
+            }
+            fetchPlace();
+
+        },[placeId]);
+
+        let cateTag = [];
+        if (place.categories) {
+
+            for(let j=0;j<place.categories.length;j++){
+                cateTag.push(
+                    <p className="text-secondary">{place.categories[j]}</p>
+                )
+            }
+        }
+
+        
+
+        useEffect(()=>{
+            
+
+            if (!place || !place.latitude || !place.longitude) return; // place가 없으면 실행 X
+
+            const container = document.getElementById("map");
+            if (!container) return;
+
+            const options = {
+                center: new window.kakao.maps.LatLng(place.latitude, place.longitude),
+                level: 3,
+            };
+
+            const map = new window.kakao.maps.Map(container, options);
+
+            // 마커 추가
+            const marker = new window.kakao.maps.Marker({
+                position: options.center,
+            });
+            marker.setMap(map);
+        },[place])
     return (
         <>
             {/* 헤더 */}
@@ -14,17 +73,17 @@ function Place() {
                 {/* 본문 */}
                 <Container className="mt-4">
                     <img
-                        src="/images/shooting-range.jpg"
-                        alt="명동사격장"
+                        src={place.image}
+                        alt={place.place_name}
                         className="w-100 rounded-3 mb-4"
                     />
 
                     <Row className="g-4">
                         {/* 1. 기본 정보 */}
                         <Col md={6}>
-                            <h2 className="fw-bold">명동사격장</h2>
-                            <p className="text-muted">서울 중구</p>
-                            <p className="text-secondary">사격 체험</p>
+                            <h2 className="fw-bold"></h2>
+                            <p className="text-muted">{place.location}</p>
+                            {cateTag}
                         </Col>
                         <Col md={6} className="text-end">
                             <Button
@@ -45,8 +104,7 @@ function Place() {
                     {/* 2. 소개글 */}
                     <Card className="mt-4">
                         <Card.Body>
-                            학교, 직장, 인간관계에서의 스트레스를 한 방에 날려
-                            버리기 적합한 곳
+                            {place.descript}
                         </Card.Body>
                     </Card>
 
@@ -54,13 +112,13 @@ function Place() {
                     <Card className="mt-4">
                         <Card.Body>
                             <p>
-                                <strong>시간:</strong> 10:00 ~ 22:00
+                                <strong>시간 : </strong> {place.time}
                             </p>
                             <p>
-                                <strong>휴무:</strong> 월요일
+                                <strong>휴무 : </strong> {place.dayoff}
                             </p>
                             <p>
-                                <strong>주차:</strong> 가능
+                                <strong>주차 : </strong> {place.parking}
                             </p>
                         </Card.Body>
                     </Card>
@@ -69,7 +127,7 @@ function Place() {
                     <Card className="mt-4">
                         <Card.Body>
                             <p>
-                                <strong>연락처:</strong> 02-333-3333
+                                <strong>연락처 : </strong>{place.call}
                             </p>
                         </Card.Body>
                     </Card>
@@ -78,12 +136,11 @@ function Place() {
                     <Card className="mt-4">
                         <Card.Body>
                             <p>
-                                <strong>주소:</strong> 서울특별시 중구 충무로2가
-                                13-1
+                                <strong>주소 : </strong>{place.location}
                             </p>
-                            <div
+                            <div id="map" 
                                 className="position-relative bg-secondary rounded-3"
-                                style={{ height: "250px" }}
+                                style={{ height: "250px"}}
                             >
                                 <Button
                                     variant="outline-light"
