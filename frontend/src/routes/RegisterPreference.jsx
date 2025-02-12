@@ -3,6 +3,7 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/preference.css';
 import TopBar from '../components/TopBar';
 
+
 const RegisterPreference = () => {
   const categories = [
     {
