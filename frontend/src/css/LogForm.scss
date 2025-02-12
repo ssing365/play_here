@@ -2,7 +2,7 @@
   display:block;
   max-width:680px;
   width:80%;
-  margin:120px auto;
+  margin:10px auto;
 }
 
 h3.loginTitle{
@@ -10,7 +10,7 @@ h3.loginTitle{
   font-size:48px;
   letter-spacing:-3px;
   text-align:center;
-  margin:120px 0 80px 0 ;
+  margin:100px 0 50px 0 ;
   transition:.2s linear;
 }
 
@@ -50,8 +50,8 @@ b.loginMessage{
 
 .loginForm{
   width:100%;
-  max-width:680px;
-  margin:40px auto 10px;
+  max-width:600px;
+  margin:40px auto 20px;
   .input__block{
      margin:20px auto;
      display:block;
@@ -119,6 +119,16 @@ b.loginMessage{
     }
   }
 }
+.remember{
+  display:block;
+  text-align:left;
+  position:relative;
+  background:transparent;
+  font-size:13px;
+  width: 500px;
+  left: 100px;
+  bottom: 10px;
+}
 
 .separator{
   display:block;
@@ -154,7 +164,7 @@ b.loginMessage{
 .naver__btn {
   display: block;
   width: 34%;
-  max-width: 680px;
+  max-width: 600px;
   margin: 20px auto;
   height: 50px;
   cursor: pointer;
@@ -190,15 +200,37 @@ b.loginMessage{
 }
 
 .naver__btn:hover {
- 
   box-shadow: 0 15px 30px rgba(3, 199, 90, 0.36);
 }
 
-.find_pwd, .regist{
+.find-me {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px; /* 각 항목 사이의 간격 */
+}
+
+.find-me span {
+  cursor: pointer;
+  color: darkblue;
+}
+
+.find-me span:hover {
+  text-decoration: underline; /* 호버 시 밑줄 추가 */
+}
+
+.regist{
+  cursor: pointer;
   display: block;
   text-align:center;
   color: darkblue;
+  margin-top: 10px;
 }
+.regist:hover {
+  text-decoration: underline;
+  color: #e91e63;
+}
+
 a {
   text-decoration: none;
 }
