@@ -1,23 +1,30 @@
 import { useEffect } from "react"
 import KakaoLogin from "react-kakao-login"
+import axios from "axios";
 
 const KakaoLoginButton = () => {
 
-    const kakaoClientId = "3b01976fc8b8677fcef51a567b2ea174"
+    const kakaoClientId = "3b01976fc8b8677fcef51a567b2ea174"; // js키
 
-    const handleLogin = () => {
-        window.Kakao.Auth.authorize({
-            redirectUri: 'http://localhost:5173/oauth/callback/kakao', // 카카오 설정과 동일해야 함
-        });
+    const kakaoOnSuccess = async (data) => {
+        console.log(data);
+        const idToken = data.response.access_token;
+
+        try {
+            const response = await axios.post("http://localhost:8586/api/kakao-login", {
+                accessToken: idToken
+            }, { withCredentials: true }); // ✅ 쿠키 전달을 위한 옵션
+
+            console.log("서버 응답:", response.data);
+            alert("카카오로 로그인 되었습니다");
+            window.location.href = '/';
+        } catch (error) {
+            console.error("백엔드 요청 실패:", error);
+        }
     };
-
-    const kakaoOnSuccess = async (data)=>{
-        console.log(data)
-        const idToken = data.response.access_token  // 엑세스 토큰 백엔드로 전달
-        console.log(idToken);
-    }
+    
     const kakaoOnFailure = (error) => {
-        console.log(error);
+        console.log("카카오 로그인 실패:", error);
     };
 
     return(
