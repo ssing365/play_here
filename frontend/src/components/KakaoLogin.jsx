@@ -7,8 +7,9 @@ const KakaoLoginButton = () => {
     const kakaoClientId = "3b01976fc8b8677fcef51a567b2ea174"; // js키
 
     const kakaoOnSuccess = async (data) => {
-        console.log(data);
+        console.log("data:",data);
         const idToken = data.response.access_token;
+        console.log("data-token", data.response.access_token);
 
         try {
             const response = await axios.post("http://localhost:8586/api/kakao-login", {

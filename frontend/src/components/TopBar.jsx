@@ -43,24 +43,6 @@ const TopBar = () => {
         checkAuth();
     }, []);
 
-    useEffect(() => {
-        const checkLoginAuth = () => {
-            const kakaoKeys = Object.keys(localStorage).filter((key) =>
-                key.startsWith("kakao_")
-            );
-            kakaoKeys.forEach((key) => {
-                const value = localStorage.getItem(key);
-                if (value !== null) {
-                    console.log("hi");
-                    setIsLoggedIn(true);
-                } else {
-                    setIsLoggedIn(false);
-                }
-            });
-        };
-        checkLoginAuth();
-    }, []);
-
     // 로그아웃 함수
     const handleLoginToggle = async () => {
         try {

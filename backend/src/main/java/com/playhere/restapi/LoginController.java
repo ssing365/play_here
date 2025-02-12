@@ -9,17 +9,12 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
 import com.playhere.member.IMemberService;
 import com.playhere.member.MemberDTO;
-import com.playhere.service.KakaoService;
 import com.playhere.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
@@ -33,9 +28,6 @@ public class LoginController {
 	
 	@Autowired
     JwtUtil jwtUtil;
-	
-	@Autowired
-    private KakaoService kakaoService;
 	
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO member, HttpServletResponse response) {
@@ -86,11 +78,10 @@ public class LoginController {
 	}
 	
 	@PostMapping("/kakao-login")
-    public ResponseEntity<String> kakaoLogin(@RequestBody Map<String, String> request) {
-		System.out.println(request);
+    public ResponseEntity<String> kakaoLogin(@RequestBody Map<String, String> request, HttpServletResponse httpResponse) {
         String accessToken = request.get("accessToken");
-        
-        // ✅ 카카오 사용자 정보 요청
+
+        /* ✅ 카카오 사용자 정보 요청
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.set("Authorization", "Bearer " + accessToken);
@@ -105,21 +96,21 @@ public class LoginController {
         );
 
         Map<String, Object> kakaoAccount = (Map<String, Object>) response.getBody().get("kakao_account");
-        String nickname = (String) kakaoAccount.get("profile_nickname");  // 닉네임 정보
+        String nickname = (String) kakaoAccount.get("nickname");  // 닉네임 정보
         
         System.out.println("nickname:"+nickname);
+        */
 
         // ✅ JWT 토큰 발급
-        String jwt = jwtUtil.generateToken(nickname);
+        String jwt = jwtUtil.generateToken(accessToken);
 
         // ✅ 클라이언트에 JWT 쿠키로 전달
         Cookie cookie = new Cookie("token", jwt);
         cookie.setHttpOnly(true);
         cookie.setPath("/");
         cookie.setMaxAge(60 * 60);
+        httpResponse.addCookie(cookie); // ✅ 쿠키 설정 완료
         
-        return ResponseEntity.ok()
-                .header(HttpHeaders.SET_COOKIE, cookie.toString())
-                .body("카카오 로그인 성공");
+        return ResponseEntity.ok("카카오 로그인 성공");
     }
 }
