@@ -9,6 +9,7 @@ public interface IMemberService {
 	//회원가입 전 id 중복 확인
 	public int idcheck(String userId);
 	
-	//회원가입
+	//회원가입(DB입력)
+	public int insertMemberinfo(MemberDTO memberDTO);
 
 }
