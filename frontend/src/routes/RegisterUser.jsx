@@ -18,6 +18,8 @@ const RegisterUser = () => {
   });
 
 
+  const remoteIp = import.meta.env.VITE_REMOTE_IP;
+  const port = import.meta.env.VITE_PORT;
 
   // const [preview, setPreview] = useState(null); 에서
   //  null 부분에 이미지 넣으면 기본 이미지 표시 가능
@@ -226,7 +228,7 @@ const RegisterUser = () => {
     
     // 서버로 전송
     try {
-      const response = await axios.post("http://localhost:8586/join/register.do", formDataToSubmit, {
+      const response = await axios.post(`http://${remoteIp}:${port}/join/register.do`, formDataToSubmit, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
