@@ -66,11 +66,11 @@ const RegisterTerms = () => {
   return (
     <Container className="mt-5">
       <div className="d-flex justify-content-center mt-4">
-      <h1>여기어때 회원가입</h1>
+      <h1>여기놀자 회원가입</h1>
       </div>
       <br/>
       <div className="d-flex justify-content-center mt-4">
-      <p>여기어때 회원가입을 하시면 여기어때 사이트의 정보와 기능을 자유롭게 이용하실 수 있습니다.</p>
+      <p>여기놀자 회원가입을 하시면 여기놀자 사이트의 정보와 기능을 자유롭게 이용하실 수 있습니다.</p>
       </div>
 
       {/* 첫 번째 약관 */}

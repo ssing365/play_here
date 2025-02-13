@@ -12,7 +12,7 @@ const RegisterUser = () => {
     // 약관 동의 여부 확인
     if (!location.state?.agreed) {
       alert("약관에 동의해야 회원가입을 진행할 수 있습니다.");
-      //navigate("/regist-terms"); // 약관 페이지로 다시 이동
+      navigate("/register-terms"); // 약관 페이지로 다시 이동
     }
   }, [location, navigate]);
 
@@ -203,12 +203,8 @@ const RegisterUser = () => {
       }
     }
   
-    // 기존 검증 로직 유지
-    // 아이디 중복확인 여부 체크
-    if (!isUserIdChecked) {
-      alert("아이디 중복확인을 진행해 주세요.");
-      return;
-    }
+    // 기존 검증 로직
+    
     // 아이디 형식 재검증
     if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
       alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");

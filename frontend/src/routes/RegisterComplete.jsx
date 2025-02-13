@@ -1,14 +1,20 @@
-import "./css/MyPage.css"; // CSS 파일 import
+import { useEffect, useState } from "react";
+import confetti from "canvas-confetti";
+import "../css/MyPage.css"; // CSS 파일 import
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { Button, Container, Card } from 'react-bootstrap';
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
+import FireworksEffect from "./FireworksEffect"; // 추가!
 
-const ConnectCouple = () => {
+const RegisterComplete = () => {
   const navigate = useNavigate();
+
+  
   return (
     <div>
+      <FireworksEffect />
       {/* 메인 컨테이너 */}
       <Container className="mypage-container" >
         <Card className="mypage-card text-center ">
@@ -40,4 +46,4 @@ const ConnectCouple = () => {
   );
 };
 
-export default ConnectCouple;
+export default RegisterComplete;
