@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.playhere.member.IMemberService">
+	<select id="idcheck" parameterType="java.lang.String" resultType="int">
+		SELECT COUNT(*) FROM member WHERE user_id = #{userId}
+	</select>
+	
+	<insert id="insertMemberinfo" parameterType='com.playhere.member.MemberDTO'>
+	INSERT INTO member 
+    (user_id, password, name, nickname, email
+    <if test="zipcode != null">, zipcode</if>
+    <if test="address != null">, address</if>
+    <if test="detailAddress != null">, detail_address</if>
+    <if test="profilePicture != null">, profile_picture</if>
+    <if test="birthDate != null">, birth_date</if>)
+    VALUES 
+    (#{userId}, #{password}, #{name}, #{nickname}, #{email}
+    <if test="zipcode != null">, #{zipcode}</if>
+    <if test="address != null">, #{address}</if>
+    <if test="detailAddress != null">, #{detailAddress}</if>
+    <if test="profilePicture != null">, #{profilePicture}</if>
+    <if test="birthDate != null">, #{birthDate}</if>)
+	</insert>
+</mapper>

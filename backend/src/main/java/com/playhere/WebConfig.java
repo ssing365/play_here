@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.playhere;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +9,8 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
-        registry.addMapping("/**")  // ¸ðµç °æ·Î¿¡ ´ëÇØ
-                .allowedOrigins("http://localhost:5173")  // ¸®¾×Æ® ¾ÛÀÇ ÁÖ¼Ò
-                .allowedMethods("GET", "POST", "PUT", "DELETE");  // Çã¿ëÇÒ HTTP ¸Þ¼Òµå
+        registry.addMapping("/**")  // ï¿½ï¿½ï¿½ ï¿½ï¿½Î¿ï¿½ ï¿½ï¿½ï¿½ï¿½
+                .allowedOrigins("http://localhost:5173")  // ï¿½ï¿½ï¿½ï¿½Æ® ï¿½ï¿½ï¿½ï¿½ ï¿½Ö¼ï¿½
+                .allowedMethods("GET", "POST", "PUT", "DELETE");  // ï¿½ï¿½ï¿½ï¿½ï¿½ HTTP ï¿½Þ¼Òµï¿½
     }
 }

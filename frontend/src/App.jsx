@@ -7,6 +7,7 @@ import ConnectCouple from "./routes/ConnectCouple";
 
 import Place from "./routes/Place";
 import MyPage from "./routes/MyPage";
+<<<<<<< HEAD
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 
@@ -15,6 +16,13 @@ import RegisterPreference from "./routes/RegisterPreference"
 import Preference from "./routes/Preference"
 
 import Map from './routes/Map';
+=======
+import RegisterPreference from "./routes/RegisterPreference";
+import RegisterUser from "./routes/RegisterUser";
+import MyPageLikes from "./routes/MyPageLikes";
+import RegistUser from "./routes/RegistComponents/RegistUser"
+
+>>>>>>> bb88c85058d6358d32b586aea20b6d49d0a8719c
 
 function App() {
     return (
@@ -31,6 +39,7 @@ function App() {
                 <Route path="/place" element={<Place />} />
 
                 <Route path="/mypage" element={<MyPage />} />
+
                 <Route path="/editprofile" element={<EditProfile />} />
                 <Route path="/connect-couple" element={<ConnectCouple />} />
 
@@ -39,6 +48,7 @@ function App() {
                 <Route path="/dd" element={<Preference/>} /> {/** 디자인 회의 필요 */}
                 
                 <Route path="/mypagelikes" element={<MyPageLikes />} />
+
             </Routes>
         </Router>
     );

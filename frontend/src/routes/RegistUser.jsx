@@ -30,6 +30,15 @@ const RegistUser = () => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+
+    // 필수 입력 필드 검증
+  const requiredFields = ["user_id", "password", "confirmPassword", "name", "nickname", "email"];
+  for (const field of requiredFields) {
+    if (!formData[field]?.trim()) {
+      alert(`"${field}" 항목을 입력해 주세요.`);
+      return;
+    }
+  }
     if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
