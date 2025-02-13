@@ -1,6 +1,7 @@
-import { useState, useEffect, useRef } from "react";
+
+import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Form, Button, Row, Col } from "react-bootstrap";
+import { Container, Navbar, Nav, Form, Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 const RegisterUser = () => {
   const [formData, setFormData] = useState({
@@ -14,8 +15,11 @@ const RegisterUser = () => {
     postcode:"",
     address: "",
     detailAddress:"",
-    profile_picture: ""
+    profile_picture: null,
   });
+
+  const remoteIp = import.meta.env.VITE_REMOTE_IP;
+  const port = import.meta.env.VITE_PORT;
 
   // const [preview, setPreview] = useState(null); 에서
   //  null 부분에 이미지 넣으면 기본 이미지 표시 가능
@@ -71,7 +75,7 @@ const RegisterUser = () => {
 
                 // 각 주소의 노출 규칙에 따라 주소를 조합한다.
                 // 내려오는 변수가 값이 없는 경우엔 공백('')값을 가지므로, 이를 참고하여 분기 한다.
-                let addr = ''; // 주소 변수
+                var addr = ''; // 주소 변수
                 var extraAddr = ''; // 참고항목 변수
                 //사용자가 선택한 주소 타입에 따라 해당 주소 값을 가져온다.
                 if (data.userSelectedType === 'R') { // 사용자가 도로명 주소를 선택했을 경우
@@ -163,11 +167,18 @@ const RegisterUser = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
+
+    if (file){
+      if(preview){
+        URL.revokeObjectURL(preview);
+      }
+    
     setFormData({ ...formData, profile_picture: file });
     setPreview(URL.createObjectURL(file));
+    }
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
   
     // 필수 입력 필드 검증
@@ -201,13 +212,38 @@ const RegisterUser = () => {
       return;
     }
   
-    // FormData 변환 후 서버로 전송
+    // JSON으로 변환할 데이터에서 profile_picture 제거
+    const { profile_picture, ...formDataWithoutFile } = formData;
+
+    // FormData 생성
     const formDataToSubmit = new FormData();
-    for (const key in formData) {
-      formDataToSubmit.append(key, formData[key]);
-    }
+
+     // JSON 데이터 문자열로 변환 후 추가
+    formDataToSubmit.append("formData", JSON.stringify(formDataWithoutFile));
+
   
-    console.log("폼 제출 성공", formDataToSubmit);
+    // 프로필 사진 추가
+    if (profile_picture) {
+    formDataToSubmit.append("profile_picture", profile_picture);
+    }
+    
+    // 서버로 전송
+    try {
+      const response = await axios.post(`http://${remoteIp}:${port}/join/register.do`, formDataToSubmit, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
+      });
+
+      if (response.data.result === 1) {
+        alert("회원가입이 완료되었습니다.");
+      } else {
+        alert("회원가입에 실패했습니다.");
+      }
+    } catch (error) {
+      console.error("회원가입 요청 중 오류 발생:", error);
+      alert("서버 오류로 회원가입에 실패했습니다.");
+    }
   };
 
   //아이디 중복확인 절차(ajax 활용)
@@ -344,7 +380,7 @@ const RegisterUser = () => {
                         src={preview} 
                         alt="미리보기 이미지" 
                         className="img-fluid rounded" 
-                        style={{ width: '200px', height: '200px', objectFit: 'cover' }} 
+                        style={{ width: '200px', height: '250px', objectFit: 'cover' }} 
                       />
                     </div>
                   )}

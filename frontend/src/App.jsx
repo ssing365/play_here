@@ -5,6 +5,7 @@ import SearchList from "./routes/SearchList";
 import ConnectCouple from "./routes/ConnectCouple";
 import Place from "./routes/Place";
 import MyPage from "./routes/MyPage";
+
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 import Login from "./routes/Login";
@@ -12,8 +13,11 @@ import RegisterComplete from "./routes/RegisterComplete";
 import NaverLoginButton, { NaverCallback } from "./components/NaverLogin"
 
 import Map from './routes/Map';
+
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
+import RegistUser from "./routes/RegistComponents/RegistUser"
+
 
 function App() {
     return (
@@ -32,6 +36,7 @@ function App() {
 
                 {/** 마이페이지 관련 */}
                 <Route path="/mypage" element={<MyPage />} />
+
                 <Route path="/editprofile" element={<EditProfile />} />
                 <Route path="/connect-couple" element={<ConnectCouple />} />
                 <Route path="/mypagelikes" element={<MyPageLikes />} />

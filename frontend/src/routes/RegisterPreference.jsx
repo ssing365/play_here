@@ -4,6 +4,7 @@ import '../css/preference.css';
 import TopBar from '../components/TopBar';
 import { Link } from 'react-router-dom';
 
+
 const RegisterPreference = () => {
   const categories = [
     {
