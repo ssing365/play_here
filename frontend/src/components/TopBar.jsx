@@ -2,22 +2,14 @@ import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-    Container,
-    Row,
-    Col,
-    Form,
-    FormControl,
-    Navbar,
-    Nav,
-    Dropdown,
-    Button,
-    Modal,
+    Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown,  Button, Modal,
 } from "react-bootstrap";
 import axios from "axios";
 
 const TopBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const [userId, setUserId] = useState("");
     const navigate = useNavigate();
 
     // 로그인 상태 확인
@@ -28,7 +20,7 @@ const TopBar = () => {
                     "http://localhost:8586/api/check-auth",
                     { withCredentials: true }
                 );
-                console.log(response);
+                setUserId(response.data);
                 setIsLoggedIn(true);
             } catch (error) {
                 console.log(error.response);
@@ -158,7 +150,7 @@ const TopBar = () => {
                                             <FaUserCircle
                                                 className="h-8 w-8 text-gray-700"
                                                 style={{ fontSize: "32px" }}
-                                            />
+                                            />{userId}
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu>
