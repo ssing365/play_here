@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.HttpEntity;
@@ -40,7 +41,10 @@ public class LoginController {
 	
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO member, HttpServletResponse response) {
-		MemberDTO user = dao.login(member.getUserId(), member.getPassword());
+	    System.out.println("요청 받은 userId: " + member.getUserId());
+	    System.out.println("요청 받은 password: " + member.getPassword());
+
+	    MemberDTO user = dao.login(member.getUserId(), member.getPassword());
 		
 		if(user!=null) {
 			// ✅ JWT 토큰 생성
@@ -51,6 +55,8 @@ public class LoginController {
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 1시간
+            cookie.setSecure(false); // 🚨 로컬 개발 환경에서는 false
+            cookie.setDomain("localhost"); // 필요 시 추가
             response.addCookie(cookie);
 
             return ResponseEntity.ok("success");
@@ -80,9 +86,11 @@ public class LoginController {
 	            Claims claims = jwtUtil.validateToken(token);
 	            return ResponseEntity.ok(claims.getSubject()); // userId 반환
 	        } catch (Exception e) {
+	        	e.printStackTrace();
 	            return ResponseEntity.status(401).body("unauthorized");
 	        }
 	    }
+		
 	    return ResponseEntity.status(401).body("unauthorized");
 	}
 	

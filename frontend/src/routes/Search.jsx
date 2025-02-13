@@ -11,6 +11,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 const Search = () => {
+
     // 카테고리 default
     const [selectedCategory, setSelectedCategory] = useState('식당 & 카페');
 

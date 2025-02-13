@@ -31,6 +31,8 @@ const TopBar = () => {
                 console.log(response);
                 setIsLoggedIn(true);
             } catch (error) {
+                console.log(error.response);
+                console.log(error.response.status);
                 if (error.response && error.response.status === 401) {
                     console.log(error);
                     setIsLoggedIn(false);
@@ -41,7 +43,7 @@ const TopBar = () => {
             }
         };
         checkAuth();
-    }, []);
+    }, [isLoggedIn]);
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
@@ -104,23 +106,16 @@ const TopBar = () => {
                                 <Nav.Link
                                     as={Link}
                                     to="/search"
-                                    className={`text-gray-700 mx-3 
-                                    ${
-                                        location.pathname === "/search"
-                                            ? "fw-bold text-primary"
-                                            : ""
-                                    }`}
+                                    className="text-gray-700 mx-3"
+                                    style={location.pathname === "/search" ? { color: "#e91e63", fontWeight: "bold" } : {}}
                                 >
                                     탐색
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
                                     to="/calender"
-                                    className={`text-gray-700 mx-3 ${
-                                        location.pathname === "/calender"
-                                            ? "fw-bold text-primary"
-                                            : ""
-                                    }`}
+                                    className="text-gray-700 mx-3"
+                                    style={location.pathname === "/calender" ? { color: "#e91e63", fontWeight: "bold" } : {}}
                                     onClick={handleCalendarClick}
                                 >
                                     캘린더
