@@ -1,10 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Navbar, Nav, Form, Button } from "react-bootstrap";
 import './css/preference.css';
+import { useLocation } from 'react-router-dom';
 
 
 const RegisterPreference = () => {
+
+  const location = useLocation();
+  // const navigate = useNavigate();
+  const [userId, setUserId] = useState("")
+
+  useEffect(() => {
+    const stateUserId = location.state?.userId;
+    //이전 페이지에서 넘어온 userId 확인
+    if (stateUserId) {
+      setUserId(stateUserId);
+    } else {
+      //없을 경우 로컬 스토리지 확인 
+      const storedUserId = localStorage.getItem("userId"); // 키값 통일
+      if (storedUserId) {
+        setUserId(storedUserId);
+      } else {
+        alert("회원가입 정보가 없습니다. 회원가입 페이지로 돌아갑니다.");
+        // navigate("/register-terms");
+      }
+    }
+  }, [location.state]); // ✅ state만 의존성으로 사용
+
   const categories = [
     {
       title: '먹기',
@@ -97,6 +120,7 @@ const RegisterPreference = () => {
       .catch((error) => console.error('Error:', error));
   };
 
+  //localstoreage user ㅑㅇ
   return (
     // NavBar 추가하기
 

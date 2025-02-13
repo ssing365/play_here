@@ -9,8 +9,8 @@ import MyPage from "./routes/MyPage";
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 import MyPageLikes from "./routes/MyPageLikes";
-import RegistUser from "./routes/RegistComponents/RegistUser"
-import Terms from "./routes/Terms";
+import RegisterTerms from "./routes/RegisterTerms";
+import RegisterComplete from './routes/RegisterComplete';
 
 
 function App() {
@@ -30,9 +30,11 @@ function App() {
                 <Route path="/mypage" element={<MyPage />} />
                 <Route path="/connect-couple" element={<CoupleCodeMatch />} />
             
-                <Route path="/regist-terms" element={<Terms/>} />
-                <Route path="/regist-preference" element={<RegisterPreference />} />
-                <Route path="/regist" element={<RegisterUser />} />
+                <Route path="/register-terms" element={<RegisterTerms/>} />
+                <Route path="/register-user" element={<RegisterUser />} />
+                <Route path="/register-preference" element={<RegisterPreference />} />
+                <Route path="/register-complete" element={<RegisterComplete />} />
+
                 <Route path="/mypage-likes" element={<MyPageLikes />} />
             </Routes>
         </Router>
