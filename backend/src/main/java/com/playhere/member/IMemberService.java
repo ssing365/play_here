@@ -1,6 +1,7 @@
 package com.playhere.member;
 
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 @Mapper
 public interface IMemberService {
@@ -13,6 +14,6 @@ public interface IMemberService {
 	
 	/*****************/
 	// 로그인
-	MemberDTO login(String userId, String password);
+	public MemberDTO login(@Param("userId") String userId, @Param("password") String password);
 
 }

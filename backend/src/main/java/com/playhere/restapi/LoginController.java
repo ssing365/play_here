@@ -1,5 +1,7 @@
 package com.playhere.restapi;
 
+import java.util.Map;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -8,7 +10,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
 import org.springframework.http.ResponseEntity;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -27,7 +28,7 @@ public class LoginController {
 	IMemberService dao;
 	
 	@Autowired
-    private JwtUtil jwtUtil;
+    JwtUtil jwtUtil;
 	
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestParam("userId") String userId,
@@ -70,7 +71,8 @@ public class LoginController {
 	
 	@GetMapping("/check-auth")
 	public ResponseEntity<?> checkAuth(@CookieValue(name = "token", required = false) String token) {
-	    if (token != null) {
+		System.out.println("받은 토큰: " + token);  // ✅ 쿠키 확인용 로그
+		if (token != null) {
 	        try {
 	            Claims claims = jwtUtil.validateToken(token);
 	            return ResponseEntity.ok(claims.getSubject()); // userId 반환
@@ -80,4 +82,41 @@ public class LoginController {
 	    }
 	    return ResponseEntity.status(401).body("unauthorized");
 	}
+	
+	@PostMapping("/kakao-login")
+    public ResponseEntity<String> kakaoLogin(@RequestBody Map<String, String> request, HttpServletResponse httpResponse) {
+        String accessToken = request.get("accessToken");
+
+        /* ✅ 카카오 사용자 정보 요청
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.set("Authorization", "Bearer " + accessToken);
+        headers.set("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
+
+        HttpEntity<String> entity = new HttpEntity<>(headers);
+        ResponseEntity<Map> response = restTemplate.exchange(
+                "https://kapi.kakao.com/v2/user/me",
+                HttpMethod.GET,
+                entity,
+                Map.class
+        );
+
+        Map<String, Object> kakaoAccount = (Map<String, Object>) response.getBody().get("kakao_account");
+        String nickname = (String) kakaoAccount.get("nickname");  // 닉네임 정보
+        
+        System.out.println("nickname:"+nickname);
+        */
+
+        // ✅ JWT 토큰 발급
+        String jwt = jwtUtil.generateToken(accessToken);
+
+        // ✅ 클라이언트에 JWT 쿠키로 전달
+        Cookie cookie = new Cookie("token", jwt);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60);
+        httpResponse.addCookie(cookie); // ✅ 쿠키 설정 완료
+        
+        return ResponseEntity.ok("카카오 로그인 성공");
+    }
 }

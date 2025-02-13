@@ -54,9 +54,6 @@ const Search = () => {
         <div className="d-flex flex-column min-vh-100">
             {/* 상단바 */}
             <TopBar />
-
-            <Link to={"/searchlist"}> <b>검색결과 리스트</b> </Link>
-            <Link to={"/place"}> <b>장소 소개 페이지</b> </Link>
             
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
