@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import org.springframework.http.ResponseEntity;
@@ -29,8 +30,13 @@ public class LoginController {
     private JwtUtil jwtUtil;
 	
 	@PostMapping("/login")
-	public ResponseEntity<String> login(@RequestBody MemberDTO member, HttpServletResponse response) {
-		MemberDTO user = dao.login(member.getUserId(), member.getPassword());
+	public ResponseEntity<String> login(@RequestParam("userId") String userId,
+			@RequestParam("password") String password,
+			 HttpServletResponse response) {
+
+		
+		MemberDTO user = dao.login(userId, password);
+
 		
 		if(user!=null) {
 			// ✅ JWT 토큰 생성

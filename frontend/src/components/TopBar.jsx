@@ -17,6 +17,8 @@ const TopBar = () => {
                 console.log(response);
                 setIsLoggedIn(true);
             } catch (error) {
+                console.log(error.response);
+                console.log(error.response.status);
                 if (error.response && error.response.status === 401) {
                     console.log(error);
                     setIsLoggedIn(false);
@@ -27,7 +29,7 @@ const TopBar = () => {
             }
         };
         checkAuth();
-    }, []);
+    }, [isLoggedIn]);
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
