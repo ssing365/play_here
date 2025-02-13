@@ -34,12 +34,12 @@ function Place() {
 
         },[placeId]);
 
-        let cateTag = [];
-        if (place.categories) {
+        let hashTag = [];
+        if (place.hashtag) {
 
-            for(let j=0;j<place.categories.length;j++){
-                cateTag.push(
-                    <p className="text-secondary">{place.categories[j]}</p>
+            for(let j=0;j<place.hashtag.length;j++){
+                hashTag.push(
+                    <p className="text-secondary">{place.hashtag[j]}</p>
                 )
             }
         }
@@ -59,11 +59,18 @@ function Place() {
                 level: 3,
             };
 
+            const imageSrc = '../../images/마커.svg'; // 마커이미지의 주소입니다    
+            const imageSize = new kakao.maps.Size(64, 69); // 마커이미지의 크기입니다
+            const imageOption = {offset: new kakao.maps.Point(27, 69)}; // 마커이미지의 옵션입니다.
+            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
             const map = new window.kakao.maps.Map(container, options);
 
             // 마커 추가
+
             const marker = new window.kakao.maps.Marker({
                 position: options.center,
+                image : markerImage
             });
             marker.setMap(map);
         },[place])
@@ -78,14 +85,15 @@ function Place() {
                         src={place.image}
                         alt={place.place_name}
                         className="w-100 rounded-3 mb-4"
+                        style={{height:"500px", objectFit: "cover", width: "100%" }}
                     />
 
                     <Row className="g-4">
                         {/* 1. 기본 정보 */}
                         <Col md={6}>
-                            <h2 className="fw-bold"></h2>
-                            <p className="text-muted">{place.location}</p>
-                            {cateTag}
+                            <h2 className="fw-bold">{place.place_name}</h2>
+                            <p className="text-muted">{place.location_short}</p>
+                            {hashTag}
                         </Col>
                         <Col md={6} className="text-end">
                             <Button

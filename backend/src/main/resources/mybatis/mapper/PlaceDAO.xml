@@ -12,8 +12,9 @@
 		LEFT JOIN place_preference pp ON p.place_id = pp.place_id
 		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
 		GROUP BY p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
-		         p.dayoff, p.call, p.Link, p.image, p.longitude, p.latitude, 
-		         p.placename_onmap, p.regist_date, p.edit_date
+		         p.call, p.Link, p.image, p.longitude, p.latitude, 
+		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
+		         p.hashtag
 
 		 
 	</select>
@@ -26,7 +27,8 @@
 		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
 		WHERE p.place_id = #{PlaceId}
 		GROUP BY p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
-		         p.dayoff, p.call, p.Link, p.image, p.longitude, p.latitude, 
-		         p.placename_onmap, p.regist_date, p.edit_date
+		         p.call, p.Link, p.image, p.longitude, p.latitude, 
+		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
+		         p.hashtag
 	</select>
 </mapper>

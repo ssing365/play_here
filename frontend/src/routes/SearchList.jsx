@@ -14,6 +14,32 @@ const App = () => {
 
     const [places, setPlaces] = useState([]);
     const [categories, setCategories] = useState([]);
+    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
+    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+
+    useEffect(() => {
+        const checkAuth = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:8586/api/check-auth",
+                    { withCredentials: true }
+                );
+                console.log(response);
+                setIsLoggedIn(true);
+            } catch (error) {
+                console.log(error.response);
+                console.log(error.response.status);
+                if (error.response && error.response.status === 401) {
+                    console.log(error);
+                    setIsLoggedIn(false);
+                } else {
+                    console.error("로그인 오류:", error);
+                    alert("서버 오류가 발생했습니다.");
+                }
+            }
+        };
+        checkAuth();
+    }, [isLoggedIn]);
 
     useEffect(()=>{
 
@@ -36,16 +62,16 @@ const App = () => {
     for(let i=0; i<places.length;i++){
 
         let cateTag = [];
-        if (places[i].categories) {
+        if (places[i].hashtag) {
 
-            for(let j=0;j<places[i].categories.length;j++){
+            for(let j=0;j<places[i].hashtag.length;j++){
                 cateTag.push(
                     <Badge
                     bg="light"
                     text="dark"
                     className="me-1"
                     >
-                        {places[i].categories[j]}
+                        {places[i].hashtag[j]}
                     </Badge>
                 )
             }
@@ -57,9 +83,10 @@ const App = () => {
                             <div className="position-relative">
                                 <img
                                     src={places[i].image}
+                                    onClick={()=>window.location.href=`/place?id=${places[i].place_id}`}
                                     alt="장소 이미지"
-                                    className="rounded w-100 h-auto"
-                                    style={{ objectFit: "cover" }}
+                                    className="rounded w-100"
+                                    style={{ height:"300px", objectFit: "cover", width: "100%"}}
                                 />
                                 <div className="position-absolute top-0 start-0 m-2">
                                     <Badge bg="dark" className="opacity-75">
@@ -74,7 +101,7 @@ const App = () => {
                                     <div>
                                         <h5 className="mb-1" onClick={()=>window.location.href=`/place?id=${places[i].place_id}`}>{places[i].place_name}</h5>
                                         <div className="text-muted small">
-                                            {places[i].location} 
+                                            {places[i].location_short} 
                                         </div>
 
                                         <div className="text-muted small mb-2">
@@ -82,7 +109,7 @@ const App = () => {
                                         </div>
                                     </div>
                                     <Button variant="outline-danger" size="sm">
-                                        ♥ 좋아요
+                                        ♥ {places[i].likes}
                                     </Button>
                                 </div>
                             </div>
