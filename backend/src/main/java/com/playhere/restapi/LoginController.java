@@ -94,7 +94,6 @@ public class LoginController {
 	            return ResponseEntity.status(401).body("unauthorized");
 	        }
 	    }
-		
 	    return ResponseEntity.status(401).body("unauthorized");
 	}
 	

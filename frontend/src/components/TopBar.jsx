@@ -2,7 +2,16 @@ import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
-    Container, Row, Col, Form, FormControl, Navbar, Nav, Dropdown,  Button, Modal,
+    Container,
+    Row,
+    Col,
+    Form,
+    FormControl,
+    Navbar,
+    Nav,
+    Dropdown,
+    Button,
+    Modal,
 } from "react-bootstrap";
 import axios from "axios";
 
@@ -10,6 +19,7 @@ const TopBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const [userId, setUserId] = useState("");
+    const [userInfo, setUserInfo] = useState(null);
     const navigate = useNavigate();
 
     // 로그인 상태 확인
@@ -36,6 +46,24 @@ const TopBar = () => {
         };
         checkAuth();
     }, [isLoggedIn]);
+
+    // 상단바에 프사와 닉네임 띄우기
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                // 쿠키를 포함하기 위해 withCredentials 옵션 사용
+                const response = await axios.get(
+                    "http://localhost:8586/api/user-info",
+                    { withCredentials: true }
+                );
+                console.log("사용자 정보:", response.data);
+                setUserInfo(response.data);
+            } catch (error) {
+                console.error("사용자 정보 가져오기 오류:", error);
+            }
+        };
+        fetchUserInfo();
+    }, []);
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
@@ -99,7 +127,14 @@ const TopBar = () => {
                                     as={Link}
                                     to="/search"
                                     className="text-gray-700 mx-3"
-                                    style={location.pathname === "/search" ? { color: "#e91e63", fontWeight: "bold" } : {}}
+                                    style={
+                                        location.pathname === "/search"
+                                            ? {
+                                                  color: "#e91e63",
+                                                  fontWeight: "bold",
+                                              }
+                                            : {}
+                                    }
                                 >
                                     탐색
                                 </Nav.Link>
@@ -107,7 +142,14 @@ const TopBar = () => {
                                     as={Link}
                                     to="/calender"
                                     className="text-gray-700 mx-3"
-                                    style={location.pathname === "/calender" ? { color: "#e91e63", fontWeight: "bold" } : {}}
+                                    style={
+                                        location.pathname === "/calender"
+                                            ? {
+                                                  color: "#e91e63",
+                                                  fontWeight: "bold",
+                                              }
+                                            : {}
+                                    }
                                     onClick={handleCalendarClick}
                                 >
                                     캘린더
@@ -145,12 +187,31 @@ const TopBar = () => {
                                             variant="light"
                                             id="dropdown-user"
                                             className="border-0 p-0 bg-transparent"
-                                            bsPrefix="custom-toggle"
                                         >
-                                            <FaUserCircle
-                                                className="h-8 w-8 text-gray-700"
-                                                style={{ fontSize: "32px" }}
-                                            />{userId}
+                                            {userInfo &&
+                                            userInfo.profilePicture ? (
+                                                <img
+                                                    src={
+                                                        userInfo.profilePicture
+                                                    }
+                                                    alt="프로필"
+                                                    style={{
+                                                        width: "32px",
+                                                        height: "32px",
+                                                        borderRadius: "50%",
+                                                    }}
+                                                />
+                                            ) : (
+                                                <FaUserCircle
+                                                    className="h-8 w-8 text-gray-700"
+                                                    style={{ fontSize: "32px" }}
+                                                />
+                                            )}
+                                            <span style={{ marginLeft: "8px" }}>
+                                                {userInfo && userInfo.nickname
+                                                    ? userInfo.nickname
+                                                    : ""}
+                                            </span>
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu>
