@@ -17,6 +17,7 @@ const ConnectCouple = () => {
     alert('커플코드가 복사되었습니다!');
   };
 
+
   return (
     <div>
       {/* 상단바 */}
@@ -50,7 +51,7 @@ const ConnectCouple = () => {
             </Button>
           </div>
 
-          <Link to={"/"}>
+          <Link to={"/mypage"}>
             <Button variant="outline-secondary" className="w-30 mt-4">다음에하기</Button>
           </Link>
           

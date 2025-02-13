@@ -8,6 +8,8 @@ import MyPage from "./routes/MyPage";
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 import Login from "./routes/Login";
+import RegisterComplete from "./routes/RegisterComplete";
+import NaverLoginButton, { NaverCallback } from "./components/NaverLogin"
 
 import Map from './routes/Map';
 import RegisterPreference from "./routes/RegisterPreference";
@@ -36,7 +38,9 @@ function App() {
 
                 {/** 회원가입, 로그인 */}
                 <Route path="/Login" element={<Login/>} />
+                <Route path="/oauth/callback/naver" element={<NaverCallback/>} />
                 <Route path="/regist" element={<RegisterUser />} />
+                <Route path="/register-complete" element={<RegisterComplete />} />
                 
                 {/** 선호도 관련 */}
                 <Route path="/preference" element={<RegisterPreference />} />

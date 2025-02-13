@@ -4,9 +4,9 @@
     justify-content: center;
     align-items: flex-start; /* 위쪽에 붙이기 */
     padding-top: 80px;        /* 상단바 높이 고려 (조절 가능) */
-    padding: 40px 20px;
+    padding: 40px 20px 0px 20px;
     background-color: #fff; /* 밝은 배경 */
-    min-height: 100vh;
+    min-height: 90vh;
 }
 
 /* 카드 스타일 (배경 반전) */
@@ -114,6 +114,7 @@
     transition: transform 0.2s, box-shadow 0.3s;
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    text-align: center;
    
 }
 

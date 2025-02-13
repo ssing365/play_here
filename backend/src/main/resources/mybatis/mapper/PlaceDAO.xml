@@ -6,8 +6,11 @@
 	
 <mapper namespace="com.playhere.place.IPlaceService">
 	<select id="list" resultType="com.playhere.place.PlaceDTO">
-		SELECT p.*, 
-       LISTAGG(pr.sub_cate, ',') AS categories
+		SELECT 
+	    p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
+	    p.call, p.Link, p.image, p.longitude, p.latitude, 
+	    p.placename_onmap, p.regist_date, p.edit_date, p.likes, p.hashtag, 
+	    LISTAGG(pr.sub_cate, ',') AS categories
 		FROM place p
 		LEFT JOIN place_preference pp ON p.place_id = pp.place_id
 		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
@@ -15,8 +18,7 @@
 		         p.call, p.Link, p.image, p.longitude, p.latitude, 
 		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
 		         p.hashtag
-
-		 
+		ORDER BY place_id
 	</select>
 	
 	<select id="view" resultType="com.playhere.place.PlaceDTO">
@@ -31,4 +33,27 @@
 		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
 		         p.hashtag
 	</select>
+	
+	<update id="placeLikeAdd" parameterType="java.lang.String">
+	    update place set likes = likes + 1 where place_id = #{placeId}
+	</update>
+	
+	<update id="placeLikeCancle" parameterType="java.lang.String">
+	    update place set likes = likes - 1 where place_id = #{placeId}
+	</update>
+
+	
+	<insert id="InterestAdd">
+	    insert into interests values(INTEREST_SEQ.nextval, #{userId}, #{placeId})
+	</insert>
+	
+	<delete id="InterestCancle">
+	    delete from interests where user_id = #{userId} and place_id = #{placeId}
+	</delete>
+
+	
+	<select id="Interestcheck" resultType="int">
+	    select count(*) from interests where user_id = #{userId} and place_id = #{placeId}
+	</select>
+
 </mapper>

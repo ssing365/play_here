@@ -1,9 +1,11 @@
 import TopBar from "../components/TopBar";
+import Footer from "../components/Footer"
 import "../css/MyPage.css"; // CSS 파일 import
 import { FaUserCircle } from "react-icons/fa";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const MyPage = () => {
+    const navigate = useNavigate();
     return (
         <>
             <TopBar />
@@ -36,18 +38,16 @@ const MyPage = () => {
 
                     {/* 하단 메뉴 버튼 */}
                     <div className="menu-buttons">
-                        <button className="menu-btn">
-                            <Link to={"/preference"}>선호도 수정</Link>
-                        </button>
-
-                        <button className="menu-btn">
-                            <Link to={"/mypagelikes"}> 좋아요 리스트</Link>
-                        </button>
-
-                        <button>고객센터</button>
+                        <Link to={"/preference"} className="menu-btn">
+                            <button >선호도 수정</button>
+                        </Link>
+                        <Link to={"/mypagelikes"} className="menu-btn">
+                            <button >좋아요 리스트</button>
+                        </Link>
                     </div>
                 </div>
             </div>
+            <Footer/>
         </>
     );
 };

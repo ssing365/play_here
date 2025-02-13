@@ -90,10 +90,9 @@ const TopBar = () => {
                         >
                             <Link to={"/"}>
                                 <img
-                                    src="/images/logo.png"
+                                    src="/images/여기놀자.svg"
                                     alt="로고"
                                     className="h-8"
-                                    style={{ width: "145px", height: "80px" }}
                                 />
                             </Link>
                         </Col>
