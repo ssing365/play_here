@@ -2,6 +2,7 @@ import { useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import '../css/preference.css';
 import TopBar from '../components/TopBar';
+import { Link } from 'react-router-dom';
 
 const RegisterPreference = () => {
   const categories = [
@@ -121,7 +122,9 @@ const RegisterPreference = () => {
           <br/>
           <button className="btn btn-primary mr-2">선택완료</button>
           <br/>
-          <button className="btn btn-secondary">다음에 고르기</button>
+          <Link to={"/mypage"}>
+            <button className="btn btn-secondary">다음에 고르기</button>
+          </Link>
         </div>
       </div>
     </div>

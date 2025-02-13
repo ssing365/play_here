@@ -9,7 +9,16 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -75,6 +84,76 @@ public class LoginController {
 	        }
 	    }
 	    return ResponseEntity.status(401).body("unauthorized");
+	}
+	
+	@PostMapping("/naver-login")
+	public ResponseEntity<String> naverLogin(@RequestBody Map<String, String> request, HttpServletResponse httpResponse) {
+        String code = request.get("code");
+        System.out.println("code : " + code);
+        
+        /* ✅ 1. 네이버 토큰 요청
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+        
+        MultiValueMap<String, String> params = new LinkedMultiValueMap<>();
+        params.add("grant_type", "authorization_code");
+        params.add("client_id", "Hro8hpVJMXD3cfsDlUr1"); // 네이버 클라이언트 ID
+        params.add("client_secret", "YOUR_NAVER_CLIENT_SECRET"); // 네이버 클라이언트 시크릿
+        params.add("code", code);
+        params.add("state", "false"); 
+
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(params, headers);
+        ResponseEntity<Map> tokenResponse = restTemplate.exchange(
+            "https://nid.naver.com/oauth2.0/token",
+            HttpMethod.POST,
+            entity,
+            Map.class
+        );
+
+        if (!tokenResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(500).body("네이버 토큰 요청 실패");
+        }
+
+        String accessToken = (String) tokenResponse.getBody().get("access_token");
+
+        // ✅ 2. 네이버 사용자 정보 요청
+        headers.set("Authorization", "Bearer " + accessToken);
+        HttpEntity<String> profileEntity = new HttpEntity<>(headers);
+        ResponseEntity<Map> profileResponse = restTemplate.exchange(
+            "https://openapi.naver.com/v1/nid/me",
+            HttpMethod.GET,
+            profileEntity,
+            Map.class
+        );
+
+        if (!profileResponse.getStatusCode().is2xxSuccessful()) {
+            return ResponseEntity.status(500).body("네이버 사용자 정보 요청 실패");
+        }
+
+        Map<String, Object> response = (Map<String, Object>) profileResponse.getBody().get("response");
+        String userId = (String) response.get("id");
+        String nickname = (String) response.get("nickname");
+        String email = (String) response.get("email");
+        */
+
+        // ✅ JWT 토큰 발급
+        String jwt = jwtUtil.generateToken(code);
+        System.out.println("jwt token : " + jwt);
+
+        /* ✅ 클라이언트에 JWT 쿠키로 전달
+        ResponseCookie cookie = ResponseCookie.from("token", jwt)
+            .httpOnly(true)
+            .path("/")
+            .maxAge(60 * 60)
+            .build();*/
+        Cookie cookie = new Cookie("token", jwt);
+        cookie.setHttpOnly(true);
+        cookie.setPath("/");
+        cookie.setMaxAge(60 * 60);
+        httpResponse.addCookie(cookie); // ✅ 쿠키 설정 완료
+        
+        return ResponseEntity.ok("네이버 로그인 성공");
 	}
 	
 	@PostMapping("/kakao-login")
