@@ -31,4 +31,6 @@
 		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
 		         p.hashtag
 	</select>
+	
+	<select id=""></select>
 </mapper>
