@@ -21,6 +21,8 @@ const TopBar = () => {
     const [userId, setUserId] = useState("");
     const [userInfo, setUserInfo] = useState(null);
     const navigate = useNavigate();
+    const remoteIp = import.meta.env.VITE_REMOTE_IP;
+    const port = import.meta.env.VITE_PORT;
 
     // 로그인 상태 확인
     useEffect(() => {
@@ -64,6 +66,13 @@ const TopBar = () => {
         };
         fetchUserInfo();
     }, []);
+
+    
+     // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
+    const profilePictureUrl = userInfo && userInfo.profilePicture 
+    ? `http://${remoteIp}:${port}/image/${userInfo.profilePicture}` 
+    : null;
+
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
@@ -191,14 +200,17 @@ const TopBar = () => {
                                             {userInfo &&
                                             userInfo.profilePicture ? (
                                                 <img
-                                                    src={
-                                                        userInfo.profilePicture
-                                                    }
+                                                    src={profilePictureUrl}
                                                     alt="프로필"
                                                     style={{
                                                         width: "32px",
                                                         height: "32px",
                                                         borderRadius: "50%",
+                                                    }}
+                                                    //이미지 불러오는 도중 에러가 나면 기본이미지(마커이미지)
+                                                    onError={(e)=>{
+                                                        e.target.onError = null;
+                                                        e.target.src="/images/marker.svg";
                                                     }}
                                                 />
                                             ) : (
@@ -206,6 +218,8 @@ const TopBar = () => {
                                                     className="h-8 w-8 text-gray-700"
                                                     style={{ fontSize: "32px" }}
                                                 />
+                                                
+                                                
                                             )}
                                             <span style={{ marginLeft: "8px" }}>
                                                 {userInfo && userInfo.nickname

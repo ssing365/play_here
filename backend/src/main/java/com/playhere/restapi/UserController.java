@@ -41,7 +41,7 @@ public class UserController {
                 System.out.println("대체 어떻게 오는데"+member);
                 if (member != null) {
                 	if (member.getProfilePicture() != null && !member.getProfilePicture().startsWith("http")) {
-                        member.setProfilePicture("http://localhost:8586/images/" + member.getProfilePicture());
+                        member.setProfilePicture(member.getProfilePicture());
                     }
                     // 필요한 정보만 Map에 담아서 반환 (보안에 주의)
                     Map<String, Object> result = new HashMap<>();
