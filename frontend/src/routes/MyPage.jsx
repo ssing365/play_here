@@ -8,6 +8,8 @@ import axios from "axios";
 
 const MyPage = () => {
     const [userInfo, setUserInfo] = useState(null); // 로그인 유저 정보
+    const remoteIp = import.meta.env.VITE_REMOTE_IP;
+    const port = import.meta.env.VITE_PORT;
 
     // 로그인 상태 확인 및 정보 추출
     useEffect(() => {
@@ -37,7 +39,7 @@ const MyPage = () => {
                     <div className="profile-section">
                         {userInfo?.profilePicture ? (
                             <img
-                                src={userInfo.profilePicture}
+                                src={`http://${remoteIp}:${port}/image/${userInfo.profilePicture}` }
                                 alt="프로필 사진"
                                 style={{
                                     width: "100px",
@@ -86,7 +88,7 @@ const MyPage = () => {
                     )}
                     {/* 하단 메뉴 버튼 */}
                     <div className="menu-buttons">
-                        <Link to={"/preference"} className="menu-btn">
+                        <Link to={"/editpreference"} className="menu-btn">
                             <button>선호도 수정</button>
                         </Link>
                         <Link to={"/mypagelikes"} className="menu-btn">

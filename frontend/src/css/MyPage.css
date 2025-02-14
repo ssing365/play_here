@@ -13,25 +13,12 @@
 .mypage-card {
     background-color: #f9f9f9; /* 카드 배경을 연한 회색으로 */
     border-radius: 16px;
-    padding: 30px 30px;
+    padding: 40px 30px;
     width: 100%;
     max-width: 600px;   /* 좌우로 더 넓게 */
     height: 600px;      /* 상하로 짧게 */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
-}
-
-/* 리본 - 카드 안으로 이동 & 왼쪽 정렬 */
-.ribbon {
-    background-color: #8785A2;
-    color: #ffffff;
-    padding: 8px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 6px;
-    position: absolute;
-    top: 10px;
-    left: 20px;
 }
 
 /* 프로필 섹션 */
@@ -115,7 +102,6 @@
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     text-align: center;
-   
 }
 
 /* 메뉴 버튼 호버 효과 */
@@ -124,7 +110,6 @@
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, #FFE2E2, #FFC7C7);
 }
-
 .profile-section {
     position: relative;
     margin: 20px 0;

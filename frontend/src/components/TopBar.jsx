@@ -5,6 +5,9 @@ import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button,
 import axios from "axios";
 
 const TopBar = () => {
+    const remoteIp = import.meta.env.VITE_REMOTE_IP;
+    const port = import.meta.env.VITE_PORT;
+
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const [userInfo, setUserInfo] = useState(null); // 로그인 유저 정보
@@ -157,7 +160,7 @@ const TopBar = () => {
                                             userInfo.profilePicture ? (
                                                 <img
                                                     src={
-                                                        userInfo.profilePicture
+                                                        `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
                                                     }
                                                     alt="프로필"
                                                     style={{
@@ -194,7 +197,7 @@ const TopBar = () => {
                                             </Dropdown.Item>
                                             <Dropdown.Item
                                                 as={Link}
-                                                to="/preference"
+                                                to="/editpreference"
                                             >
                                                 선호도 수정
                                             </Dropdown.Item>
