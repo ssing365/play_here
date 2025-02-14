@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
+import { UserProvider } from './contexts/UserContext';
 import Search from "./routes/Search";
 import Calender from "./routes/Calender";
 import SearchList from "./routes/SearchList";
@@ -21,7 +22,7 @@ import RegisterTerms from "./routes/RegisterTerms";
 
 function App() {
     return (
-        
+        <UserProvider>
         <Router>
             <Routes>
                 {/** 메인 */}
@@ -58,6 +59,7 @@ function App() {
                 <Route path="/register-complete" element={<RegisterComplete />} />
             </Routes>
         </Router>
+        </UserProvider>
     );
 }
 

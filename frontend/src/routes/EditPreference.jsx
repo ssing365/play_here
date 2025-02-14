@@ -4,6 +4,8 @@ import "./css/preference.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../css/preference.css";
 import TopBar from "../components/TopBar";
+import { Link } from "react-router-dom";
+
 const RegisterPreference = () => {
     const location = useLocation();
     const navigate = useNavigate();
@@ -171,17 +173,19 @@ const RegisterPreference = () => {
                             선택완료
                         </button>
                         <br />
-                        <button
-                            className="btn btn-secondary"
-                            style={{
-                                fontSize: "20px",
-                                padding: "10px 20px",
-                                margin: "10px 0",
-                                width: "200px",
-                            }}
-                        >
-                            다음에 고르기
-                        </button>
+                        <Link to={"/mypage"}>
+                            <button
+                                className="btn btn-secondary"
+                                style={{
+                                    fontSize: "20px",
+                                    padding: "10px 20px",
+                                    margin: "10px 0",
+                                    width: "200px",
+                                }}
+                            >
+                                다음에 고르기
+                            </button>
+                        </Link>
                     </div>
                 </div>
             </div>

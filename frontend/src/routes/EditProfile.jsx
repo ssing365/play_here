@@ -1,60 +1,147 @@
 import TopBar from "../components/TopBar";
 import "../css/MyPage.css"; // CSS 파일 import
 import { FaUserCircle } from "react-icons/fa";
-import 'bootstrap/dist/css/bootstrap.min.css';
+import { useContext, useEffect, useRef } from "react";
+import { UserContext } from "../contexts/UserContext";
+import { Button } from "react-bootstrap";
 
 const EditProfile = () => {
-    const handleAddressClick = () => {
-        // 외부 주소 API 창 열기 (예: 카카오 주소 API)
-        alert("주소 입력 창이 열립니다."); // 실제 API로 대체
+    const remoteIp = import.meta.env.VITE_REMOTE_IP;
+    const port = import.meta.env.VITE_PORT;
+
+    // context에서 로그인 유저 정보 가져오기
+    const { userInfo } = useContext(UserContext);
+
+    //우편번호 검색 완료 후 detailAddress 포커스하기
+    const detailAddressRef = useRef(null);
+
+    useEffect(() => {
+        if (!window.daum || !window.daum.Postcode) {
+            const script = document.createElement("script");
+            script.src =
+                "//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js";
+            script.async = true;
+            document.body.appendChild(script);
+        }
+    }, []);
+
+    const execDaumPostcode = () => {
+        new window.daum.Postcode({
+            oncomplete: (data) => {
+                // 팝업에서 검색결과 항목을 클릭했을때 실행할 코드를 작성하는 부분.
+                // detailAddressRef.current을 사용하여 포커스를 설정합니다.
+                detailAddressRef.current.focus();
+            },
+        }).open();
     };
-    
+
     return (
         <>
             <TopBar />
-            <div className="mypage-container">
-                <div className="edit-mypage-card ">
+            <div className="mypage-wrapper">
+                <div className="mypage-container">
+                    <div className="edit-mypage-card ">
                         <div className="profile-section d-flex justify-content-center">
                             <label htmlFor="profile-upload">
-                                <FaUserCircle className="edit-profile-icon" style={{ cursor: 'pointer' }} />
+                                {userInfo?.profilePicture ? (
+                                    <img
+                                        src={`http://${remoteIp}:${port}/image/${userInfo.profilePicture}`}
+                                        alt="프로필 사진"
+                                        style={{
+                                            width: "200px",
+                                            height: "200px",
+                                            borderRadius: "50%",
+                                        }}
+                                    />
+                                ) : (
+                                    <FaUserCircle
+                                        className="profile-icon"
+                                        style={{
+                                            width: "200px",
+                                            height: "200px",
+                                        }}
+                                    />
+                                )}
                             </label>
-                            <input id="profile-upload" type="file" style={{ display: 'none' }} />
+                            <input
+                                id="profile-upload"
+                                type="file"
+                                style={{ display: "none" }}
+                            />
                         </div>
 
-                        <div className= "w-100 d-flex justify-content-center mt-3">
-                            <div className="me-4 text-end">
-                                <label className="d-block mb-4">닉네임</label>
-                                <label className="d-block mb-4">이메일</label>
-                                <label className="d-block mb-4">생년월일</label>
-                                <label className="d-block mb-4">주소</label>
-                            </div>
+                        <div className="w-100 d-flex justify-content-center mt-3">
+                            <div className="profile-form">
+                                {/* 각 라벨과 인풋을 한 줄로 정렬 */}
+                                <div className="form-group">
+                                    <label>닉네임</label>
+                                    <input
+                                        className="form-control"
+                                        type="text"
+                                        value={userInfo.nickname}
+                                    />
+                                </div>
 
-                            <div>
-                                <input className="form-control mb-2" type="text" defaultValue="홍길동이" />
-                                <input className="form-control mb-2" type="email" defaultValue="ssing365@naver.com" />
-                                <input className="form-control mb-2" type="date" defaultValue="1998-11-30" />
-                                <input 
-                                    className="form-control mb-2" 
-                                    type="text" 
-                                    defaultValue="경기도 광명시 도덕로 56" 
-                                    onClick={handleAddressClick} 
-                                    readOnly
-                                    style={{ cursor: 'pointer' }} 
-                                />
+                                <div className="form-group">
+                                    <label>이메일</label>
+                                    <input
+                                        className="form-control"
+                                        type="email"
+                                        value={userInfo.email}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>생년월일</label>
+                                    <input
+                                        className="form-control"
+                                        type="date"
+                                        value={userInfo.birthDate}
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label>주소</label>
+                                    <input
+                                        className="form-control"
+                                        type="text"
+                                        value={userInfo.address}
+                                        onClick={execDaumPostcode}
+                                        readOnly
+                                        style={{ cursor: "pointer" }}
+                                    />
+                                </div>
                             </div>
                         </div>
-                        
-                        <div className="d-flex justify-content-end">
-                            <button className="btn btn-secondary my-4">비밀번호 변경</button>
-                            <button className="btn btn-success my-4 ms-auto">저장</button>
+
+                        <div className="button-container">
+                            <Button
+                                variant="outline-secondary"
+                                className="edit-button"
+                            >
+                                비밀번호 변경
+                            </Button>
+                            <button className="btn btn-success save-btn">
+                                저장
+                            </button>
                         </div>
-                        <br />
 
                         <hr className="divider" />
-                        <button className="btn btn-danger my-2">커플 끊기</button>
-
-                        <hr className="divider" />
-                        <button className="btn btn-outline-danger ">회원 탈퇴</button>
+                        {userInfo.coupleStatus ? (
+                            <div className="button-container">
+                                <button className="btn btn-danger my-2 disconnection">
+                                    커플 끊기
+                                </button>
+                            </div>
+                        ) : (
+                            <></>
+                        )}
+                    </div>
+                </div>
+                <div className="quit-button-container">
+                    <button className="btn btn-outline-danger quit-btn ">
+                        회원 탈퇴
+                    </button>
                 </div>
             </div>
         </>

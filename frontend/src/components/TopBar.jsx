@@ -2,36 +2,19 @@ import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
-import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from '../contexts/UserContext';
+import axios from 'axios';
 
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
 
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-    const [userInfo, setUserInfo] = useState(null); // 로그인 유저 정보
     const navigate = useNavigate();
 
-    // 로그인 상태 확인 및 정보 추출
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                // 쿠키를 포함하기 위해 withCredentials 옵션 사용
-                const response = await axios.get(
-                    "http://localhost:8586/api/user-info",
-                    { withCredentials: true }
-                );
-                console.log("사용자 정보:", response.data);
-                setUserInfo(response.data);
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.error("사용자 정보 가져오기 오류:", error);
-                setIsLoggedIn(false);
-            }
-        };
-        fetchUserInfo();
-    }, [isLoggedIn]);
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
@@ -154,6 +137,7 @@ const TopBar = () => {
                                         <Dropdown.Toggle
                                             variant="light"
                                             id="dropdown-user"
+                                            bsPrefix="custom-toggle"
                                             className="border-0 p-0 bg-transparent"
                                         >
                                             {userInfo &&
@@ -164,8 +148,8 @@ const TopBar = () => {
                                                     }
                                                     alt="프로필"
                                                     style={{
-                                                        width: "32px",
-                                                        height: "32px",
+                                                        width: "40px",
+                                                        height: "40px",
                                                         borderRadius: "50%",
                                                     }}
                                                 />
@@ -175,11 +159,6 @@ const TopBar = () => {
                                                     style={{ fontSize: "32px" }}
                                                 />
                                             )}
-                                            <span style={{ marginLeft: "8px" }}>
-                                                {userInfo && userInfo.nickname
-                                                    ? userInfo.nickname
-                                                    : ""}
-                                            </span>
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu>

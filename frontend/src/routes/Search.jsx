@@ -7,7 +7,8 @@ import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from '../contexts/UserContext';
 
 const Search = () => {
     // 카테고리 default
@@ -17,9 +18,8 @@ const Search = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [weekDates, setWeekDates] = useState([]);
 
-    // 로그인 상태 관리 및 정보 추출
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-    const [userInfo, setUserInfo] = useState(null);
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn } = useContext(UserContext);
 
     // 날짜 출력
     useEffect(() => {
@@ -31,31 +31,6 @@ const Search = () => {
         });
         setWeekDates(dates);
     }, []);
-    
-    // 로그인 상태 확인
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/api/user-info",
-                    { withCredentials: true }
-                );
-                setUserInfo(response.data);
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.log(error.response);
-                console.log(error.response.status);
-                if (error.response && error.response.status === 401) {
-                    console.log(error);
-                    setIsLoggedIn(false);
-                } else {
-                    console.error("로그인 오류:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            }
-        };
-        checkAuth();
-    }, [isLoggedIn]);
 
     // 주간 행사 더미
     const events = {
