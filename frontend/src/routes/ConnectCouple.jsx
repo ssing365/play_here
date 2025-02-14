@@ -1,9 +1,13 @@
-import Navbar from "../components/Navbar";
+import TopBar from "../components/TopBar";
+import "./css/MyPage.css"; // CSS 파일 import
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 import { useState } from 'react';
 import { FormControl, Button, Container, Card } from 'react-bootstrap';
-import 'bootstrap/dist/css/bootstrap.min.css';
 import { Link } from "react-router-dom";
+
+import { CiShare2 } from "react-icons/ci";
+
 
 const ConnectCouple = () => {
   const [coupleCode, setCoupleCode] = useState('AE6EWX');
@@ -17,30 +21,40 @@ const ConnectCouple = () => {
   return (
     <div>
       {/* 상단바 */}
-      <Navbar />
+      <TopBar />
 
       {/* 메인 컨테이너 */}
-      <Container className="d-flex justify-content-center py-5" style={{ maxWidth: '60%' }}>
-        <Card className="w-100 p-4 text-center shadow-sm">
-          <div className="bg-dark text-white px-3 py-1 d-inline-block mb-3 rounded">마이페이지</div>
+      <Container className="mypage-container" >
+        <Card className="mypage-card text-center ">
+          
           <h5>연결하시면 더 많은 서비스를 이용하실 수 있습니다!</h5>
 
           <div className="my-4">
             <h6>내 커플코드</h6>
             <h3>{coupleCode}</h3>
-            <Button variant="outline-secondary" onClick={copyToClipboard}>코드 복사하기</Button>
+            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>
+              <Button variant="secondary" onClick={copyToClipboard}>코드 복사하기 </Button>
+              <CiShare2  style={{ marginLeft: '8px' }}/>
+            </div>
           </div>
 
-          <Button variant="primary" className="w-50 my-2">커플코드 공유하기</Button>
-          <FormControl
-            className="my-3 text-center"
-            placeholder="연결할 커플코드를 입력하세요"
-            value={inputCode}
-            onChange={(e) => setInputCode(e.target.value)}
-          />
-          <Button variant="success" className="w-50 my-2">커플 연결하기</Button>
+          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'  }}>
+            <FormControl 
+              className="my-3 h-13 text-center"
+              placeholder="연결할 커플코드를 입력하세요"
+              value={inputCode}
+              style={{ width: '400px' }}
+              onChange={(e) => setInputCode(e.target.value)}
+            />
+            <Button className="menu-btn" style={{ width: '400px' }}>
+              💛 커플 연결하기 💛
+            </Button>
+          </div>
+
+
+
           <Link to={"/"}>
-            <Button variant="secondary" className="w-50 my-2">다음에하기</Button>
+            <Button variant="outline-secondary" className="w-30 mt-4">다음에하기</Button>
           </Link>
           
         </Card>

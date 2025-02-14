@@ -1,24 +1,23 @@
-
 import TopBar from "../components/TopBar";
 import { Link } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Container, Row, Col, Button, Form, Card } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { FaSearch } from "react-icons/fa";
+import { useLocation } from "react-router-dom";
 
+const Map = () => {
+    
+    const location = useLocation();
+    const Date = location.state.selectedDate;
 
-const Calender = () => {
-    const [selectedDate, setSelectedDate] = useState(null);
+    const [selectedDate, setSelectedDate] = useState(Date);
     const [diaryEntry, setDiaryEntry] = useState("");
     const [month, setMonth] = useState(2);
-
+    const [year, setYear] = useState(2025);
     const [newPlace, setNewPlace] = useState("");
     const [showInput, setShowInput] = useState(false);
-
-    const [year, setYear] = useState(2025);
     const [showSearch, setShowSearch] = useState(false);
-
 
     const calendarData = [
         ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"],
@@ -34,8 +33,36 @@ const Calender = () => {
         5: ["스타벅스 강남점", "코엑스몰", "롯데월드타워"],
     };
 
-    const [places, setPlaces] = useState(initialPlaces);
+    const container = useRef(null);
 
+    useEffect(() => {
+        // ✅ Kakao Maps API가 아직 로드되지 않았으면 동적으로 추가
+        if (!window.kakao || !window.kakao.maps) {
+            const script = document.createElement("script");
+            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b5ba96e8bd64e3f89af591fdaa2a20d&autoload=false`;
+            script.async = true;
+            document.head.appendChild(script);
+
+            script.onload = () => {
+                console.log("✅ Kakao Maps API 로드 완료");
+                window.kakao.maps.load(() => {
+                    createMap();
+                });
+            };
+        } else {
+            createMap();
+        }
+
+        function createMap() {
+            if (container.current && window.kakao) {
+                const position = new window.kakao.maps.LatLng(33.450701, 126.570667);
+                const options = { center: position, level: 3 };
+                new window.kakao.maps.Map(container.current, options);
+            }
+        }
+    }, []);
+    
+    const [places, setPlaces] = useState(initialPlaces);
 
     const addPlace = () => {
         if (newPlace.trim() !== "") {
@@ -60,51 +87,20 @@ const Calender = () => {
         <>
             <TopBar />
             <Container>
+            
             <Row className="mt-3">
-                <Col md={6} className="position-relative">
-                    <h4 className="text-center">김철수 ♥ 김유리</h4>
-                    <Row className="align-items-center justify-content-center pb-2">
-                        <Col xs="auto" className="d-flex align-items-center">
-                            <Button variant="outline-secondary" size="sm" onClick={() => setMonth(month - 1)} className="me-2 border-0">◀</Button>
-                            <h5 className="mb-0">{year}년 {month}월</h5>
-                            <Button variant="outline-secondary" size="sm" onClick={() => setMonth(month + 1)} className="ms-2 border-0">▶</Button>
-                        </Col>
-                    </Row>
-                    <div className="d-flex justify-content-end align-items-center mb-2">
-                        {showSearch && (
-                            <Form.Control
-                                type="text"
-                                placeholder="검색"
-                                className="me-2"
-                                style={{ width: "150px", height: "30px", transition: "opacity 0.3s ease-in-out", opacity: showSearch ? 1 : 0 }}
-                            />
-                        )}
-                        <FaSearch style={{ cursor: "pointer", height:"30px" }} onClick={() => setShowSearch(!showSearch)} />
-                    </div>
-                    <table className="table table-bordered text-center mt-2">
-                        <tbody>
-                            {calendarData.map((week, i) => (
-                                <tr key={i}>
-                                    {week.map((day, j) => (
-                                        <td key={j} className="p-3" style={{ cursor: day ? "pointer" : "default" }} onClick={() => day && setSelectedDate(day)}>
-                                            {day}
-                                        </td>
-                                    ))}
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    
-                </Col>
+            <Col md={6} className="position-relative">
+            <div ref={container} style={{ width: "500px", height: "500px" }}></div>
+            </Col>
                 <Col md={6}>
                     {selectedDate && (
                         <>
                             <h4>{month}월 {selectedDate}일</h4>
                             <div className="d-flex align-items-center">
                                 <h5 className="mb-0">방문지 리스트</h5>
-                                <Link to="/map" state={{month:month, selectedDate:selectedDate}}>
+                                <Link to="/map">
                                     <Button variant="outline-success" className="ms-3 border-0">지도 보기</Button>
-                                </Link>s
+                                </Link>
                             </div>
 
                             <DragDropContext onDragEnd={onDragEnd}>
@@ -166,9 +162,9 @@ const Calender = () => {
                     )}
                 </Col>
             </Row>
-            </Container>
+        </Container>
         </>
     );
 };
 
-export default Calender;
+export default Map;

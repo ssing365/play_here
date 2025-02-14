@@ -1,3 +1,5 @@
+import '../css/preference.css';
+import TopBar from '../components/TopBar';
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Navbar, Nav, Form, Button } from "react-bootstrap";
@@ -72,6 +74,7 @@ const RegisterPreference = () => {
   const handleSkip = () => {
     navigate("/register-complete")
   }
+
 
   const handleSubmit = async () => {
     if (!userId){

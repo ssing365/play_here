@@ -2,6 +2,9 @@ import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Container, Navbar, Nav, Form, Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
+
+const RegisterUser = () => {
+
 import { useLocation, useNavigate } from "react-router-dom";
 const RegisterUser = () => {
   const location = useLocation();
@@ -31,12 +34,14 @@ const RegisterUser = () => {
     profile_picture: null,
   });
 
+
   const defaultProfilePicture = "/images/head_logo.png"; // 기본 이미지 경로
   const remoteIp = import.meta.env.VITE_REMOTE_IP;
   const port = import.meta.env.VITE_PORT;
 
   // const [preview, setPreview] = useState(null); 에서
   //  null 부분에 이미지 넣으면 기본 이미지 표시 가능
+
   const [preview, setPreview] = useState(defaultProfilePicture);
   //에러메세지(아이디, 비밀번호)
   const [errors, setErrors] = useState({});
@@ -203,6 +208,7 @@ const RegisterUser = () => {
       }
     }
   
+
     // 기존 검증 로직
     
     // 아이디 형식 재검증
@@ -232,6 +238,7 @@ const RegisterUser = () => {
 
   
     // 프로필 사진 추가
+
     if (profile_picture && preview !== defaultProfilePicture) {
     formDataToSubmit.append("profile_picture", profile_picture);
     }
@@ -246,13 +253,13 @@ const RegisterUser = () => {
 
       if (response.data.result === 1) {
         alert("회원가입이 완료되었습니다.");
+
         //formData에서 user_id 가져와 state로 전달
         const userId = formData.user_id;
         //로컬 스토리지 백업
         localStorage.setItem("userId", formData.user_id);
         navigate("/register-preference", { state: { userId } });
-        
-        
+
       } else {
         alert("회원가입에 실패했습니다.");
       }

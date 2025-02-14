@@ -1,4 +1,4 @@
-import Navbar from "../components/Navbar";
+import TopBar from "../components/TopBar";
 import Footer from "../components/Footer";
 
 import "bootstrap/dist/css/bootstrap.min.css";
@@ -9,7 +9,11 @@ const Search = () => {
     return (
         <div className="flex flex-col min-h-screen">
             {/* 상단바 */}
-            <Navbar />
+            <TopBar />
+
+            <Link to={"/regist"}>
+                <b>회원가입</b>
+            </Link>
 
             <Link to={"/searchlist"}>
                 <b>검색결과 리스트</b>
@@ -18,7 +22,6 @@ const Search = () => {
             <Link to={"/place"}>
                 <b>장소 소개 페이지</b>
             </Link>
-
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
                 {/* 지금 가기 좋은 곳 */}
