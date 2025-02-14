@@ -1,19 +1,11 @@
-<<<<<<< HEAD
-=======
-import '../css/preference.css';
-import TopBar from '../components/TopBar';
->>>>>>> 6f76a189f813e5186c91a0ab1bd37b2cfc1bf7aa
 import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Navbar, Nav, Form, Button } from "react-bootstrap";
 import './css/preference.css';
-<<<<<<< HEAD
 import { useLocation, useNavigate, Link } from 'react-router-dom';
 import '../css/preference.css';
 import TopBar from '../components/TopBar';
-=======
-import { useLocation, useNavigate } from 'react-router-dom';
->>>>>>> 6f76a189f813e5186c91a0ab1bd37b2cfc1bf7aa
+
 
 
 const RegisterPreference = () => {
@@ -84,10 +76,6 @@ const RegisterPreference = () => {
     navigate("/register-complete")
   }
 
-<<<<<<< HEAD
-=======
-
->>>>>>> 6f76a189f813e5186c91a0ab1bd37b2cfc1bf7aa
   const handleSubmit = async () => {
     if (!userId){
       alert("회원 정보를 확인할 수 없습니다.");

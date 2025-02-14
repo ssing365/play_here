@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Navbar, Nav, Form, Button, Row, Col } from "react-bootstrap";
+import { Container, Form, Button, Row, Col } from "react-bootstrap";
 import axios from "axios";
 import { useLocation, useNavigate } from "react-router-dom";
 const RegisterUser = () => {
@@ -508,7 +508,7 @@ const RegisterUser = () => {
             <Button variant="primary" type="submit">
               가입하기
             </Button>
-          </Form>
+          </Form>  
         </Col>
       </Row>
     </Container>

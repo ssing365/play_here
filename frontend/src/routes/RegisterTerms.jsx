@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Form, Button, Row} from 'react-bootstrap';
 
@@ -147,7 +147,11 @@ const RegisterTerms = () => {
         </Form>
       </div>
     </Row>
-      
+    <Link to={'/'}>
+                    <span className="regist">    
+                     메인으로 돌아가기   
+                    </span>  
+    </Link>   
     </Container>
   );
 };
