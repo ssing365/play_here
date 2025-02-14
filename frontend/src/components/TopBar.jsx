@@ -1,53 +1,16 @@
 import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-    Container,
-    Row,
-    Col,
-    Form,
-    FormControl,
-    Navbar,
-    Nav,
-    Dropdown,
-    Button,
-    Modal,
-} from "react-bootstrap";
+import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
 import axios from "axios";
 
 const TopBar = () => {
     const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-    const [userId, setUserId] = useState("");
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState(null); // 로그인 유저 정보
     const navigate = useNavigate();
 
-    // 로그인 상태 확인
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/api/check-auth",
-                    { withCredentials: true }
-                );
-                setUserId(response.data);
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.log(error.response);
-                console.log(error.response.status);
-                if (error.response && error.response.status === 401) {
-                    console.log(error);
-                    setIsLoggedIn(false);
-                } else {
-                    console.error("로그인 오류:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            }
-        };
-        checkAuth();
-    }, [isLoggedIn]);
-
-    // 상단바에 프사와 닉네임 띄우기
+    // 로그인 상태 확인 및 정보 추출
     useEffect(() => {
         const fetchUserInfo = async () => {
             try {
@@ -58,12 +21,14 @@ const TopBar = () => {
                 );
                 console.log("사용자 정보:", response.data);
                 setUserInfo(response.data);
+                setIsLoggedIn(true);
             } catch (error) {
                 console.error("사용자 정보 가져오기 오류:", error);
+                setIsLoggedIn(false);
             }
         };
         fetchUserInfo();
-    }, []);
+    }, [isLoggedIn]);
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
