@@ -1,8 +1,8 @@
 import { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
-import './css/preference.css';
-import { useLocation, useNavigate } from 'react-router-dom';
 import '../css/preference.css';
+import { useLocation, useNavigate } from 'react-router-dom';
+
 const RegisterPreference = () => {
 
   const location = useLocation();

@@ -29,27 +29,28 @@
 
 /* 프로필 섹션 */
 .profile-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 60px; /* 리본과 간격 */
+    position: relative;
+    margin: 20px 0;
 }
 
 /* 프로필 아이콘 */
 .profile-icon {
-    font-size: 60px;
+    font-size: 100px;
     color: #555;
+    position: relative;
+    right: -30px; /* 약간 우측으로 이동 */
 }
 
 /* 닉네임 */
 .nickname {
-    font-size: 22px;
-    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
     flex-grow: 1;
     text-align: center;
     color: #333;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* 강조 효과 */
 }
-
 
 /* 구분선 */
 .divider {
@@ -107,31 +108,12 @@
     background: linear-gradient(135deg, #FFE2E2, #FFC7C7);
 }
 
-.profile-section {
-    position: relative;
-    margin: 20px 0;
-}
-
-.profile-icon {
-    font-size: 100px;
-    color: #555;
-    position: relative;
-    right: -30px; /* 약간 우측으로 이동 */
-}
-
-.nickname {
-    font-size: 24px;
-    font-weight: bold;
-    color: #222;
-    margin: 10px 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* 강조 효과 */
-}
-
 .profile-info {
     font-size: 16px;
     color: #888; /* 흐릿한 느낌 */
     line-height: 1.5;
     padding-left: 40px; /* 약간 우측으로 이동 */
+    flex-grow: 1; /* 가능한 공간 차지 */
 }
 
 .edit-profile-icon {
@@ -156,10 +138,6 @@
     align-items: center; /* 수직 중앙 정렬 */
     width: 100%; /* 부모 요소의 너비를 차지하도록 설정 */
     padding: 10px; /* 여백 추가 */
-}
-
-.profile-info {
-    flex-grow: 1; /* 가능한 공간 차지 */
 }
 
 .profile-form {
@@ -188,7 +166,8 @@
     display: flex;
     align-items: center; /* 버튼 높이 맞춤 */
     width: 100%; /* 부모 요소의 전체 너비 사용 */
-    margin-top: 10px;
+    margin-top: 50px;
+    gap: 5px
 }
 
 .button-container button {
@@ -196,8 +175,16 @@
     padding: 5px 15px; /* 버튼 내부 여백 */
 }
 
-.save-btn, .disconnection, .quit-btn {
+.button-container .spacer {
+    flex-grow: 1; /* 중간 여백을 자동으로 차지 */
+}
+
+.save-btn, .disconnection {
     margin-left: auto; /* '저장' 버튼을 오른쪽으로 밀기 */
+}
+
+.cancel-btn{
+    margin-right: 10px;
 }
 
 .quit-button-container {

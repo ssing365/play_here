@@ -4,10 +4,12 @@ import { FaUserCircle } from "react-icons/fa";
 import { useContext, useEffect, useRef } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { Button } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
 
 const EditProfile = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
+    const navigate = useNavigate();
 
     // context에서 로그인 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
@@ -117,10 +119,14 @@ const EditProfile = () => {
                         <div className="button-container">
                             <Button
                                 variant="outline-secondary"
-                                className="edit-button"
                             >
                                 비밀번호 변경
                             </Button>
+                            <div className="spacer"></div>
+                            <button className="btn btn-secondary"
+                                onClick={()=>navigate(-1)}>
+                                cancel
+                            </button>
                             <button className="btn btn-success save-btn">
                                 저장
                             </button>

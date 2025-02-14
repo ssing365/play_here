@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
+import "../css/Bar.css"
 import { useContext } from "react";
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
@@ -77,14 +78,13 @@ const TopBar = () => {
                                 <Nav.Link
                                     as={Link}
                                     to="/search"
-                                    className="text-gray-700 mx-3"
+                                    className="text-gray-700 mx-5"
                                     style={
                                         location.pathname === "/search"
-                                            ? {
+                                            ? {fontSize: "1.1rem",
                                                   color: "#e91e63",
-                                                  fontWeight: "bold",
                                               }
-                                            : {}
+                                            : {fontSize:"17px"}
                                     }
                                 >
                                     탐색
@@ -92,14 +92,13 @@ const TopBar = () => {
                                 <Nav.Link
                                     as={Link}
                                     to="/calender"
-                                    className="text-gray-700 mx-3"
+                                    className="text-gray-700 mx-5"
                                     style={
                                         location.pathname === "/calender"
-                                            ? {
+                                            ? {fontSize: "1.1rem",
                                                   color: "#e91e63",
-                                                  fontWeight: "bold",
                                               }
-                                            : {}
+                                            : {fontSize:"17px"}
                                     }
                                     onClick={handleCalendarClick}
                                 >
@@ -113,21 +112,14 @@ const TopBar = () => {
                             <div className="d-flex align-items-center justify-content-end">
                                 <Form
                                     className="position-relative d-none d-md-block me-3"
-                                    style={{ width: "300px" }}
+                                    style={{ width: "350px" }}
                                 >
                                     <FormControl
                                         type="text"
                                         placeholder="어떤 데이트를 하고 싶으신가요?"
                                         className="custom-input w-100"
                                     />
-                                    <FaSearch
-                                        className="position-absolute"
-                                        style={{
-                                            right: "10px",
-                                            top: "50%",
-                                            transform: "translateY(-50%)",
-                                            color: "#6c757d",
-                                        }}
+                                    <FaSearch className="search-icon"
                                     />
                                 </Form>
 

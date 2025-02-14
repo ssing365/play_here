@@ -89,7 +89,7 @@ const Search = () => {
                 {/* 지금 가기 좋은 곳 */}
                 {isLoggedIn ? (
                         <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
-                        {userInfo.nickname} 님을 위한 추천 </h4>
+                        {userInfo?.nickname || "Loading..."} 님을 위한 추천 </h4>
                     ):(
                         <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
                         지금 가기 좋은 곳 </h4>
