@@ -255,6 +255,7 @@ const RegisterUser = () => {
         //로컬 스토리지 백업
         localStorage.setItem("userId", formData.user_id);
         navigate("/register-preference", { state: { userId } });
+
       } else {
         alert("회원가입에 실패했습니다.");
       }

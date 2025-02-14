@@ -2,6 +2,7 @@ package com.playhere.member;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -12,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -34,7 +36,7 @@ public class MemberRegistController {
 	
 	@Autowired
 	IMemberService dao; 
-	
+
 	@PostMapping("/register.do")
 	public Map<String, Integer> registerUser(
 			@RequestPart("formData") String formDataJson,

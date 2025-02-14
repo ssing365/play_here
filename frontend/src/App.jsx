@@ -11,13 +11,13 @@ import EditProfile from "./routes/EditProfile";
 import Login from "./routes/Login";
 import NaverLoginButton, { NaverCallback } from "./components/NaverLogin"
 
+
 import Map from './routes/Map';
 
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 import RegisterTerms from "./routes/RegisterTerms";
 import RegisterComplete from './routes/RegisterComplete';
-
 
 function App() {
     return (
@@ -40,6 +40,7 @@ function App() {
 
                 <Route path="/editprofile" element={<EditProfile />} />
                 <Route path="/connect-couple" element={<ConnectCouple />} />
+
                 <Route path="/mypagelikes" element={<MyPageLikes />} />
 
                 {/** 회원가입, 로그인 */}
@@ -48,6 +49,7 @@ function App() {
                
                   
                 {/** 회원가입로직 (약관 - 회원가입 폼 - 선호도 - 회원가입 완료) */}
+
                 <Route path="/register-terms" element={<RegisterTerms/>} />
                 <Route path="/register-user" element={<RegisterUser />} />
                 <Route path="/register-preference" element={<RegisterPreference />} />

@@ -5,6 +5,7 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 
 <mapper namespace="com.playhere.member.IMemberService">
+
 	<!-- 아이디 중복확인 -->
 	<select id="idcheck" parameterType="java.lang.String" resultType="int">
 		SELECT COUNT(*) FROM member WHERE user_id = #{userId}
@@ -38,6 +39,7 @@
     	SELECT * FROM DUAL
 	</insert>
 
+
 	<!-- 로그인 -->
 	<select id="login" resultType="com.playhere.member.MemberDTO">
         SELECT * FROM member WHERE user_id = #{userId} AND password = #{password}
@@ -64,4 +66,5 @@
     FROM member 
     WHERE user_id = #{userId}
     </select>
+
 </mapper>
