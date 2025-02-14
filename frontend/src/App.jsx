@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import Search from "./routes/Search";
 import Calender from "./routes/Calender";
 import SearchList from "./routes/SearchList";
@@ -9,18 +9,19 @@ import MyPage from "./routes/MyPage";
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 import Login from "./routes/Login";
-import NaverLoginButton, { NaverCallback } from "./components/NaverLogin"
-
+import RegisterComplete from "./routes/RegisterComplete";
+import { NaverCallback } from "./components/NaverLogin"
+import EditPreference from "./routes/EditPreference"
 
 import Map from './routes/Map';
 
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 import RegisterTerms from "./routes/RegisterTerms";
-import RegisterComplete from './routes/RegisterComplete';
 
 function App() {
     return (
+        
         <Router>
             <Routes>
                 {/** 메인 */}
@@ -40,6 +41,7 @@ function App() {
 
                 <Route path="/editprofile" element={<EditProfile />} />
                 <Route path="/connect-couple" element={<ConnectCouple />} />
+                <Route path="/editpreference" element={<EditPreference/>} />
 
                 <Route path="/mypagelikes" element={<MyPageLikes />} />
 

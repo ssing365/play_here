@@ -1,4 +1,3 @@
-import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import "../css/MyPage.css"; // CSS 파일 import
 import 'bootstrap/dist/css/bootstrap.min.css';
