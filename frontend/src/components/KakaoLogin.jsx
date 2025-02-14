@@ -4,7 +4,7 @@ import axios from "axios";
 
 const KakaoLoginButton = () => {
 
-    const kakaoClientId = "3b01976fc8b8677fcef51a567b2ea174"; // js키
+    const kakaoClientId = import.meta.env.VITE_KAKAO_CLIENT_ID; // js키
 
     const kakaoOnSuccess = async (data) => {
         console.log("data:",data);

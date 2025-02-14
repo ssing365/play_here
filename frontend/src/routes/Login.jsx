@@ -111,7 +111,7 @@ const Login = () => {
                     </span>
                 </div>
                 
-                <Link to={'/regist'}>
+                <Link to={'/register-terms'}>
                     <span className="regist">    
                         회원가입
                     </span>  
