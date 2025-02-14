@@ -15,7 +15,4 @@ public class MainController {
         return "Hi from Spring Boot~~!!";
     }
     */
-	
-	
-	
 }

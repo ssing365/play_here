@@ -2,7 +2,9 @@ import React, { useEffect, useState } from 'react';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { Container, Navbar, Nav, Form, Button } from "react-bootstrap";
 import './css/preference.css';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate, Link } from 'react-router-dom';
+import '../css/preference.css';
+import TopBar from '../components/TopBar';
 
 
 const RegisterPreference = () => {

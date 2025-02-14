@@ -47,3 +47,4 @@ const RegisterComplete = () => {
 };
 
 export default RegisterComplete;
+

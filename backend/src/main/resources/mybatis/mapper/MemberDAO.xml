@@ -37,4 +37,31 @@
     	</foreach>
     	SELECT * FROM DUAL
 	</insert>
+
+	<!-- 로그인 -->
+	<select id="login" resultType="com.playhere.member.MemberDTO">
+        SELECT * FROM member WHERE user_id = #{userId} AND password = #{password}
+    </select>
+
+	<!-- 로그인유저 정보 찾기  -->
+	<select id="findByUserId" resultType="com.playhere.member.MemberDTO">
+        SELECT 
+        user_id AS userId, 
+        password, 
+        name, 
+        nickname, 
+        email, 
+        birth_date AS birthDate, 
+        zipcode, 
+        address, 
+        detail_address AS detailAddress, 
+        profile_picture AS profilePicture,
+        couple_id AS coupleId, 
+        couple_status AS coupleStatus, 
+        account_status AS accountStatus, 
+        created_at AS createdAt, 
+        updated_at AS updatedAt
+    FROM member 
+    WHERE user_id = #{userId}
+    </select>
 </mapper>
