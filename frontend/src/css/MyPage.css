@@ -128,7 +128,7 @@
     padding: 30px 30px;
     width: 100%;
     max-width: 600px;   /* 좌우로 더 넓게 */
-    height: 650px;      /* 상하로 짧게 */
+    height: 750px;      /* 상하로 짧게 */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
 }

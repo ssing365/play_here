@@ -66,5 +66,19 @@
     FROM member 
     WHERE user_id = #{userId}
     </select>
+    
+    <!-- 정보 수정 -->
+    <update id="updateUser" parameterType="com.playhere.member.MemberDTO">
+        UPDATE member
+        SET
+            nickname = #{nickname},
+            email = #{email},
+            birth_date = #{birthDate},
+            address = #{address},
+            detail_address = #{detailAddress},
+            zipcode = #{zipcode},
+            profile_picture = #{profilePicture, jdbcType=VARCHAR}
+        WHERE user_id = #{userId}
+    </update>
 
 </mapper>

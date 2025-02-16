@@ -11,6 +11,7 @@ export const UserProvider = ({ children }) => {
         const fetchUserInfo = async () => {
             try {
                 const response = await axios.get("http://localhost:8586/api/user-info", { withCredentials: true });
+                console.log(response.data)
                 setUserInfo(response.data);
                 setIsLoggedIn(true);
             } catch (error) {
