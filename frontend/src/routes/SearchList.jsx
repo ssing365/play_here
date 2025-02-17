@@ -40,6 +40,7 @@ const App = () => {
 
     // 좋아요 클릭 시 처리
     const handleLikeClick = async (PlaceId, e) => {
+        console.log(isLoggedIn);
         if (!isLoggedIn) {
             e.preventDefault(); // 기본 페이지 이동 막기
             setShowModal(true); // 모달 표시

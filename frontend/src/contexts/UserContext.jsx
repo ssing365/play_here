@@ -16,7 +16,7 @@ export const UserProvider = ({ children }) => {
                 setIsLoggedIn(true);
             } catch (error) {
                 console.error("사용자 정보 가져오기 오류:", error);
-                setIsLoggedIn(true);
+                setIsLoggedIn(false);
             }
         };
         fetchUserInfo();

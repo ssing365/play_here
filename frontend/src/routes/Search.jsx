@@ -19,6 +19,8 @@ const Search = () => {
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [weekDates, setWeekDates] = useState([]);
     const [top5, setTop5] = useState([]);
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn } = useContext(UserContext);
 
     useEffect(()=>{
         const fetchTop5 = async () => {
@@ -33,8 +35,6 @@ const Search = () => {
         fetchTop5();
     },[])
 
-    // context에서 로그인 상태, 유저 정보 가져오기
-    const { userInfo, isLoggedIn } = useContext(UserContext);
 
     // 날짜 출력
     useEffect(() => {
