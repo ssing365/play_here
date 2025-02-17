@@ -65,6 +65,9 @@ const TopBar = () => {
                                     src="/images/여기놀자.svg"
                                     alt="로고"
                                     className="h-8"
+                                    style={{
+                                        width:"200px"
+                                    }}
                                 />
                             </Link>
                         </Col>
