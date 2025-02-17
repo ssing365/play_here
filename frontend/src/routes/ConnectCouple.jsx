@@ -11,6 +11,9 @@ import { CiShare2 } from "react-icons/ci";
 const ConnectCouple = () => {
   const [coupleCode, setCoupleCode] = useState('AE6EWX');
   const [inputCode, setInputCode] = useState('');
+  //우선 링크에 id를 저장하는 방식 
+  // const [userId, setUserId] = useState("banana");
+  // const [inviteLink, setInviteLink] = useState(""); 
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(coupleCode);

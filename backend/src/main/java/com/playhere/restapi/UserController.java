@@ -52,7 +52,9 @@ public class UserController {
                 // DB에서 사용자 정보 조회
                 MemberDTO member = memberService.findByUserId(userId);
                 if (member != null) {
-                	
+                	if (member.getProfilePicture() != null && !member.getProfilePicture().startsWith("http")) {
+                        member.setProfilePicture(member.getProfilePicture());
+                    }
                     // 필요한 정보만 Map에 담아서 반환 (보안에 주의)
                 	System.out.println(member);
                     Map<String, Object> result = new HashMap<>();

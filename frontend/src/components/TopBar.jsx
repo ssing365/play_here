@@ -15,6 +15,11 @@ const TopBar = () => {
 
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const navigate = useNavigate();
+    
+     // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
+    const profilePictureUrl = userInfo && userInfo.profilePicture 
+    ? `http://${remoteIp}:${port}/image/${userInfo.profilePicture}` 
+    : null;
 
 
     // 로그아웃 함수
@@ -139,9 +144,7 @@ const TopBar = () => {
                                             {userInfo &&
                                             userInfo.profilePicture ? (
                                                 <img
-                                                    src={
-                                                        `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
-                                                    }
+                                                    src={profilePictureUrl}
                                                     alt="프로필"
                                                     style={{
                                                         width: "40px",
