@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { useContext } from "react";
 import { useNavigate } from 'react-router-dom';
-import { UserContext } from '../contexts/UserContext';
+import { UserContext } from '../../contexts/UserContext';
 
 const MemberWithdrawal = () => {
   const navigate = useNavigate();
@@ -18,6 +18,7 @@ const MemberWithdrawal = () => {
                   { withCredentials: true }
                 );
                 setIsLoggedIn(false);
+                localStorage.removeItem("savedUserId");
                 alert(response.data);
                 window.location.href = "/";
               } catch (error) {

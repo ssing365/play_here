@@ -6,8 +6,8 @@ import { UserContext } from "../contexts/UserContext";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import CoupleDisconnect from './CoupleDisconnect'; // 커플 끊기
-import MemberWithdrawal from './MemberWithdrawal'; // 회원 탈퇴
+import CoupleDisconnect from '../components/EditProfile/CoupleDisconnect'; // 커플 끊기
+import MemberWithdrawal from '../components/EditProfile/MemberWithdrawal'; // 회원 탈퇴
 
 const EditProfile = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
