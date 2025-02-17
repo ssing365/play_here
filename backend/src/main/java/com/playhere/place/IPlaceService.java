@@ -16,5 +16,6 @@ public interface IPlaceService {
 	public void placeLikeCancle(@Param("placeId") String placeId);
 	public void InterestAdd(@Param("userId") String userId, @Param("placeId") String placeId);
 	public void InterestCancle(@Param("userId") String userId, @Param("placeId") String placeId);
-
+	public List<PlaceDTO> top5();
+	public List<PlaceDTO> interests(@Param("userId") String userId);
 }

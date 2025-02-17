@@ -9,6 +9,7 @@ import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
 
 import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import axios from "axios";
 
 const Search = () => {
 
@@ -21,6 +22,20 @@ const Search = () => {
     // 주간 날짜 뽑기
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [weekDates, setWeekDates] = useState([]);
+    const [top5, setTop5] = useState([]);
+
+    useEffect(()=>{
+        const fetchTop5 = async () => {
+            try {
+                const response = await axios.get("http://localhost:8586/top5.do");
+                console.log(response.data);
+                setTop5(response.data);
+            } catch (error) {
+                console.error("장소 리스트 불러오기 실패:", error);
+            }
+        };
+        fetchTop5();
+    },[])
 
     useEffect(() => {
         const today = new Date();
@@ -51,10 +66,10 @@ const Search = () => {
     };
 
     {/** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 시작*/}
-    const images = [
-        { src: "/images/main1.png", alt: "제주 감귤농장" },
-        { src: "/images/main2.png", alt: "제주 해변" }
-    ];
+    // const images = [
+    //     { src: "/images/main1.png", alt: "제주 감귤농장" },
+    //     { src: "/images/main2.png", alt: "제주 해변" }
+    // ];
 
     const [index, setIndex] = useState(0);
     const [direction, setDirection] = useState(1);
@@ -65,20 +80,29 @@ const Search = () => {
             handleNext();
         }, 4000);
 
-        return () => clearInterval(interval); // 컴포넌트가 언마운트되면 인터벌 제거
+        return () => clearInterval(interval); // 컴포넌트가 언마운트되면 인터벌 제거2
         }, [index]); // index가 변경될 때마다 인터벌 재설정
 
-    const handleNext = () => {
-        setDirection(1);
-        setIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
-
-    const handlePrev = () => {
-        setDirection(-1);
-        setIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-    };
+        const handleNext = () => {
+            if (!top5 || top5.length === 0) return;
+            setDirection(1);
+            setIndex((prevIndex) => (prevIndex + 1) % top5.length);
+        };
+        
+        const handlePrev = () => {
+            if (!top5 || top5.length === 0) return;
+            setDirection(-1);
+            setIndex((prevIndex) => (prevIndex - 1 + top5.length) % top5.length);
+        };
+        
     {/** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 끝 */}
 
+    useEffect(() => {
+        if (top5 && top5.length > 0) {
+            setIndex(0); // 새로운 데이터가 들어오면 index 초기화
+        }
+    }, [top5]);
+    
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* 상단바 */}
@@ -125,17 +149,17 @@ const Search = () => {
                         {/* 오른쪽 이미지 변경 */}
                         <Col md={8} className="position-relative overflow-hidden" style={{ height: "500px" }}>
                             <AnimatePresence initial={false} custom={direction}>
-                                <motion.img
-                                    key={index} // key 값이 바뀌어야 애니메이션이 작동함
-                                    src={images[index].src}
-                                    alt={images[index].alt}
-                                    className="d-block w-100 position-absolute"
-                                    style={{ objectFit: 'cover', height: '500px' }}
-                                    initial={{ x: direction * 100, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    exit={{ x: -direction * 100, opacity: 0 }}
-                                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                                />
+                            <motion.img
+                                key={index}
+                                src={top5.length > 0 ? top5[index].image : "/images/placeholder.png"} 
+                                className="d-block w-100 position-absolute"
+                                style={{ objectFit: 'cover', height: '500px' }}
+                                initial={{ x: direction * 100, opacity: 0 }}
+                                animate={{ x: 0, opacity: 1 }}
+                                exit={{ x: -direction * 100, opacity: 0 }}
+                                transition={{ duration: 0.5, ease: "easeInOut" }}
+                            />
+
                             </AnimatePresence>
                         </Col>
                     </Row>

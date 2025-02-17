@@ -7,6 +7,8 @@ import { Container, Button, Row, Badge } from "react-bootstrap";
 import { Calendar, X } from 'lucide-react';
 import TopBar from "../components/TopBar";
 
+const [interests, setInterests] = useState([]);
+
 const likedItems = [
   {
     name: "연남토마",

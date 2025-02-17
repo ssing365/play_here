@@ -1,23 +1,13 @@
 package com.playhere.restapi;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.playhere.member.IMemberService;
 import com.playhere.place.IPlaceService;
 import com.playhere.place.PlaceDTO;
-import com.playhere.util.JwtUtil;
-
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-
-import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -62,5 +52,17 @@ public class Placelist {
 	        e.printStackTrace();
 	    }
 	}
+	
+	@GetMapping("/top5.do")
+	public List<PlaceDTO> placeTop5() {
+		return dao.top5();
+	}
+	
+	@PostMapping("/interests.do")
+	public List<PlaceDTO> interests(@RequestBody Map<String, String> requestBody) {
+		String userId = requestBody.get("userId"); // body에서 userId 추출
+		return dao.interests(userId);
+	}
+	
 	
 }
