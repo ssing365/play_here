@@ -8,19 +8,14 @@ import { FaSearch } from "react-icons/fa";
 
 import CalendarComponent from "../Cal_components/CalendarUI.jsx";
 import Visit from "../Cal_components/Visit";
-import conCouple from "../routes/ConnectCouple.jsx";
 import "@fullcalendar/daygrid";
+
+// 거의 모든 기능은  Visit.jsx에 작성되어있습니다.!
+
 
 const Calender = () => {
   const [selectedDate, setSelectedDate] = useState(new Date()); //날짜
-  // const [diaryEntry, setDiaryEntry] = useState("");
-  // const [month, setMonth] = useState(2);
-
-  // const [newPlace, setNewPlace] = useState("");
-  // const [showInput, setShowInput] = useState(false);
-
-  // const [year, setYear] = useState(2025);
-  // const [showSearch, setShowSearch] = useState(false);
+  
 
   return (
     <>

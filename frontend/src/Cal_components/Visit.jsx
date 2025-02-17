@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useReducer, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Calendar from "react-calendar";
 
@@ -10,15 +10,57 @@ function Visit({ selectedDate }) {
     4: ["백년옥 서초점", "프리퍼", "예술의전당", "미나미 서초점"],
     5: ["스타벅스 강남점", "코엑스몰", "롯데월드타워"],
   };
-
+  const initialState = {
+    places: {},
+    diary: {},
+    diary2:{}
+  };
+  
+  // 리듀서 함수
+  const reducer = (state, action) => {
+    switch (action.type) {
+      case "ADD_PLACE":
+        return {
+          ...state,
+          places: {
+            ...state.places,
+            [action.date]: [...(state.places[action.date] || []), action.place],
+          },
+        };
+      case "DELETE_PLACE":
+        return {
+          ...state,
+          places: {
+            ...state.places,
+            [action.date]: state.places[action.date].filter((_, i) => i !== action.index),
+          },
+        };
+      case "UPDATE_DIARY":
+        return {
+          ...state,
+          diary: { ...state.diary, [action.date]: action.entry },
+        };
+      case "REBATCH_PLACES":
+        return {
+          ...state,
+          places: { ...state.places, [action.date]: action.places },
+        };
+      default:
+        return state;
+    }
+  };
   // const navigator= useNavigate();
-  const [places, setPlaces] = useState(initialPlaces);
-  const [newPlace, setNewPlace] = useState("");
+  const [state, dispatch]=useReducer(reducer,initialState);
 
+  const [places, setPlaces] = useState(initialPlaces); //더미
+  const [newPlace, setNewPlace] = useState("");
+  
   const [diaryEntry, setDiaryEntry] = useState("");
   const [CoupdiaryEntry, setCoupDiaryEntry] = useState("");
 
-const userId=userId();
+  // const userIdRef=useRef();
+// const userId=userId();
+
   // 방문했던 장소 검색?
 //  const searchPlace({onSelect}){
 //     const [query, setQuery]= useState("");
@@ -38,25 +80,15 @@ const userId=userId();
 //  }
 //  }
 // 날짜 별 방문 리스트  로드
-useEffect(() =>{
-  fetch(`/api/couple_visit?date=${selectedDate}`)
-  .then((res) => res.json())
-  .then((data) => setPlaces(data))
-  .catch((err) => console.error("방문지 로딩 오류:", err));
-}, [selectedDate]);
+// useEffect(() =>{
+//   fetch(`/api/couple_visit?date=${selectedDate}`)
+//   .then((res) => res.json())
+//   .then((data) => setPlaces(data))
+//   .catch((err) => console.error("방문지 로딩 오류:", err));
+// }, [selectedDate]);
 
-const saveDiary1 = () => {
-  fetch("/api/diary", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ userId, date: selectedDate, content: diaryEntry }),
-  })
-    .then((res) => res.json())
-    .then(() => alert("일기 저장 완료!"))
-    .catch((err) => console.error("일기 저장 오류:", err));
 
-};
-// const saveDiary2 = () => {
+// const saveDiary1 = () => {
 //   fetch("/api/diary", {
 //     method: "POST",
 //     headers: { "Content-Type": "application/json" },
@@ -65,7 +97,9 @@ const saveDiary1 = () => {
 //     .then((res) => res.json())
 //     .then(() => alert("일기 저장 완료!"))
 //     .catch((err) => console.error("일기 저장 오류:", err));
+
 // };
+
   // useEffect(()=>{   커플 매칭 확인?
   //   fetch(``)  //spring 매치 확인
   //   .then((res) => res.json())
@@ -78,32 +112,28 @@ const saveDiary1 = () => {
   //     .catch((error) => console.error("커플 여부 확인 실패:", error));
   // }, []);
 
-  // 장소 검색 후 추가
+  // 방문지 추가
   const addPlace = () => {
-    
-    if (newPlace.trim() !== "") {
-      setPlaces({
-        ...places,
-        [selectedDate]: [...(places[selectedDate] || []), newPlace],
-      });
+    if (newPlace.trim()) {
+      dispatch({ type: "ADD_PLACE", date: selectedDate, place: newPlace });
       setNewPlace("");
-      // setShowInput(false);
     }
   };
-  //방문지  드래그
+
+  // 방문지 삭제
+  const deletePlace = (index) => {
+    dispatch({ type: "DELETE_PLACE", date: selectedDate, index });
+  };
+
+  // 방문지 순서 변경 
   const onDragEnd = (result) => {
     if (!result.destination) return;
-    const items = Array.from(places[selectedDate] || []);
+    const items = Array.from(state.places[selectedDate] || []);
     const [reorderedItem] = items.splice(result.source.index, 1);
     items.splice(result.destination.index, 0, reorderedItem);
-    setPlaces({ ...places, [selectedDate]: items });
+    dispatch({ type: "REBATCH_PLACES", date: selectedDate, places: items });
   };
-  // 장소 삭제
-  const deletePlace = (index) => {
-    const updatedPlaces = [...(places[selectedDate] || [])];
-    updatedPlaces.splice(index, 1);
-    setPlaces({ ...places, [selectedDate]: updatedPlaces });
-  };
+
   return (
     <Container>
     <div className="visit-log">
@@ -180,18 +210,19 @@ const saveDiary1 = () => {
         <Col>
           <Card className="p-3">
             {/* <h6><label htmlFor={`${userId}-name`}></label></h6> */}
-           
+
+           <h6>철수의 일기</h6> 
             <Form.Control
               as="textarea"
               rows={3}
               value={diaryEntry}
-              onChange={(e) => setDiaryEntry(e.target.value)}
+              onChange={(e) => handleDiaryChange("철수",e.target.value)}
               placeholder="일기를 입력하세요 " 
             />
 
-            <Button className="mt-3" onclick={saveDiary1}>
+            {/* <Button className="mt-3" onclick={saveDiary1}>
               저장
-            </Button>
+            </Button> */}
 
           </Card>
         </Col>
@@ -205,7 +236,7 @@ const saveDiary1 = () => {
               value={CoupdiaryEntry}
               onChange={(e) => setCoupDiaryEntry(e.target.value)}
               placeholder="일기를 입력하세요"
-              readOnly
+              
               
             />
             <Button className="mt-3">

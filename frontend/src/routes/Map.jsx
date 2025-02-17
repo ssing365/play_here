@@ -126,16 +126,7 @@ const Map = (selectedDate, setSelectedDate) => {
                   <Button onClick={addPlace}>추가</Button>
                 </div>
            
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
-                    setShowInput(true);
-                  }}
-                >
-                  + 추가하기
-                </a>
-                )<h5 className="mt-3">일기</h5>
+                <h5 className="mt-3">일기</h5>
                 <Row>
                   <Col>
                     <Card className="p-3">
