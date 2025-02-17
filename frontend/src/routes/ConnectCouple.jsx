@@ -17,7 +17,6 @@ const ConnectCouple = () => {
     alert('커플코드가 복사되었습니다!');
   };
 
-
   return (
     <div>
       {/* 상단바 */}

@@ -24,5 +24,13 @@ public interface IMemberService {
 	// 로그인한 유저 정보 출력
 	public MemberDTO findByUserId(@Param("userId") String userId);
 
+	// 정보 수정
+	public void updateUser(MemberDTO updatedUser);
+
+	public void disconnectCouple(String userId);
+	
+	// 회원 탈퇴
+	public void withdrawUser(String userId);
+
 
 }

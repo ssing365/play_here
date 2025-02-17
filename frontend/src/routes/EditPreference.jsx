@@ -1,14 +1,18 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useContext } from "react";
+import { UserContext } from "../contexts/UserContext";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./css/preference.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../css/preference.css";
 import TopBar from "../components/TopBar";
+
 const RegisterPreference = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const [userId, setUserId] = useState("");
     const [categories, setCategories] = useState([]);
+
+    // context에서 로그인 유저 정보 가져오기
+    const { userInfo } = useContext(UserContext);
 
     useEffect(() => {
         //JSON 파일에서 categories.json 불러오기
@@ -51,11 +55,6 @@ const RegisterPreference = () => {
     };
 
     const handleSubmit = async () => {
-        if (!userId) {
-            alert("회원 정보를 확인할 수 없습니다.");
-            navigate("/register-terms");
-            return;
-        }
 
         //선택된 선호도 ID들을 배열로 변환하기
         const selectedPreferences = Object.values(selected).flat();
@@ -64,6 +63,7 @@ const RegisterPreference = () => {
             return;
         }
 
+        /*
         const preferencesToSend = selectedPreferences.map((preferenceId) => ({
             userId: userId, // 각 선호도에 userId 추가
             preferenceId: preferenceId,
@@ -101,87 +101,128 @@ const RegisterPreference = () => {
             alert(
                 "서버 오류로 선호도를 저장하지 못했습니다. 다시 시도해주세요."
             );
-        }
+        }*/
     };
 
     return (
         <>
             <TopBar />
-
-            <div className="container mt-5">
-                <div className="d-flex justify-content-center mt-4">
-                    <h1>회원 선호도 조사</h1>
+            <div className="container">
+                <div className="d-flex mt-5 ">
+                    <h4 style={{ fontWeight: "bold" }}>
+                        {userInfo.nickname}님의 선호도를 기반으로 데이트 장소를 추천해 드려요😊
+                    </h4>
                 </div>
-                <br />
-                <div className="d-flex justify-content-center mt-4">
-                    <h5>
-                        💕선호도를 기반으로 데이트 장소를 추천해 드려요😊
-                        <br />
-                        🌟선호도는 1개 이상 선택해주세요
-                        <br />
-                    </h5>
+                <div className="text-muted mb-5">
+                    🌟선호도는 1개 이상 선택해주세요
                 </div>
                 <div className="row">
-                    {categories.map((category) => (
-                        <div
-                            key={category.title}
-                            className="col-12 col-lg-6 mb-4"
-                        >
-                            <h3>{category.title}</h3>
-                            <div className="d-flex flex-wrap">
-                                {category.items.map((item) => (
-                                    <div
-                                        key={item.id}
-                                        className={`icon ${
-                                            selected[category.title]?.includes(
-                                                item.id
-                                            )
-                                                ? "selected"
-                                                : ""
-                                        }`}
-                                        onClick={() =>
-                                            handleClick(category.title, item)
-                                        }
-                                    >
-                                        <span className="icon-content">
-                                            {item.icon}
-                                            <br />
-                                            {item.label}
-                                        </span>
+                    <div className="col-12 col-lg-6">
+                        {categories
+                            .filter((category) =>
+                                ["먹기", "마시기", "놀기"].includes(
+                                    category.title
+                                )
+                            )
+                            .map((category) => (
+                                <div
+                                    key={category.title}
+                                    className="category-section"
+                                >
+                                    <h5 className="category-title">
+                                        {category.title}
+                                    </h5>
+                                    <div className="d-flex flex-wrap">
+                                        {category.items.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="d-flex flex-column align-items-center"
+                                            >
+                                                <div
+                                                    className={`icon-circle ${
+                                                        selected[
+                                                            category.title
+                                                        ]?.includes(item.id)
+                                                            ? "selected"
+                                                            : ""
+                                                    }`}
+                                                    onClick={() =>
+                                                        handleClick(
+                                                            category.title,
+                                                            item
+                                                        )
+                                                    }
+                                                >
+                                                    {item.icon}
+                                                </div>
+                                                <span className="label">
+                                                    {item.label}
+                                                </span>
+                                            </div>
+                                        ))}
                                     </div>
-                                ))}
-                            </div>
+                                </div>
+                            ))}
+                    </div>
+                    <div className="col-12 col-lg-6">
+                        {categories
+                            .filter((category) =>
+                                ["보기", "걷기"].includes(category.title)
+                            )
+                            .map((category) => (
+                                <div
+                                    key={category.title}
+                                    className="category-section"
+                                >
+                                    <h5 className="category-title">
+                                        {category.title}
+                                    </h5>
+                                    <div className="d-flex flex-wrap">
+                                        {category.items.map((item) => (
+                                            <div
+                                                key={item.id}
+                                                className="d-flex flex-column align-items-center"
+                                            >
+                                                <div
+                                                    className={`icon-circle ${
+                                                        selected[
+                                                            category.title
+                                                        ]?.includes(item.id)
+                                                            ? "selected"
+                                                            : ""
+                                                    }`}
+                                                    onClick={() =>
+                                                        handleClick(
+                                                            category.title,
+                                                            item
+                                                        )
+                                                    }
+                                                >
+                                                    {item.icon}
+                                                </div>
+                                                <span className="label">
+                                                    {item.label}
+                                                </span>
+                                            </div>
+                                        ))}
+                                    </div>
+                                </div>
+                            ))}
+                        <div className="text-center mt-3">
+                            <button
+                                className="preference-btn"
+                                onClick={handleSubmit}
+                            >
+                                선택완료
+                            </button>
+                            <br />
+                            <button
+                                onClick={() => navigate(-1)}
+                                className="btn btn-secondary mt-2"
+                            >
+                                다음에 고르기
+                            </button>
                         </div>
-                    ))}
-                    <div
-                        className="col-12 col-lg-6 mb-4"
-                        style={{ textAlign: "center" }}
-                    >
-                        <br />
-                        <button
-                            className="btn btn-primary mr-2"
-                            onClick={handleSubmit}
-                            style={{
-                                fontSize: "20px",
-                                padding: "10px 20px",
-                                margin: "10px 0",
-                                width: "200px",
-                            }}
-                        >
-                            선택완료
-                        </button>
-                        <br />
-                        <button
-                            className="btn btn-secondary"
-                            style={{
-                                fontSize: "20px",
-                                padding: "10px 20px",
-                                margin: "10px 0",
-                                width: "200px",
-                            }}
-                        >
-                            다음에 고르기
-                        </button>
                     </div>
                 </div>
             </div>

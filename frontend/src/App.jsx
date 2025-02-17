@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
+import { UserProvider } from './contexts/UserContext';
 import Search from "./routes/Search";
 import Calender from "./routes/Calender";
 import SearchList from "./routes/SearchList";
@@ -9,8 +10,7 @@ import MyPage from "./routes/MyPage";
 import MyPageLikes from "./routes/MyPageLikes";
 import EditProfile from "./routes/EditProfile";
 import Login from "./routes/Login";
-import RegisterComplete from "./routes/RegisterComplete";
-import { NaverCallback } from "./components/NaverLogin"
+import { NaverCallback } from "./components/Login/NaverLogin"
 import EditPreference from "./routes/EditPreference"
 
 import Map from './routes/Map';
@@ -18,10 +18,11 @@ import Map from './routes/Map';
 import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 import RegisterTerms from "./routes/RegisterTerms";
+import RegisterComplete from "./routes/RegisterComplete";
 
 function App() {
     return (
-        
+        <UserProvider>
         <Router>
             <Routes>
                 {/** 메인 */}
@@ -48,7 +49,7 @@ function App() {
                 {/** 회원가입, 로그인 */}
                 <Route path="/Login" element={<Login/>} />
                 <Route path="/oauth/callback/naver" element={<NaverCallback/>} />
-               
+
                   
                 {/** 회원가입로직 (약관 - 회원가입 폼 - 선호도 - 회원가입 완료) */}
 
@@ -58,6 +59,7 @@ function App() {
                 <Route path="/register-complete" element={<RegisterComplete />} />
             </Routes>
         </Router>
+        </UserProvider>
     );
 }
 

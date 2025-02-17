@@ -2,8 +2,8 @@ import { useEffect, useRef } from "react";
 // import Container_ from 'postcss/lib/container';
 import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
-import KakaoLoginButton from "../components/KakaoLogin.jsx"
-import NaverLoginButton from "../components/NaverLogin.jsx"
+import KakaoLoginButton from "../components/Login/KakaoLogin.jsx"
+import NaverLoginButton from "../components/Login/NaverLogin.jsx"
 import { Link, useNavigate, } from "react-router-dom";
 import axios from "axios";
 
