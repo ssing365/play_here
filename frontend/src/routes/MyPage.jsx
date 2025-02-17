@@ -76,7 +76,7 @@ const MyPage = () => {
                                     </button>
                                 </Link>
                             ) : userInfo.coupleStatus === 1 ? (
-                                <Link to="/calender">
+                                <Link to="/calendar">
                                     <button className="couple-btn">
                                         커플 캘린더 이동하기
                                     </button>

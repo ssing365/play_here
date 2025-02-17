@@ -99,10 +99,10 @@ const TopBar = () => {
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 mx-5"
                                     style={
-                                        location.pathname === "/calender"
+                                        location.pathname === "/calendar"
                                             ? {fontSize: "1.1rem",
                                                   color: "#e91e63",
                                               }
@@ -254,7 +254,7 @@ const TopBar = () => {
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 my-1"
                                 >
                                     캘린더

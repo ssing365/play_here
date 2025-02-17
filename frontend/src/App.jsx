@@ -1,7 +1,7 @@
 import { BrowserRouter as Router, Routes, Route, Navigate} from "react-router-dom";
 import { UserProvider } from './contexts/UserContext';
 import Search from "./routes/Search";
-import Calender from "./routes/Calender";
+import Calendar from "./routes/Calendar";
 import SearchList from "./routes/SearchList";
 import ConnectCouple from "./routes/ConnectCouple";
 import Place from "./routes/Place";
@@ -34,7 +34,7 @@ function App() {
                 <Route path="/place" element={<Place />} />
 
                 {/** 지도, 캘린더 */}
-                <Route path="/calender" element={<Calender />} />
+                <Route path="/calendar" element={<Calendar />} />
                 <Route path="/map" element={<Map />} />
 
                 {/** 마이페이지 관련 */}
