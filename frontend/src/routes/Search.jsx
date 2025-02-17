@@ -4,20 +4,16 @@ import WeatherCard from "../components/WeatherCard"; // WeatherCard 추가
 import '../index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
-import { Link } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
-
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { useContext } from "react";
+import { UserContext } from '../contexts/UserContext';
 
 const Search = () => {
-
     // 카테고리 default
     const [selectedCategory, setSelectedCategory] = useState('식당 & 카페');
-
-    // 이미지 슬라이드용
-    const carouselRef = useRef(null);
 
     // 주간 날짜 뽑기
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
@@ -37,6 +33,10 @@ const Search = () => {
         fetchTop5();
     },[])
 
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn } = useContext(UserContext);
+
+    // 날짜 출력
     useEffect(() => {
         const today = new Date();
         const dates = Array.from({ length: 7 }, (_, i) => {
@@ -111,7 +111,13 @@ const Search = () => {
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
                 {/* 지금 가기 좋은 곳 */}
-                <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>지금 가기 좋은 곳 (or 선호도 기반 추천지)</h4>
+                {isLoggedIn ? (
+                        <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
+                        {userInfo?.nickname || "Loading..."} 님을 위한 추천 </h4>
+                    ):(
+                        <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
+                        지금 가기 좋은 곳 </h4>
+                    )}
                 <div className="d-flex gap-3 mb-3">
                     {['식당 & 카페', '가볼만한 곳', '축제, 공연'].map((category) => (
                         <Button 

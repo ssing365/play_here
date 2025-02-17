@@ -6,43 +6,22 @@ import TopBar from "../components/TopBar";
 
 
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Container, Nav, Form, Button, Row, Col, Badge, Modal } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
+
 
 //!! npm install react-bootstrap bootstrap 해야됨 !!
 const App = () => {
 
     const [places, setPlaces] = useState([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const navigate = useNavigate();
-    const [userId, setUserId] = useState("");
+    
 
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/api/check-auth",
-                    { withCredentials: true }
-                );
-                console.log(response.data);
-                setUserId(response.data);
-                setIsLoggedIn(true);
-            } catch (error) {
-                if (error.response && error.response.status === 401) {
-                    console.log(error);
-                    setIsLoggedIn(false);
-                } else {
-                    console.error("로그인 오류:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            }
-        };
-        checkAuth();
-    }, [isLoggedIn]);
-
+    const { userInfo, isLoggedIn} = useContext(UserContext);
+    const userId = userInfo?.userId
     
     // 장소 리스트 불러오는 함수 분리
     const fetchPlace = async () => {

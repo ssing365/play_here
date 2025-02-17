@@ -8,9 +8,17 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
+import org.springframework.web.client.RestTemplate;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
@@ -24,19 +32,20 @@ import io.jsonwebtoken.Claims;
 @RestController
 @RequestMapping("/api")
 public class LoginController {
-	
 	@Autowired
 	IMemberService dao;
 	
 	@Autowired
     JwtUtil jwtUtil;
 	
+//	로그인
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO member, HttpServletResponse response) {
 	    System.out.println("요청 받은 userId: " + member.getUserId());
 	    System.out.println("요청 받은 password: " + member.getPassword());
 
 	    MemberDTO user = dao.login(member.getUserId(), member.getPassword());
+		
 		if(user!=null) {
 			// ✅ JWT 토큰 생성
             String jwt = jwtUtil.generateToken(member.getUserId());
@@ -49,7 +58,6 @@ public class LoginController {
             cookie.setSecure(false); // 🚨 로컬 개발 환경에서는 false
             cookie.setDomain("localhost"); // 필요 시 추가
             response.addCookie(cookie);
-                 
 
             return ResponseEntity.ok("success");
 		} else {
@@ -57,6 +65,7 @@ public class LoginController {
 		}	
 	}
 	
+//	로그아웃
 	@PostMapping("/logout")
 	public ResponseEntity<String> logout(HttpServletResponse response) {
 	    // 토큰 쿠키 삭제 (만료 시간을 과거로 설정)
@@ -68,24 +77,6 @@ public class LoginController {
 	    response.addCookie(cookie);
 	    
 	    return ResponseEntity.ok("logout success");
-	}
-	
-	@GetMapping("/check-auth")
-	public ResponseEntity<?> checkAuth(@CookieValue(name = "token", required = false) String token) {
-		System.out.println("받은 토큰: " + token);  // ✅ 쿠키 확인용 로그
-		if (token != null) {
-	        try {
-	        	Claims claims = jwtUtil.validateToken(token);
-	            System.out.println("Subject: " + claims.getSubject());
-	            claims.forEach((key, value) -> System.out.println(key + ": " + value));
-	            return ResponseEntity.ok(claims.getSubject()); // userId 반환
-	        } catch (Exception e) {
-	        	e.printStackTrace();
-	            return ResponseEntity.status(401).body("unauthorized");
-	        }
-	    }
-		
-	    return ResponseEntity.status(401).body("unauthorized");
 	}
 	
 	@PostMapping("/naver-login")

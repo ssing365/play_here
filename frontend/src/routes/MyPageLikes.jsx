@@ -1,13 +1,15 @@
 
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import DatePicker from "react-datepicker";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
 import { Container, Button, Row, Badge } from "react-bootstrap";
 import { Calendar, X } from 'lucide-react';
 import TopBar from "../components/TopBar";
+import { UserContext } from "../contexts/UserContext";
+import axios from "axios";
 
-const [interests, setInterests] = useState([]);
+
 
 const likedItems = [
   {
@@ -123,9 +125,33 @@ const likedItems = [
 ];
 
 const MyPageLikes = () => {
+
+  // context에서 로그인 상태, 유저 정보 가져오기
+  const { userInfo } = useContext(UserContext);
   const [hoverIndex, setHoverIndex] = useState(null);
   const [startDate, setStartDate] = useState(null);
   const [openDatePickerIndex, setOpenDatePickerIndex] = useState(null); // 각 항목에 대한 달력 상태 관리
+  const userId = userInfo?.userId
+  const [interests, setInterests] = useState([]);
+
+  useEffect(() => {
+    if (userId) {  // userId가 존재할 때만 API 요청
+        const fetchInterest = async () => {
+            try {
+                const response = await axios.post(
+                    "http://localhost:8586/interests.do",
+                    { userId },  // userId를 바디에 포함
+                    { headers: { "Content-Type": "application/json" } }
+                );
+                console.log(response.data);
+                setInterests(response.data);
+            } catch (error) {
+                console.error("장소 리스트 불러오기 실패:", error);
+            }
+        };
+        fetchInterest();
+    }
+}, [userId]); // userId가 설정된 후 실행
 
   const handleMouseEnter = (index) => setHoverIndex(index);
   const handleMouseLeave = () => {
@@ -134,7 +160,7 @@ const MyPageLikes = () => {
   };
 
   const handleDelete = (index) => {
-    console.log(`항목 삭제: ${likedItems[index].name}`);
+    console.log(`항목 삭제: ${interests[index].name}`);
   };
 
   const handleDatePickerToggle = (index) => {
@@ -148,7 +174,7 @@ const MyPageLikes = () => {
 
       {/* 페이지 제목 */}
       <Container className="mb-4">
-        <h2 className="text-center">홍길동님의 좋아요 리스트</h2>
+        <h2 className="text-center">{userInfo?.nickname || "Loading..."}님의 좋아요 리스트</h2>
       </Container>
 
       {/* 좋아요 리스트 */}
@@ -157,7 +183,7 @@ const MyPageLikes = () => {
           <Row md={4} key={index} onMouseEnter={() => handleMouseEnter(index)} onMouseLeave={handleMouseLeave}>
             <div key={index} className="position-relative">
               <img 
-                src="https://image.toast.com/aaaaaqx/catchtable/shopmenu/smROLHx_6mjlRTyatx4bSkA/mrolhx_6mjlrtyatx4bska_244415531261767.png"
+                src={item.image}
                 alt={item.name} 
                 className="rounded w-100 h-auto"
                 style={{ objectFit: 'cover' }}

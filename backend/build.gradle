@@ -50,7 +50,7 @@ dependencies {
 	implementation 'org.json:json:20210307'
 	
 	//.env를 활용하기 위한 의존성 추가
-	implementation 'io.github.cdimascio:java-dotenv:5.2.2'
+	//implementation 'io.github.cdimascio:java-dotenv:5.2.2'
 	implementation group: 'io.github.cdimascio', name: 'dotenv-java', version: '3.0.2'
 }
 
