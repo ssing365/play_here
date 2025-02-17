@@ -123,6 +123,7 @@ const TopBar = () => {
                                         className="custom-input w-100"
                                     />
                                     <FaSearch className="search-icon"
+                                    onClick={() => navigate("/searchlist")}
                                     />
                                 </Form>
 

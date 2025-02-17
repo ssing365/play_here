@@ -1,58 +1,24 @@
 
 import axios from "axios";
-
-
 import TopBar from "../components/TopBar";
-
-
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useEffect, useState } from "react";
 import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
 
 //!! npm install react-bootstrap bootstrap 해야됨 !!
-const App = () => {
+const SearchList = () => {
 
     const [places, setPlaces] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/api/check-auth",
-                    { withCredentials: true }
-                );
-                console.log(response);
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.log(error.response);
-                console.log(error.response.status);
-                if (error.response && error.response.status === 401) {
-                    console.log(error);
-                    setIsLoggedIn(false);
-                } else {
-                    console.error("로그인 오류:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            }
-        };
-        checkAuth();
-    }, [isLoggedIn]);
 
     useEffect(()=>{
-
         const fetchPlace = async() =>{
-
-            try {
-        const response = await axios.get("http://localhost:8586/placeList.do");
-        console.log(response.data);
-        setPlaces(response.data);  // 받아온 데이터를 상태에 저장
-
-      } catch (error) {
-        console.error("Error fetching places:", error);
-      }
+        try {
+            const response = await axios.get("http://localhost:8586/placeList.do");
+            console.log(response.data);
+            setPlaces(response.data);  // 받아온 데이터를 상태에 저장
+        } catch (error) {
+            console.error("Error fetching places:", error);
+        }
         }
         fetchPlace();
     },[]);    
@@ -213,4 +179,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default SearchList;
