@@ -151,6 +151,11 @@ const TopBar = () => {
                                                         height: "40px",
                                                         borderRadius: "50%",
                                                     }}
+                                                    //이미지 불러오는 도중 에러가 나면 기본이미지(마커이미지)
+                                                    onError={(e)=>{
+                                                        e.target.onError = null;
+                                                        e.target.src="/images/marker.svg";
+                                                    }}
                                                 />
                                             ) : (
                                                 <FaUserCircle

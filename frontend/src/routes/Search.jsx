@@ -16,7 +16,7 @@ const Search = () => {
     // 주간 날짜 뽑기
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [weekDates, setWeekDates] = useState([]);
-
+    
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo, isLoggedIn } = useContext(UserContext);
 
@@ -86,6 +86,7 @@ const Search = () => {
                 </Row>
 
                 {/* 중간 섹션 : 큐레이션, 큰 사진 슬라이드*/}
+
                 <Top5/>
 
                 {/* 주간 달력과 날씨 */}

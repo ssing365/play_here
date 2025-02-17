@@ -15,6 +15,7 @@ public class JwtUtil {
 
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
     
+    
     // ✅ 토큰 생성
 	public String generateToken(String userId) {
         return Jwts.builder()
@@ -33,4 +34,5 @@ public class JwtUtil {
                 .parseClaimsJws(token)
                 .getBody();
     }
+	
 }
