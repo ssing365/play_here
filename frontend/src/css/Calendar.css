@@ -1,0 +1,86 @@
+.couple-calendar-container {
+    padding: 20px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  }
+  
+  .calendar-column {
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    min-height: 100%;
+  }
+  
+  .search-bar {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+  
+  .search-container {
+    position: relative;
+    margin-bottom: 15px;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+  }
+  
+  .search-input {
+    width: 30%; /* 너비 절반 정도로 줄임 */
+    height: 35px;
+    transition: opacity 0.3s ease-in-out;
+  }
+  
+  .search-icon {
+    cursor: pointer;
+    font-size: 24px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  
+  .couple-calendar {
+    flex-grow: 1;
+    width: 100%;
+    border: none !important;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  .react-calendar__tile {
+    padding: 15px 10px;
+    text-align: center;
+    border-radius: 8px;
+    transition: background 0.2s;
+  }
+  
+  .react-calendar__tile--now {
+    background: #ffe0e0 !important;
+    color: #d32f2f;
+  }
+  
+  .react-calendar__tile--active {
+    background: #d32f2f !important;
+    color: #fff;
+  }
+  
+  .react-calendar__navigation button {
+    color: #d32f2f;
+  }
+  
+  .react-calendar__navigation button:enabled:hover {
+    background: #ffe0e0;
+  }
+  
+  .places-column {
+    padding: 15px;
+  }
+  
+  @media (max-width: 768px) {
+    .calendar-column, .places-column {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #e0e0e0;
+    }
+  }
+  

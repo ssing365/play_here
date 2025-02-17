@@ -1,84 +1,55 @@
-/* 전체 배경색 변경 */
+.mypage-wrapper {
+    display: flex;
+    flex-direction: column;
+    width: 100%; /* 전체 너비 유지 */
+    min-height: 90vh; /* 화면 크기 유지 */
+    padding: 20px 20px;
+}
+
 .mypage-container {
     display: flex;
-    justify-content: center;
-    align-items: flex-start; /* 위쪽에 붙이기 */
-    padding-top: 80px;        /* 상단바 높이 고려 (조절 가능) */
-<<<<<<< HEAD
-    padding: 40px 20px;
-    background-color: #fff; /* 밝은 배경 */
-    min-height: 100vh;
-=======
-    padding: 40px 20px 0px 20px;
-    background-color: #fff; /* 밝은 배경 */
-    min-height: 90vh;
->>>>>>> 9f6cfe1d906078f6b4c7db865570e8511dba976b
+    justify-content: center; /* 가운데 정렬 */
+    align-items: flex-start;
+    width: 100%; /* 부모 너비를 꽉 채우기 */
+    padding-top: 40px;
+    background-color: #fff;
 }
 
 /* 카드 스타일 (배경 반전) */
 .mypage-card {
     background-color: #f9f9f9; /* 카드 배경을 연한 회색으로 */
     border-radius: 16px;
-<<<<<<< HEAD
     padding: 40px 30px;
-=======
-    padding: 30px 30px;
->>>>>>> 9f6cfe1d906078f6b4c7db865570e8511dba976b
     width: 100%;
     max-width: 600px;   /* 좌우로 더 넓게 */
-    height: 600px;      /* 상하로 짧게 */
+    height: 750px;      /* 상하로 짧게 */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
 }
 
-/* 리본 - 카드 안으로 이동 & 왼쪽 정렬 */
-.ribbon {
-    background-color: #8785A2;
-    color: #ffffff;
-    padding: 8px 20px;
-    font-size: 16px;
-    font-weight: bold;
-    border-radius: 6px;
-    position: absolute;
-<<<<<<< HEAD
-    top: 20px;
-=======
-    top: 10px;
->>>>>>> 9f6cfe1d906078f6b4c7db865570e8511dba976b
-    left: 20px;
-}
-
 /* 프로필 섹션 */
 .profile-section {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-top: 60px; /* 리본과 간격 */
+    position: relative;
+    margin: 20px 0;
 }
 
 /* 프로필 아이콘 */
 .profile-icon {
-    font-size: 60px;
+    font-size: 100px;
     color: #555;
+    position: relative;
+    right: -30px; /* 약간 우측으로 이동 */
 }
 
 /* 닉네임 */
 .nickname {
-    font-size: 22px;
-    margin: 0;
+    font-size: 24px;
+    font-weight: bold;
+    margin: 10px 0;
     flex-grow: 1;
     text-align: center;
     color: #333;
-}
-
-/* 정보수정 버튼 */
-.edit-btn {
-    background: none;
-    border: none;
-    color: #5b6269;
-    font-size: 14px;
-    cursor: pointer;
-    padding: 5px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* 강조 효과 */
 }
 
 /* 구분선 */
@@ -128,40 +99,13 @@
     transition: transform 0.2s, box-shadow 0.3s;
     font-weight: bold;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-<<<<<<< HEAD
-=======
     text-align: center;
-   
->>>>>>> 9f6cfe1d906078f6b4c7db865570e8511dba976b
 }
-
 /* 메뉴 버튼 호버 효과 */
 .menu-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
     background: linear-gradient(135deg, #FFE2E2, #FFC7C7);
-<<<<<<< HEAD
-=======
-}
-
-.profile-section {
-    position: relative;
-    margin: 20px 0;
-}
-
-.profile-icon {
-    font-size: 100px;
-    color: #555;
-    position: relative;
-    right: -30px; /* 약간 우측으로 이동 */
-}
-
-.nickname {
-    font-size: 24px;
-    font-weight: bold;
-    color: #222;
-    margin: 10px 0;
-    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2); /* 강조 효과 */
 }
 
 .profile-info {
@@ -169,6 +113,7 @@
     color: #888; /* 흐릿한 느낌 */
     line-height: 1.5;
     padding-left: 40px; /* 약간 우측으로 이동 */
+    flex-grow: 1; /* 가능한 공간 차지 */
 }
 
 .edit-profile-icon {
@@ -183,8 +128,68 @@
     padding: 30px 30px;
     width: 100%;
     max-width: 600px;   /* 좌우로 더 넓게 */
-    height: 700px;      /* 상하로 짧게 */
+    height: 750px;      /* 상하로 짧게 */
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
     position: relative;
->>>>>>> 9f6cfe1d906078f6b4c7db865570e8511dba976b
+}
+.profile-container {
+    display: flex;
+    justify-content: space-between; /* 양쪽 정렬 */
+    align-items: center; /* 수직 중앙 정렬 */
+    width: 100%; /* 부모 요소의 너비를 차지하도록 설정 */
+    padding: 10px; /* 여백 추가 */
+}
+
+.profile-form {
+    display: flex;
+    flex-direction: column;
+    gap: 12px; /* 줄 간격 조정 */
+}
+
+.form-group {
+    display: flex;
+    align-items: center; /* 수직 정렬 */
+    justify-content: flex-start; /* 왼쪽 정렬 */
+}
+
+.form-group label {
+    width: 80px; /* 라벨 너비 설정 */
+    text-align: right; /* 오른쪽 정렬 */
+    margin-right: 12px; /* 라벨과 인풋 사이 간격 */
+}
+
+.form-group input {
+    width: 300px; /* 인풋 창 크기 */
+}
+
+.button-container {
+    display: flex;
+    align-items: center; /* 버튼 높이 맞춤 */
+    width: 100%; /* 부모 요소의 전체 너비 사용 */
+    margin-top: 50px;
+    gap: 5px
+}
+
+.button-container button {
+    height: 38px; /* 버튼 높이 통일 */
+    padding: 5px 15px; /* 버튼 내부 여백 */
+}
+
+.button-container .spacer {
+    flex-grow: 1; /* 중간 여백을 자동으로 차지 */
+}
+
+.save-btn, .disconnection {
+    margin-left: auto; /* '저장' 버튼을 오른쪽으로 밀기 */
+}
+
+.cancel-btn{
+    margin-right: 10px;
+}
+
+.quit-button-container {
+    display: flex;
+    justify-content: flex-end; /* 회원 탈퇴 버튼만 오른쪽 정렬 */
+    width: 100%; /* 부모 컨테이너 너비 유지 */
+    margin-top: 10px; /* 위쪽 간격 조정 */
 }

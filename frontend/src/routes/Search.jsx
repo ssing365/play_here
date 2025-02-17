@@ -1,27 +1,26 @@
 import TopBar from "../components/TopBar";
 import Footer from "../components/Footer";
-import WeatherCard from "../components/WeatherCard"; // WeatherCard 추가
+import Top5 from "../components/Main/Top5"
+import WeatherCard from "../components/Main/WeatherCard"; // WeatherCard 추가
 import '../index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Button, Container, Row, Col, Card, Carousel } from "react-bootstrap";
-import { Link } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from 'react-bootstrap-icons';
-
-import { useState, useEffect, useRef } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { Button, Container, Row, Col, Card } from "react-bootstrap";
+import { useState, useEffect } from "react";
+import { useContext } from "react";
+import { UserContext } from '../contexts/UserContext';
 
 const Search = () => {
-
     // 카테고리 default
     const [selectedCategory, setSelectedCategory] = useState('식당 & 카페');
-
-    // 이미지 슬라이드용
-    const carouselRef = useRef(null);
 
     // 주간 날짜 뽑기
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [weekDates, setWeekDates] = useState([]);
+    
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn } = useContext(UserContext);
 
+    // 날짜 출력
     useEffect(() => {
         const today = new Date();
         const dates = Array.from({ length: 7 }, (_, i) => {
@@ -34,13 +33,13 @@ const Search = () => {
 
     // 주간 행사 더미
     const events = {
-        10: [{ name: '행사 1', img: '/images/main1.png' }, { name: '행사 2', img: '/images/main2.png' }, { name: '행사 3', img: '/images/main4.png' }],
-        11: [{ name: '행사 A', img: '/images/main2.png' }, { name: '행사 B', img: '/images/main3.png' }, { name: '행사 C', img: '/images/main5.png' }],
-        12: [{ name: '행사 D', img: '/images/main3.png' }, { name: '행사 I', img: '/images/main4.png' }, { name: '행사 N', img: '/images/main3.png' }],
-        13: [{ name: '행사 E', img: '/images/main4.png' }, { name: '행사 J', img: '/images/main5.png' }, { name: '행사 O', img: '/images/main2.png' }],
-        14: [{ name: '행사 F', img: '/images/main5.png' }, { name: '행사 K', img: '/images/main1.png' }, { name: '행사 P', img: '/images/main1.png' }],
-        15: [{ name: '행사 G', img: '/images/main1.png' }, { name: '행사 L', img: '/images/main2.png' }, { name: '행사 Q', img: '/images/main4.png' }],
-        16: [{ name: '행사 H', img: '/images/main2.png' }, { name: '행사 M', img: '/images/main3.png' }, { name: '행사 R', img: '/images/main5.png' }],
+        17: [{ name: '행사 1', img: '/images/main1.png' }, { name: '행사 2', img: '/images/main2.png' }, { name: '행사 3', img: '/images/main4.png' }],
+        18: [{ name: '행사 A', img: '/images/main2.png' }, { name: '행사 B', img: '/images/main3.png' }, { name: '행사 C', img: '/images/main5.png' }],
+        19: [{ name: '행사 D', img: '/images/main3.png' }, { name: '행사 I', img: '/images/main4.png' }, { name: '행사 N', img: '/images/main3.png' }],
+        20: [{ name: '행사 E', img: '/images/main4.png' }, { name: '행사 J', img: '/images/main5.png' }, { name: '행사 O', img: '/images/main2.png' }],
+        21: [{ name: '행사 F', img: '/images/main5.png' }, { name: '행사 K', img: '/images/main1.png' }, { name: '행사 P', img: '/images/main1.png' }],
+        22: [{ name: '행사 G', img: '/images/main1.png' }, { name: '행사 L', img: '/images/main2.png' }, { name: '행사 Q', img: '/images/main4.png' }],
+        23: [{ name: '행사 H', img: '/images/main2.png' }, { name: '행사 M', img: '/images/main3.png' }, { name: '행사 R', img: '/images/main5.png' }],
     }
 
     // 맨위 추천장소 더미
@@ -50,35 +49,6 @@ const Search = () => {
         '축제, 공연': ['/images/main3.png', '/images/main5.png', '/images/main4.png'],
     };
 
-    {/** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 시작*/}
-    const images = [
-        { src: "/images/main1.png", alt: "제주 감귤농장" },
-        { src: "/images/main2.png", alt: "제주 해변" }
-    ];
-
-    const [index, setIndex] = useState(0);
-    const [direction, setDirection] = useState(1);
-
-    // 👉 일정 시간(4초)마다 자동으로 다음 이미지로 전환
-    useEffect(() => {
-        const interval = setInterval(() => {
-            handleNext();
-        }, 4000);
-
-        return () => clearInterval(interval); // 컴포넌트가 언마운트되면 인터벌 제거
-        }, [index]); // index가 변경될 때마다 인터벌 재설정
-
-    const handleNext = () => {
-        setDirection(1);
-        setIndex((prevIndex) => (prevIndex + 1) % images.length);
-    };
-
-    const handlePrev = () => {
-        setDirection(-1);
-        setIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
-    };
-    {/** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 끝 */}
-
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* 상단바 */}
@@ -87,7 +57,13 @@ const Search = () => {
             {/* 메인 컨테이너 */}
             <Container className="mt-4">
                 {/* 지금 가기 좋은 곳 */}
-                <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>지금 가기 좋은 곳 (or 선호도 기반 추천지)</h4>
+                {isLoggedIn ? (
+                        <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
+                        {userInfo?.nickname || "Loading..."} 님을 위한 추천 </h4>
+                    ):(
+                        <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
+                        지금 가기 좋은 곳 </h4>
+                    )}
                 <div className="d-flex gap-3 mb-3">
                     {['식당 & 카페', '가볼만한 곳', '축제, 공연'].map((category) => (
                         <Button 
@@ -110,45 +86,8 @@ const Search = () => {
                 </Row>
 
                 {/* 중간 섹션 : 큐레이션, 큰 사진 슬라이드*/}
-                <Carousel className="mb-4" indicators={false} controls={false}>
-                <Carousel.Item>
-                    <Row>
-                        {/* 왼쪽 설명은 고정 */}
-                        <Col md={4} className="d-flex flex-column justify-content-center p-4">
-                            <div style={{ backgroundColor: '#FFC7C7', padding: '5px 10px', borderRadius: '15px', display: 'inline-block', fontSize: '12px' }}>
-                                <b>여놀 PICK!</b>
-                            </div>
-                            <h4 className="mt-2 fw-bold">여기놀자 좋아요 TOP5</h4>
-                            
-                        </Col>
 
-                        {/* 오른쪽 이미지 변경 */}
-                        <Col md={8} className="position-relative overflow-hidden" style={{ height: "500px" }}>
-                            <AnimatePresence initial={false} custom={direction}>
-                                <motion.img
-                                    key={index} // key 값이 바뀌어야 애니메이션이 작동함
-                                    src={images[index].src}
-                                    alt={images[index].alt}
-                                    className="d-block w-100 position-absolute"
-                                    style={{ objectFit: 'cover', height: '500px' }}
-                                    initial={{ x: direction * 100, opacity: 0 }}
-                                    animate={{ x: 0, opacity: 1 }}
-                                    exit={{ x: -direction * 100, opacity: 0 }}
-                                    transition={{ duration: 0.5, ease: "easeInOut" }}
-                                />
-                            </AnimatePresence>
-                        </Col>
-                    </Row>
-                </Carousel.Item>
-            </Carousel>
-                <div className="d-flex justify-content-center gap-3 mb-3">
-                    <Button variant="outline-dark" size="sm" onClick={handlePrev}>
-                        <ChevronLeft />
-                    </Button>
-                    <Button variant="outline-dark" size="sm" onClick={handleNext}>
-                        <ChevronRight />
-                    </Button>
-                </div>
+                <Top5/>
 
                 {/* 주간 달력과 날씨 */}
                 <Row>

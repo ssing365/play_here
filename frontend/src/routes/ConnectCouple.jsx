@@ -25,7 +25,6 @@ const ConnectCouple = () => {
         headers: {
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify({ username, password })
       });
       if (response.ok) {
         const data = await response.json();
@@ -93,7 +92,6 @@ const ConnectCouple = () => {
     navigator.clipboard.writeText(coupleCode);
     alert('커플코드가 복사되었습니다!');
   };
-
 
   return (
     <div>

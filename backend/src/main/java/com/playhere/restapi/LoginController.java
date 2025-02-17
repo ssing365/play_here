@@ -79,24 +79,6 @@ public class LoginController {
 	    return ResponseEntity.ok("logout success");
 	}
 	
-//	로그인 상태 확인
-	@GetMapping("/check-auth")
-	public ResponseEntity<?> checkAuth(@CookieValue(name = "token", required = false) String token) {
-		System.out.println("받은 토큰: " + token);  // ✅ 쿠키 확인용 로그
-		if (token != null) {
-	        try {
-	            Claims claims = jwtUtil.validateToken(token);
-	            System.out.println("Subject: " + claims.getSubject());
-	            claims.forEach((key, value) -> System.out.println(key + ": " + value));
-	            return ResponseEntity.ok(claims.getSubject()); // userId 반환
-	        } catch (Exception e) {
-	        	e.printStackTrace();
-	            return ResponseEntity.status(401).body("unauthorized");
-	        }
-	    }
-	    return ResponseEntity.status(401).body("unauthorized");
-	}
-	
 	@PostMapping("/naver-login")
 	public ResponseEntity<String> naverLogin(@RequestBody Map<String, String> request, HttpServletResponse httpResponse) {
         String code = request.get("code");

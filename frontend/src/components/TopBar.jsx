@@ -1,72 +1,20 @@
 import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import {
-    Container,
-    Row,
-    Col,
-    Form,
-    FormControl,
-    Navbar,
-    Nav,
-    Dropdown,
-    Button,
-    Modal,
-} from "react-bootstrap";
-import axios from "axios";
+import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
+import "../css/Bar.css"
+import { useContext } from "react";
+import { UserContext } from '../contexts/UserContext';
+import axios from 'axios';
 
 const TopBar = () => {
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-    const [userId, setUserId] = useState("");
-    const [userInfo, setUserInfo] = useState(null);
-    const navigate = useNavigate();
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
 
-    // 로그인 상태 확인
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/api/check-auth",
-                    { withCredentials: true }
-                );
-                setUserId(response.data);
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.log(error.response);
-                console.log(error.response.status);
-                if (error.response && error.response.status === 401) {
-                    console.log(error);
-                    setIsLoggedIn(false);
-                } else {
-                    console.error("로그인 오류:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            }
-        };
-        checkAuth();
-    }, [isLoggedIn]);
-
-    // 상단바에 프사와 닉네임 띄우기
-    useEffect(() => {
-        const fetchUserInfo = async () => {
-            try {
-                // 쿠키를 포함하기 위해 withCredentials 옵션 사용
-                const response = await axios.get(
-                    "http://localhost:8586/api/user-info",
-                    { withCredentials: true }
-                );
-                console.log("사용자 정보:", response.data);
-                setUserInfo(response.data);
-            } catch (error) {
-                console.error("사용자 정보 가져오기 오류:", error);
-            }
-        };
-        fetchUserInfo();
-    }, []);
-
+    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const navigate = useNavigate();
     
      // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
     const profilePictureUrl = userInfo && userInfo.profilePicture 
@@ -122,6 +70,9 @@ const TopBar = () => {
                                     src="/images/여기놀자.svg"
                                     alt="로고"
                                     className="h-8"
+                                    style={{
+                                        width:"200px"
+                                    }}
                                 />
                             </Link>
                         </Col>
@@ -135,29 +86,27 @@ const TopBar = () => {
                                 <Nav.Link
                                     as={Link}
                                     to="/search"
-                                    className="text-gray-700 mx-3"
+                                    className="text-gray-700 mx-5"
                                     style={
                                         location.pathname === "/search"
-                                            ? {
+                                            ? {fontSize: "1.1rem",
                                                   color: "#e91e63",
-                                                  fontWeight: "bold",
                                               }
-                                            : {}
+                                            : {fontSize:"17px"}
                                     }
                                 >
                                     탐색
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
-                                    className="text-gray-700 mx-3"
+                                    to="/calendar"
+                                    className="text-gray-700 mx-5"
                                     style={
-                                        location.pathname === "/calender"
-                                            ? {
+                                        location.pathname === "/calendar"
+                                            ? {fontSize: "1.1rem",
                                                   color: "#e91e63",
-                                                  fontWeight: "bold",
                                               }
-                                            : {}
+                                            : {fontSize:"17px"}
                                     }
                                     onClick={handleCalendarClick}
                                 >
@@ -171,21 +120,15 @@ const TopBar = () => {
                             <div className="d-flex align-items-center justify-content-end">
                                 <Form
                                     className="position-relative d-none d-md-block me-3"
-                                    style={{ width: "300px" }}
+                                    style={{ width: "350px" }}
                                 >
                                     <FormControl
                                         type="text"
                                         placeholder="어떤 데이트를 하고 싶으신가요?"
                                         className="custom-input w-100"
                                     />
-                                    <FaSearch
-                                        className="position-absolute"
-                                        style={{
-                                            right: "10px",
-                                            top: "50%",
-                                            transform: "translateY(-50%)",
-                                            color: "#6c757d",
-                                        }}
+                                    <FaSearch className="search-icon"
+                                    onClick={() => navigate("/searchlist")}
                                     />
                                 </Form>
 
@@ -195,6 +138,7 @@ const TopBar = () => {
                                         <Dropdown.Toggle
                                             variant="light"
                                             id="dropdown-user"
+                                            bsPrefix="custom-toggle"
                                             className="border-0 p-0 bg-transparent"
                                         >
                                             {userInfo &&
@@ -203,8 +147,8 @@ const TopBar = () => {
                                                     src={profilePictureUrl}
                                                     alt="프로필"
                                                     style={{
-                                                        width: "32px",
-                                                        height: "32px",
+                                                        width: "40px",
+                                                        height: "40px",
                                                         borderRadius: "50%",
                                                     }}
                                                     //이미지 불러오는 도중 에러가 나면 기본이미지(마커이미지)
@@ -218,14 +162,7 @@ const TopBar = () => {
                                                     className="h-8 w-8 text-gray-700"
                                                     style={{ fontSize: "32px" }}
                                                 />
-                                                
-                                                
                                             )}
-                                            <span style={{ marginLeft: "8px" }}>
-                                                {userInfo && userInfo.nickname
-                                                    ? userInfo.nickname
-                                                    : ""}
-                                            </span>
                                         </Dropdown.Toggle>
 
                                         <Dropdown.Menu>
@@ -243,7 +180,7 @@ const TopBar = () => {
                                             </Dropdown.Item>
                                             <Dropdown.Item
                                                 as={Link}
-                                                to="/preference"
+                                                to="/editpreference"
                                             >
                                                 선호도 수정
                                             </Dropdown.Item>
@@ -317,7 +254,7 @@ const TopBar = () => {
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 my-1"
                                 >
                                     캘린더

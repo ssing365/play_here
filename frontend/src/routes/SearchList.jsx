@@ -1,62 +1,66 @@
 
 import axios from "axios";
-
-
 import TopBar from "../components/TopBar";
-
-
 import "bootstrap/dist/css/bootstrap.min.css";
-import { useEffect, useState } from "react";
-import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
+import { useContext, useEffect, useState } from "react";
+import { Container, Nav, Form, Button, Row, Col, Badge, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
-//!! npm install react-bootstrap bootstrap 해야됨 !!
-const App = () => {
+const SearchList = () => {
 
     const [places, setPlaces] = useState([]);
-    const [categories, setCategories] = useState([]);
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // 로그인 상태 관리
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
-
-    useEffect(() => {
-        const checkAuth = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/api/check-auth",
-                    { withCredentials: true }
-                );
-                console.log(response);
-                setIsLoggedIn(true);
-            } catch (error) {
-                console.log(error.response);
-                console.log(error.response.status);
-                if (error.response && error.response.status === 401) {
-                    console.log(error);
-                    setIsLoggedIn(false);
-                } else {
-                    console.error("로그인 오류:", error);
-                    alert("서버 오류가 발생했습니다.");
-                }
-            }
-        };
-        checkAuth();
-    }, [isLoggedIn]);
 
     useEffect(()=>{
-
         const fetchPlace = async() =>{
-
-            try {
-        const response = await axios.get("http://localhost:8586/placeList.do");
-        console.log(response.data);
-        setPlaces(response.data);  // 받아온 데이터를 상태에 저장
-
-      } catch (error) {
-        console.error("Error fetching places:", error);
-      }
+        try {
+            const response = await axios.get("http://localhost:8586/placeList.do");
+            console.log(response.data);
+            setPlaces(response.data);  // 받아온 데이터를 상태에 저장
+        } catch (error) {
+            console.error("Error fetching places:", error);
+        }
         }
         fetchPlace();
     },[]);    
+    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const navigate = useNavigate();
     
+
+    const { userInfo, isLoggedIn} = useContext(UserContext);
+    const userId = userInfo?.userId
+    
+    // 장소 리스트 불러오는 함수 분리
+    const fetchPlace = async () => {
+        try {
+            const response = await axios.get("http://localhost:8586/placeList.do");
+            setPlaces(response.data);
+        } catch (error) {
+            console.error("장소 리스트 불러오기 실패:", error);
+        }
+    };
+
+    // 컴포넌트 마운트 시 리스트 불러오기
+    useEffect(() => {
+        fetchPlace();
+    }, []);
+
+    // 좋아요 클릭 시 처리
+    const handleLikeClick = async (PlaceId, e) => {
+        console.log(isLoggedIn);
+        if (!isLoggedIn) {
+            e.preventDefault(); // 기본 페이지 이동 막기
+            setShowModal(true); // 모달 표시
+        } else {
+            try {
+                await axios.post("http://localhost:8586/placeLike.do", { PlaceId, userId });
+                fetchPlace(); // 좋아요 누른 후 최신 데이터 반영
+            } catch (error) {
+                console.error("좋아요 요청 중 오류 발생:", error);
+            }
+        }
+    };
+
     let Tag = [];
     
     for(let i=0; i<places.length;i++){
@@ -70,6 +74,7 @@ const App = () => {
                     bg="light"
                     text="dark"
                     className="me-1"
+                    key={places[i].hashtag[j]}
                     >
                         {places[i].hashtag[j]}
                     </Badge>
@@ -77,7 +82,7 @@ const App = () => {
             }
         }
         Tag.push(
-            <div className="mb-4">
+            <div className="mb-4" key={places[i].place_id}>
                     <Row>
                         <Col md={4}>
                             <div className="position-relative">
@@ -108,7 +113,9 @@ const App = () => {
                                             {cateTag}
                                         </div>
                                     </div>
-                                    <Button variant="outline-danger" size="sm">
+                                    <Button variant="outline-danger" size="sm"
+                                    onClick={(e)=>handleLikeClick(places[i].place_id,e)}
+                                    >
                                         ♥ {places[i].likes}
                                     </Button>
                                 </div>
@@ -118,6 +125,7 @@ const App = () => {
                 </div>
         )
     }
+
     return (
         <>
             <TopBar />
@@ -209,8 +217,27 @@ const App = () => {
             <Container>
                 {Tag}
             </Container>
+
+            {/* 로그인 요청 모달 */}
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Body>관심리스트를 이용하려면 로그인해야 합니다.</Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setShowModal(false)}
+                    >
+                        닫기
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => navigate("/login")}
+                    >
+                        로그인하기
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };
 
-export default App;
+export default SearchList;
