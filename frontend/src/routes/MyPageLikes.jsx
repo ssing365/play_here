@@ -1,9 +1,10 @@
-import { useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState, useRef } from "react";
 import DatePicker from "react-datepicker";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "react-datepicker/dist/react-datepicker.css";
+import "../css/MyPageLikes.css"
 import { Container, Button, Badge, Modal } from "react-bootstrap";
-import { Calendar, X, Check } from 'lucide-react';
+import { Calendar, X, Check, Trash } from 'lucide-react';
 import TopBar from "../components/TopBar";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
@@ -19,6 +20,7 @@ const MyPageLikes = () => {
   const [tempDate, setTempDate] = useState(null); // 임시 날짜 저장
   const [selectedDates, setSelectedDates] = useState({}); // 최종 선택된 날짜
   const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+  const datepickerRef = useRef(null);
 
   // 관심 장소 불러오기
   const fetchInterest = async () => {
@@ -50,40 +52,58 @@ const MyPageLikes = () => {
     }
   };
 
+
   const handleConfirmDate = async (placeId, visitDate) => {
-    
     if (userInfo?.coupleStatus===0) {
         // e.preventDefault(); // 기본 페이지 이동 막기
         setShowModal(true); // 모달 표시
     } else {
         try {
             await axios.post("http://localhost:8586/addCalendar.do", { placeId, coupleId, visitDate, userId });
+            alert("캘린더에 성공적으로 추가되었습니다!"); // 성공 알림
+            setOpenDatePickerIndex(null); // DatePicker 닫기
             fetchInterest(); // 최신 데이터 반영
         } catch (error) {
             console.error("캘린더 추가 요청 중 오류 발생:", error);
+            alert("캘린더 추가 중 오류가 발생했습니다."); // 실패 알림
+            setOpenDatePickerIndex(null); // 오류 발생 시에도 DatePicker 닫기
         }
     }
 };
-  const interestDelte = async (placeId) => {
+  const interestDelete = async (placeId) => {
         console.log(placeId);
-        try {
+        if(window.confirm("좋아요 리스트에서 삭제하시겠어요?")){
+          try {
             await axios.post("http://localhost:8586/interestCancle.do", { placeId, userId });
             fetchInterest(); // 최신 데이터 반영
         } catch (error) {
             console.error("관심리스트 삭제 요청 중 오류 발생:", error);
         }
-    
+      };  
   };
 
   const handleCancelDate = () => {
     setOpenDatePickerIndex(null);
   };
 
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (openDatePickerIndex !== null && datepickerRef.current && !datepickerRef.current.contains(event.target)) {
+        handleDatePickerToggle(null); // DatePicker 닫기
+      }
+    }
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [openDatePickerIndex]);
+  
+
   return (
     <>
       <TopBar />
-      <Container className="mb-4">
-        <h2 className="text-center">{userInfo?.nickname || "Loading..."}님의 좋아요 리스트</h2>
+      <Container className="mt-5 mb-5">
+        <h4> <b>{userInfo?.nickname || "Loading..."}님의 좋아요 리스트</b> </h4>
       </Container>
 
       <Container>
@@ -93,7 +113,7 @@ const MyPageLikes = () => {
           interests.map((interest, index) => (
             <div 
               key={index} 
-              className="position-relative mb-3 d-flex align-items-center" 
+              className="position-relative mb-5 d-flex align-items-center" 
             >
               <img 
                 src={interest.image}
@@ -107,31 +127,26 @@ const MyPageLikes = () => {
                 </div>
                 
                 <div className="mt-2">
-                  <h5>{interest.place_name}</h5>
+                  <h5><b>{interest.place_name}</b></h5>
                   <p className="mb-1">{interest.location_short}</p>
                   <p className="mb-1">
                     {interest.tags?.map((tag, i) => (
                       <Badge bg="secondary" className="me-1" key={i}>{tag}</Badge>
                     ))}
                   </p>
-                  <p className="text-muted">
-                    ♥ {interest.likes}
+                  <p className="likes-container">
+                    ❤ {interest.likes}
                   </p>
 
                   <div className="mt-3 d-flex gap-2">
-                    {/* 삭제 버튼 */}
-                    <Button variant="light" className="rounded-circle p-1"
-                      onClick={() => interestDelte(interest.place_id)}>
-                      <X size={20} />
-                    </Button>
-                    {/* 캘린더 버튼 */}
-                    <Button 
-                      variant="light" 
-                      className="rounded-circle p-1" 
+                    {/* 캘린더에 추가 버튼 */}
+                    <button 
+                      className="cal-add-btn d-flex align-items-center " // 한 줄로 정렬
                       onClick={() => handleDatePickerToggle(index)}
                     >
-                      <Calendar size={20} />
-                    </Button>
+                      <Calendar  size={20} /> 캘린더에 추가하기
+                    </button>
+
                   </div>
                   
                   {/* 선택된 날짜 표시 */}
@@ -140,10 +155,8 @@ const MyPageLikes = () => {
                   )}
 
                   {openDatePickerIndex === index && (
-                    <div className="datepicker-popup position-absolute p-3 bg-white border rounded shadow mt-2" style={{ zIndex: 10 }}>
-                      <p className="text-center fw-bold mb-2">
-                        📅 캘린더에 추가하기
-                       </p>
+                    <div ref={datepickerRef}
+                    className="datepicker-popup position-absolute p-3 bg-white border rounded shadow mt-2" style={{ zIndex: 10 }}>
                       {/* 캘린더 */}
                       <DatePicker 
                         inline 
@@ -155,26 +168,30 @@ const MyPageLikes = () => {
                       {/* 버튼 그룹 */}
                       <div className="d-flex justify-content-end gap-2 mt-2">
                         {/* ✅ 선택한 날짜 표시 */}
-                        <p className="text-center fw-bold mb-2">
+                        <p className="text-center fw-bold m-1">
                           {tempDate ? tempDate.toLocaleDateString() : "날짜 선택"}
                         </p>
-                        <Button variant="secondary" size="sm" onClick={handleCancelDate}>
-                          <X size={16} /> 취소
-                        </Button>
-                        <Button variant="primary" size="sm" onClick={() => handleConfirmDate(interest.place_id,tempDate)}>
-                          <Check size={16} /> 확인
+                        <Button className="add-btn p-2" size="sm" onClick={() => handleConfirmDate(interest.place_id,tempDate)}>
+                          캘린더에 추가하기
                         </Button>
                       </div>
                     </div>
                   )}
                 </div>
               </div>
+              <Button 
+    variant="outline-danger"  // 빨간색 Bootstrap 테마 사용
+    className="p-1 ms-auto" // 화면 오른쪽 끝으로 이동
+    onClick={() => interestDelete(interest.place_id)}
+  >
+    <Trash size={20} /> 
+  </Button>
             </div>
           ))
         )}
       </Container>
 
-      {/* 로그인 요청 모달 */}
+      {/* 커플 연결 요청 모달 */}
       <Modal show={showModal} onHide={() => setShowModal(false)} centered>
                 <Modal.Body>캘린더를 이용하려면 커플연결을 해야합니다.</Modal.Body>
                 <Modal.Footer>

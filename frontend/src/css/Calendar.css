@@ -127,7 +127,7 @@
     background-color: #f8f9fa;
   }
 
-/* 방문지 추가 취소 버튼 */
+/* 방문지 추가 버튼 */
  .add-btn{
     background-color: #e91e63;
     border: #e91e63;
@@ -137,10 +137,6 @@
     background-color: #e91e63;
     border: #e91e63;
     box-shadow: 0 4px 10px #FFC7C7;
- }
- .cancel-btn{
-    background-color: #e91e63;
-    border: #e91e63;
  }
 
  /* 커플 연동 안내 */
