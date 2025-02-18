@@ -1,54 +1,39 @@
 .couple-calendar-container {
-    padding: 20px;
+    padding: 20px 50px;
     background: #fff;
     border-radius: 10px;
     box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    width: 100%;
   }
   
+  /* 좌측 패널 : 달력 */
   .calendar-column {
     padding: 15px;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
     min-height: 100%;
+    height: 70vh;
   }
-  
-  .search-bar {
-    width: 100%;
-    margin-bottom: 15px;
-  }
-  
-  .search-container {
-    position: relative;
-    margin-bottom: 15px;
-    justify-content: flex-end; /* 오른쪽 정렬 */
-  }
-  
-  .search-input {
-    width: 30%; /* 너비 절반 정도로 줄임 */
-    height: 35px;
-    transition: opacity 0.3s ease-in-out;
-  }
-  
-  .search-icon {
-    cursor: pointer;
-    font-size: 24px;
-    height: 35px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-  
   
   .couple-calendar {
     flex-grow: 1;
-    width: 100%;
+    width: 95%;
     border: none !important;
-    font-family: 'Arial', sans-serif;
   }
   
+  .react-calendar__navigation__label {
+    font-size: large;
+    color: #333;
+  }
+  .react-calendar__month-view__weekdays__weekday abbr{
+    font-size: 16px;
+    text-decoration: none;
+  }
+
   .react-calendar__tile {
-    padding: 15px 10px;
+    padding: 25px 10px;
+    font-size: 15px;
     text-align: center;
     border-radius: 8px;
     transition: background 0.2s;
@@ -60,7 +45,7 @@
   }
   
   .react-calendar__tile--active {
-    background: #d32f2f !important;
+    background: #e91e63 !important;
     color: #fff;
   }
   
@@ -70,8 +55,20 @@
   
   .react-calendar__navigation button:enabled:hover {
     background: #ffe0e0;
+    border-radius: 10px;
   }
-  
+
+  /* 방문지, 일기 추가 시 표시 */
+  .calendar-dot {
+    display: block;
+    width: 5px;
+    height: 5px;
+    background-color: #d32f2f;
+    border-radius: 50%;
+    margin: auto;
+  }
+
+  /* 우측 패널 : 방문지 리스트 */
   .places-column {
     padding: 15px;
   }
@@ -84,3 +81,97 @@
     }
   }
   
+  /* 좌측 패널 달력 검색 */
+  .search-container {
+    position: relative;
+    margin : 0px 25px 15px 0px;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+  }
+  
+  .search-input {
+    width: 25%; /* 너비 절반 정도로 줄임 */
+    height: 35px;
+    transition: opacity 0.3s ease-in-out;
+    border: none;                 /* 테두리 제거 */
+    border-bottom: 1px solid #333; /* 밑줄 스타일 */
+    border-radius: 0px;
+  }
+  
+  .search-icon {
+    cursor: pointer;
+    font-size: 15px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* 우측 패널 날짜 */
+  .today-date-title{
+    background-color: #ffe0e0;
+    border-radius: 10px;
+    padding: 10px;
+    color: #333;
+    width: 20%;
+  }
+
+  /* 방문지 리스트 */
+  .list-group-item {
+    padding: 15px !important;
+    margin-bottom: 10px;
+    user-select: none;
+    transition: background 0.2s ease-in-out;
+  }
+  
+  .list-group-item:hover {
+    background-color: #f8f9fa;
+  }
+
+/* 방문지 추가 취소 버튼 */
+ .add-btn{
+    background-color: #e91e63;
+    border: #e91e63;
+    margin-right: 5px;
+ }
+ .add-btn:hover{
+    background-color: #e91e63;
+    border: #e91e63;
+    box-shadow: 0 4px 10px #FFC7C7;
+ }
+ .cancel-btn{
+    background-color: #e91e63;
+    border: #e91e63;
+ }
+
+ /* 커플 연동 안내 */
+ .muted-overlay {
+  z-index: 1050;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.muted-message {
+  background: #fff;
+  padding: 30px 50px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.couple-btn {
+  background-color: white;
+  border: 2px solid #FFC7C7;
+  color: #ff6b6b;
+  padding: 14px;
+  width: 100%;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px #FFC7C7;
+}
+.couple-btn:hover {
+  background-color: #ffeff0;
+  box-shadow: 0 4px 10px #FFC7C7;
+}
