@@ -13,6 +13,8 @@ const MyPage = () => {
 
     // context에서 로그인 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
+    //렌더링되고 coupleStatus
+    console.log(userInfo?.coupleStatus);
 
     return (
         <>

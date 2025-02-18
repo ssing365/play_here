@@ -6,10 +6,17 @@
 
 <mapper namespace="com.playhere.couple.ICoupleCodeService">
 
-  <select id="findByUserId" parameterType="String" resultType="com.playhere.couple.CoupleCodeDTO">
-    SELECT user_id, code, updated_at
-    FROM couple_code
-    WHERE user_id = #{userId}
+	<!-- 명시적 resultMap 정의 -->
+  <resultMap id="coupleCodeResultMap" type="com.playhere.couple.CoupleCodeDTO">
+      <result property="userId" column="user_id"/>
+      <result property="code" column="code"/>
+      <result property="updatedAt" column="updated_at"/>
+  </resultMap>
+
+  <select id="findByUserId" parameterType="String" resultMap="coupleCodeResultMap">
+  SELECT user_id, code, updated_at
+  FROM couple_code
+  WHERE user_id = #{userId}
   </select>
 
   <select id="findByCode" parameterType="String" resultType="com.playhere.couple.CoupleCodeDTO">
@@ -25,7 +32,7 @@
 
   <update id="updateCoupleCode" parameterType="com.playhere.couple.CoupleCodeDTO">
     UPDATE couple_code
-    SET code = #{code}, updated_at = #{updatedAt}
+    SET code = #{code}, updated_at = #{updatedAt, jdbcType=TIMESTAMP}
     WHERE user_id = #{userId}
   </update>
 

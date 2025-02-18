@@ -28,42 +28,60 @@ public class CoupleCodeService implements ICoupleCodeBusinessService {
 	public CoupleCodeDTO getCoupleCode(String userId) {
 		CoupleCodeDTO coupleCodeDTO = coupleCodeMapper.findByUserId(userId);
 		
+		//이미 커플이면 "COUPLE" 코드 반환 (갱신x)
 		if (coupleCodeDTO != null && "COUPLE".equals(coupleCodeDTO.getCode())) {
-			//이미 커플 등록된 상태이면 그대로 반환
 			return coupleCodeDTO;
 		}
 		
-		if (coupleCodeDTO == null || isExpired(coupleCodeDTO.getUpdatedAt())) {
-			//신규 생성 혹은 갱신 필요
-			String newCode = CoupleCodeGenerator.generateCode();
-			Date now = new Date();
-			if (coupleCodeDTO == null) {
-				coupleCodeDTO = new CoupleCodeDTO();
-				coupleCodeDTO.setUserId(userId);
-				coupleCodeDTO.setCode(newCode);
-				coupleCodeDTO.setUpdatedAt(now);
-				coupleCodeMapper.insertCoupleCode(coupleCodeDTO);
-				
-				
-			} 
-			else {
-				coupleCodeDTO.setCode(newCode);
-				coupleCodeDTO.setUpdatedAt(now);
-				coupleCodeMapper.updateCoupleCode(coupleCodeDTO);
-			}
-			
-		}
-		return coupleCodeDTO;
-	}
+		//커플 코드가 없거나, 만료된 경우 새 코드 생성
+		 if (coupleCodeDTO == null || coupleCodeDTO.getUpdatedAt() == null || isExpired(coupleCodeDTO.getUpdatedAt())) {
+	            System.out.println("새 커플 코드 생성 또는 기존 코드 갱신 필요");
+	            String newCode = CoupleCodeGenerator.generateCode();
+	            Date now = new Date();
+
+	            if (coupleCodeDTO == null) {
+	                // userId가 없으면 새 코드 생성
+	                coupleCodeDTO = new CoupleCodeDTO();
+	                coupleCodeDTO.setUserId(userId);
+	                coupleCodeDTO.setCode(newCode);
+	                coupleCodeDTO.setUpdatedAt(now);
+	                
+	                System.out.println("디버깅: userId=" + coupleCodeDTO.getUserId());
+	                
+	                coupleCodeMapper.insertCoupleCode(coupleCodeDTO);
+	                System.out.println("새 커플 코드 생성 완료: " + newCode);
+	            } else {
+	                // 기존 코드가 있고, `updatedAt`이 `null`이면 기본값 설정 후 업데이트
+	            	if (coupleCodeDTO.getUpdatedAt() == null) {
+	                    System.out.println("기존 updatedAt이 null이므로 기본값 설정");
+	                    coupleCodeDTO.setUpdatedAt(now);
+	                }
+	            	
+	            	System.out.println("디버깅: userId=" + coupleCodeDTO.getUserId());
+
+	            	coupleCodeDTO.setUserId(userId);
+	                coupleCodeDTO.setCode(newCode);
+	                coupleCodeDTO.setUpdatedAt(now);
+	                coupleCodeMapper.updateCoupleCode(coupleCodeDTO);
+	                System.out.println("커플 코드 갱신 완료: " + newCode);
+	                
+	                coupleCodeDTO = coupleCodeMapper.findByUserId(userId);
+	            }
+	        }
+
+	        return coupleCodeDTO;
+	    }
 	
 	//오늘 자정 이전인지 확인하는 메서드
 	private boolean isExpired(Date updateAt) {
 		if (updateAt == null) {
-		    return true;  // null인 경우 만료된 것으로 처리
-		}
+            return true; // ✅ updatedAt이 `null`이면 만료된 것으로 간주
+        }
 		LocalDate today = LocalDate.now();
 		Date todayMidnight = Date.from(today.atStartOfDay(ZoneId.systemDefault()).toInstant());
-		return updateAt.before(todayMidnight);
+	    System.out.println("DB updatedAt: " + updateAt);
+	    System.out.println("Today's Midnight: " + todayMidnight);
+	    return updateAt.before(todayMidnight);
 	}
 	
 	@Override
@@ -76,6 +94,7 @@ public class CoupleCodeService implements ICoupleCodeBusinessService {
 			if (codeDTO != null && "COUPLE".equals(codeDTO.getCode())) {
 				continue;
 			}
+			// 만료된 경우만 새 코드 생성
 			String newCode = CoupleCodeGenerator.generateCode();
 			if (codeDTO == null) {
 				codeDTO = new CoupleCodeDTO();
