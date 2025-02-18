@@ -49,6 +49,16 @@
 		INNER JOIN place p ON i.place_id = p.place_id
 		WHERE user_id = #{userId}
 	</select>
-
-
+	
+	<insert id="addCalendar">
+    INSERT INTO couple_visit
+	    VALUES (
+	        VISIT_SEQ.nextval, 
+	        #{placeId}, 
+	        #{coupleId}, 
+	        #{visitDate}, 
+	        (SELECT COUNT(*) FROM couple_visit WHERE couple_id = #{coupleId} AND visit_date = #{visitDate}) + 1
+	    )
+	</insert>
+	
 </mapper>
