@@ -82,6 +82,38 @@ const ConnectCouple = () => {
     alert('커플코드가 복사되었습니다!');
   };
 
+  const handleSubmit = async () => {
+    if (!inputCode.trim()) {
+      alert("커플 코드를 입력하세요.");
+      return;
+    }
+
+    try {
+      const response = await fetch("http://localhost:8586/api/couple/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          userId: userInfo.userId, 
+          coupleCode: inputCode, 
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        alert("커플 연결 성공!");
+        setCoupleCode("COUPLE");
+        setInputCode("");
+      } else {
+        alert(data.message || "커플 연결 실패!");
+      }
+    } catch (error) {
+      console.error("커플 연결 오류:", error);
+      alert("서버 오류 발생");
+    }
+  };
+
   return (
     <div>
       {/* 상단바 */}
@@ -112,7 +144,7 @@ const ConnectCouple = () => {
               style={{ width: '400px' }}
               onChange={(e) => setInputCode(e.target.value)}
             />
-            <Button className="menu-btn" style={{ width: '400px' }}>
+            <Button className="menu-btn" style={{ width: '400px' }} onClick={handleSubmit}>
               💛 커플 연결하기 💛
             </Button>
           </div>
