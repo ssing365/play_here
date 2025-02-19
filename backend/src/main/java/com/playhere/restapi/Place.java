@@ -2,6 +2,7 @@ package com.playhere.restapi;
 
 import java.sql.Date;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -9,9 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.playhere.place.IPlaceService;
+import com.playhere.place.ParameterDTO;
 import com.playhere.place.PlaceDTO;
-
-import oracle.jdbc.proxy.annotation.Post;
 
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -24,13 +24,37 @@ public class Place {
 	
 	@Autowired
 	IPlaceService dao;
-
+	
 	
 	@GetMapping("/placeList.do")
-	public List<PlaceDTO> placeList() {
-		    return dao.list();
+	public List<PlaceDTO> placeList(ParameterDTO parameterDTO) {
+	    // 한 페이지에 출력할 게시물의 수
+	    int pageSize = 10;
+	    // 페이지 번호
+	    System.out.println(parameterDTO);
+	    int pageNum = parameterDTO.getPageNum() == null ? 1 : Integer.parseInt(parameterDTO.getPageNum());
+	    // 게시물의 구간 계산
+	    int start = (pageNum - 1) * pageSize + 1;
+	    int end = pageNum * pageSize;
+
+	    parameterDTO.setStart(start);
+	    parameterDTO.setEnd(end);
+
+//	    // 검색 위치와 검색어 처리
+	    ArrayList<String> searchLocation = parameterDTO.getSearchLocation();
+	    ArrayList<String> searchWord = parameterDTO.getSearchWord();
+	    ArrayList<String> searchCategory = parameterDTO.getSearchCategory();
+	    System.out.println("searchWord:"+searchWord);
+	    System.out.println("searchloca:"+searchLocation);
+	    System.out.println("searchCate:"+searchCategory);
+	    // 예시로 검색 조건을 출력
+	    System.out.println("start: " +parameterDTO.getStart());
+	    System.out.println("end: " + parameterDTO.getEnd());
+
+	    // DAO 메서드 호출하여 필터링된 장소 리스트 반환
+	    return dao.list(parameterDTO);
 	}
-	
+
 	@GetMapping("/placeView.do")
 	public List<PlaceDTO> placeView(@RequestParam("id") String PlaceId){
 		return dao.view(PlaceId);

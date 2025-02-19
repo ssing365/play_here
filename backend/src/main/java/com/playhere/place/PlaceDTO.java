@@ -23,15 +23,9 @@ public class PlaceDTO {
 	private String regist_date;
 	private String edit_date;
 	private String likes;
-	private List<String> categories;
+	private String main_cate;
 	private List<String> hashtag;
 	
-	
-	public void setCategories(String categoriesStr) {
-        if (categoriesStr != null) {
-            this.categories = Arrays.asList(categoriesStr.split(","));
-        }
-    }
 	public void setHashtag(String hashtagStr) {
 		if (hashtagStr != null) {
 			this.hashtag = Arrays.asList(hashtagStr.split(","));
