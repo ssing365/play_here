@@ -6,8 +6,24 @@ import { Container, Nav, Form, Button, Row, Col, Badge, Modal } from "react-boot
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 
-const App = () => {
+
+//!! npm install react-bootstrap bootstrap 해야됨 !!
+const SearchList = () => {
+
     const [places, setPlaces] = useState([]);
+
+    useEffect(()=>{
+        const fetchPlace = async() =>{
+        try {
+            const response = await axios.get("http://localhost:8586/placeList.do");
+            console.log(response.data);
+            setPlaces(response.data);  // 받아온 데이터를 상태에 저장
+        } catch (error) {
+            console.error("Error fetching places:", error);
+        }
+        }
+        fetchPlace();
+    },[]);    
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const [searchCategory, setSearchCategory] = useState([]);
     const [searchLocation, setSearchLocation] = useState([]);
@@ -111,6 +127,7 @@ const App = () => {
                     bg="light"
                     text="dark"
                     className="me-1"
+                    key={places[i].hashtag[j]}
                     >
                         {places[i].hashtag[j]}
                     </Badge>
@@ -118,7 +135,7 @@ const App = () => {
             }
         }
         Tag.push(
-            <div className="mb-4">
+            <div className="mb-4" key={places[i].place_id}>
                     <Row>
                         <Col md={4}>
                             <div className="position-relative">
@@ -341,4 +358,4 @@ const App = () => {
     );
 };
 
-export default App;
+export default SearchList;

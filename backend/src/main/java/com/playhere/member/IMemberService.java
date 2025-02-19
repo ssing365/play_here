@@ -27,5 +27,10 @@ public interface IMemberService {
 	// 정보 수정
 	public void updateUser(MemberDTO updatedUser);
 
+	public void disconnectCouple(String userId);
+	
+	// 회원 탈퇴
+	public void withdrawUser(String userId);
+
 
 }

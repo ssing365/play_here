@@ -1,11 +1,22 @@
 import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
-import "../css/Bar.css"
+import {
+    Container,
+    Row,
+    Col,
+    Form,
+    FormControl,
+    Navbar,
+    Nav,
+    Dropdown,
+    Button,
+    Modal,
+} from "react-bootstrap";
+import "../css/Bar.css";
 import { useContext } from "react";
-import { UserContext } from '../contexts/UserContext';
-import axios from 'axios';
+import { UserContext } from "../contexts/UserContext";
+import axios from "axios";
 
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
@@ -16,6 +27,11 @@ const TopBar = () => {
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const navigate = useNavigate();
 
+    // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
+    const profilePictureUrl =
+        userInfo && userInfo.profilePicture
+            ? `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
+            : null;
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
@@ -65,6 +81,9 @@ const TopBar = () => {
                                     src="/images/여기놀자.svg"
                                     alt="로고"
                                     className="h-8"
+                                    style={{
+                                        width: "200px",
+                                    }}
                                 />
                             </Link>
                         </Col>
@@ -81,24 +100,26 @@ const TopBar = () => {
                                     className="text-gray-700 mx-5"
                                     style={
                                         location.pathname === "/search"
-                                            ? {fontSize: "1.1rem",
+                                            ? {
+                                                  fontSize: "1.1rem",
                                                   color: "#e91e63",
                                               }
-                                            : {fontSize:"17px"}
+                                            : { fontSize: "17px" }
                                     }
                                 >
                                     탐색
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 mx-5"
                                     style={
-                                        location.pathname === "/calender"
-                                            ? {fontSize: "1.1rem",
+                                        location.pathname === "/calendar"
+                                            ? {
+                                                  fontSize: "1.1rem",
                                                   color: "#e91e63",
                                               }
-                                            : {fontSize:"17px"}
+                                            : { fontSize: "17px" }
                                     }
                                     onClick={handleCalendarClick}
                                 >
@@ -119,7 +140,9 @@ const TopBar = () => {
                                         placeholder="어떤 데이트를 하고 싶으신가요?"
                                         className="custom-input w-100"
                                     />
-                                    <FaSearch className="search-icon"
+                                    <FaSearch
+                                        className="search-icon"
+                                        onClick={() => navigate("/searchlist")}
                                     />
                                 </Form>
 
@@ -135,14 +158,18 @@ const TopBar = () => {
                                             {userInfo &&
                                             userInfo.profilePicture ? (
                                                 <img
-                                                    src={
-                                                        `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
-                                                    }
+                                                    src={profilePictureUrl}
                                                     alt="프로필"
                                                     style={{
                                                         width: "40px",
                                                         height: "40px",
                                                         borderRadius: "50%",
+                                                    }}
+                                                    //이미지 불러오는 도중 에러가 나면 기본이미지(마커이미지)
+                                                    onError={(e) => {
+                                                        e.target.onError = null;
+                                                        e.target.src =
+                                                            "/images/marker.svg";
                                                     }}
                                                 />
                                             ) : (
@@ -160,12 +187,22 @@ const TopBar = () => {
                                             >
                                                 마이페이지
                                             </Dropdown.Item>
-                                            <Dropdown.Item
-                                                as={Link}
-                                                to="/connect-couple"
-                                            >
-                                                커플 연결하기
-                                            </Dropdown.Item>
+                                            {userInfo?.coupleStatus === 0 ? (
+                                                <Dropdown.Item
+                                                    as={Link}
+                                                    to="/connect-couple"
+                                                >
+                                                    커플 연결하기
+                                                </Dropdown.Item>
+                                            ) : (
+                                                <Dropdown.Item
+                                                    as={Link}
+                                                    to="/calendar"
+                                                >
+                                                    커플 캘린더
+                                                </Dropdown.Item>
+                                            )}
+
                                             <Dropdown.Item
                                                 as={Link}
                                                 to="/editpreference"
@@ -242,7 +279,7 @@ const TopBar = () => {
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 my-1"
                                 >
                                     캘린더

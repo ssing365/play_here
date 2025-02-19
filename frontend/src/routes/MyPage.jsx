@@ -13,6 +13,8 @@ const MyPage = () => {
 
     // context에서 로그인 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
+    //렌더링되고 coupleStatus
+    console.log(userInfo?.coupleStatus);
 
     return (
         <>
@@ -76,7 +78,7 @@ const MyPage = () => {
                                     </button>
                                 </Link>
                             ) : userInfo.coupleStatus === 1 ? (
-                                <Link to="/calender">
+                                <Link to="/calendar">
                                     <button className="couple-btn">
                                         커플 캘린더 이동하기
                                     </button>

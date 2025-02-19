@@ -26,6 +26,7 @@ import com.playhere.member.MemberDTO;
 import com.playhere.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
 import utils.MyFunctions;
 
@@ -51,11 +52,9 @@ public class UserController {
                 // DB에서 사용자 정보 조회
                 MemberDTO member = memberService.findByUserId(userId);
                 if (member != null) {
-                	/* 이미지 불러오기 시도 실패
-                	 * if (member.getProfilePicture() != null && !member.getProfilePicture().startsWith("http")) {
-                        member.setProfilePicture("http://localhost:8586/images/" + member.getProfilePicture());
-                    }*/
-                	
+                	if (member.getProfilePicture() != null && !member.getProfilePicture().startsWith("http")) {
+                        member.setProfilePicture(member.getProfilePicture());
+                    }
                     // 필요한 정보만 Map에 담아서 반환 (보안에 주의)
                 	System.out.println(member);
                     Map<String, Object> result = new HashMap<>();
@@ -90,9 +89,6 @@ public class UserController {
             @CookieValue(name = "token", required = false) String token,
             HttpServletResponse response) {
     	
-    	System.out.println("profilePictureee : " + profilePicture);
-    	System.out.println("formDataJsonnnn : " + formDataJson);
-    	
     	// JSON 문자열을 Map으로 변환
 	    ObjectMapper objectMapper = new ObjectMapper();
 	    Map<String, String> formData;
@@ -123,8 +119,6 @@ public class UserController {
             updatedUser.setDetailAddress((String) formData.get("detailAddress"));
             updatedUser.setZipcode((String) formData.get("postcode"));
             
-            System.out.println("profilePicture : " + profilePicture);
-			
           //2. 이미지 파일 업로드 처리 
     		if (profilePicture != null && !profilePicture.isEmpty()) {
     			
@@ -165,5 +159,37 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("업데이트 실패");
         }
     }
+    
+ // 회원 탈퇴 API: 토큰을 검증하여 해당 사용자의 account_status를 0으로 변경
+    @PutMapping("/user/withdraw")
+    public ResponseEntity<?> withdrawUser(
+            @CookieValue(name = "token", required = false) String token,
+            HttpServletResponse response) {
+        if (token == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unauthorized");
+        }
+        try {
+            Claims claims = jwtUtil.validateToken(token);
+            String userId = claims.getSubject();
+            // 서비스 호출: 계정 상태를 0으로 업데이트
+            memberService.withdrawUser(userId);
+            
+            /* 로그아웃 */
+            Cookie cookie = new Cookie("token", null);
+    	    System.out.println(cookie);
+    	    cookie.setHttpOnly(true);
+    	    cookie.setPath("/");
+    	    cookie.setMaxAge(0); // 쿠키 즉시 만료
+    	    cookie.setDomain("localhost");
+    	    response.addCookie(cookie);
+    	    
+            return ResponseEntity.ok("회원 탈퇴가 완료되었습니다.");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("회원 탈퇴 실패");
+        }
+    }
+    
+    
 
 }

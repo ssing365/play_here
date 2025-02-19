@@ -6,6 +6,8 @@ import { UserContext } from "../contexts/UserContext";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import CoupleDisconnect from '../components/EditProfile/CoupleDisconnect'; // 커플 끊기
+import MemberWithdrawal from '../components/EditProfile/MemberWithdrawal'; // 회원 탈퇴
 
 const EditProfile = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
@@ -328,21 +330,13 @@ const EditProfile = () => {
                         </form>
                         <hr className="divider" />
                         {userInfo.coupleStatus ? (
-                            <div className="quit-button-container">
-                                <button className="btn btn-danger my-2 disconnection ">
-                                    커플 끊기
-                                </button>
-                            </div>
+                            <CoupleDisconnect />
                         ) : (
                             <></>
                         )}
                     </div>
                 </div>
-                <div className="quit-button-container">
-                    <button className="btn btn-outline-danger quit-btn ">
-                        회원 탈퇴
-                    </button>
-                </div>
+                <MemberWithdrawal />
             </div>
         </>
     );

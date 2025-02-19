@@ -1,26 +1,66 @@
-.icon {
-  width: 105px;  /* 70px의 1.5배 */
-  height: 105px;  /* 70px의 1.5배 */
-  margin: 7.5px;
+/* 카테고리 제목 간격 및 스타일 */
+.category-section {
+  margin-bottom: 2rem; /* 각 카테고리 간격 */
+  padding-bottom: 1.5rem;
+}
+.category-title {
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #000000;
+}
+/* 아이콘과 라벨 스타일 */
+.icon-circle {
+  width: 60px;
+  height: 60px;
+  border: 2px solid #FF6B6B;
+  border-radius: 50%;
+  margin: 10px;
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
-  border-radius: 50%;
-  background-color: #f0f0f0;
+  font-size: 2rem;
   cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.icon-circle.selected {
+  background-color: #E91E63;
+  color: #fff;
+}
+
+.icon-circle .icon {
+  font-size: 2rem;
+}
+
+.label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-top: 5px;
   text-align: center;
-  flex-direction: column; /* 수직 정렬 */
 }
 
-.icon.selected {
-  background-color: #007bff;
-  color: white;
+/* 버튼 스타일 */
+.btn-container{
+}
+.preference-btn {
+  background-color: white;
+  border: 2px solid #FFC7C7;
+  color: #ff6b6b;
+  padding: 14px;
+  width: 50%;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 5px #FFC7C7;
+  margin-top: 30px;
+  margin-bottom: 10px;
 }
 
-.icon-content {
-  font-size: 25px;
+.preference-btn:hover {
+  background-color: #ffeff0;
+  box-shadow: 0 4px 10px #FFC7C7;
 }
 
-.label-content {
-  font-size: 25px; /* 적절한 크기로 조정 */
-}

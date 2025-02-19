@@ -80,5 +80,19 @@
             profile_picture = #{profilePicture, jdbcType=VARCHAR}
         WHERE user_id = #{userId}
     </update>
+    
+    <!-- 커플 끊기 -->
+    <update id="disconnectCouple" parameterType="String">
+        UPDATE member
+        SET couple_status = 0
+        WHERE user_id = #{userId}
+    </update>
+
+	<!-- 회원 탈퇴 -->
+    <update id="withdrawUser" parameterType="String">
+        UPDATE member
+        SET account_status = 0
+        WHERE user_id = #{userId}
+    </update>
 
 </mapper>
