@@ -31,6 +31,7 @@
     "react-kakao-login": "^2.1.1",
     "react-router-dom": "^7.1.4",
     "sass": "^1.84.0",
+    "sweetalert2": "^11.17.2",
     "uuid": "^11.0.5"
   },
   "devDependencies": {

@@ -6,8 +6,9 @@ import { UserContext } from "../contexts/UserContext";
 import { Button, Form } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
-import CoupleDisconnect from '../components/EditProfile/CoupleDisconnect'; // 커플 끊기
-import MemberWithdrawal from '../components/EditProfile/MemberWithdrawal'; // 회원 탈퇴
+import Swal from "sweetalert2";
+import CoupleDisconnect from "../components/EditProfile/CoupleDisconnect"; // 커플 끊기
+import MemberWithdrawal from "../components/EditProfile/MemberWithdrawal"; // 회원 탈퇴
 
 const EditProfile = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
@@ -51,8 +52,7 @@ const EditProfile = () => {
         const file = e.target.files[0];
         console.log(file);
         if (file) {
-             URL.revokeObjectURL(preview);
-            
+            URL.revokeObjectURL(preview);
         }
         setEditedUser((prev) => ({ ...prev, profilePicture: file }));
         setPreview(URL.createObjectURL(file));
@@ -78,7 +78,10 @@ const EditProfile = () => {
         const formDataToSubmit = new FormData();
 
         // JSON 데이터(텍스트 정보)만 담은 객체를 문자열로 변환해서 추가
-        formDataToSubmit.append("formData", JSON.stringify(formDataWithoutFile));
+        formDataToSubmit.append(
+            "formData",
+            JSON.stringify(formDataWithoutFile)
+        );
 
         // 파일이 선택되었으면 추가 (없으면 회원가입 시와 같이 생략)
         if (profilePicture) {
@@ -99,8 +102,16 @@ const EditProfile = () => {
                 }
             );
             console.log("수정 성공:", response.data);
-            alert("정보 수정이 완료되었습니다.");
-            window.location.href = "/mypage";
+            
+            // Swal이 완료된 후 페이지 이동
+            Swal.fire({
+                title: "수정 되었습니다.",
+                icon: "success",
+                timer: 1500,
+                showConfirmButton: false,
+            }).then(() => {
+                window.location.href = "/mypage"; // Swal이 끝난 후 실행
+            });
         } catch (error) {
             console.error("정보 수정 오류:", error);
             alert("정보 수정에 실패했습니다.");
@@ -329,11 +340,7 @@ const EditProfile = () => {
                             </div>
                         </form>
                         <hr className="divider" />
-                        {userInfo.coupleStatus ? (
-                            <CoupleDisconnect />
-                        ) : (
-                            <></>
-                        )}
+                        {userInfo.coupleStatus ? <CoupleDisconnect /> : <></>}
                     </div>
                 </div>
                 <MemberWithdrawal />
