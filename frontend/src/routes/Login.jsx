@@ -9,6 +9,9 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const Login = () => {
+    const remoteIp = import.meta.env.VITE_REMOTE_IP;
+    const port = import.meta.env.VITE_PORT;
+
     const idRef = useRef(null);
     const passwordRef = useRef(null);
     const rememberMeRef = useRef(null);
@@ -32,7 +35,7 @@ const Login = () => {
 
         try {
             const response = await axios.post(
-                "http://localhost:8586/api/login",
+                '/api/login',
                 { userId, password },
                 { withCredentials: true }
             );

@@ -47,7 +47,7 @@ const MemberWithdrawal = () => {
             {
                 try {
                     const response = await axios.put(
-                        "http://localhost:8586/api/user/withdraw",
+                        "/api/user/withdraw",
                         {},
                         { withCredentials: true }
                     );

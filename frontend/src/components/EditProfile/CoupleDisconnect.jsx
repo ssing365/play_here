@@ -42,7 +42,7 @@ const CoupleDisconnect = () => {
         if (confirmed) {
             try {
                 const response = await axios.put(
-                    "http://localhost:8586/api/couple/disconnect",
+                    "/api/couple/disconnect",
                     {},
                     { withCredentials: true }
                 );
