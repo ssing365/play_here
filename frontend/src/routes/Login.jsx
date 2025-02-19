@@ -47,7 +47,6 @@ const Login = () => {
                 } else {
                     localStorage.removeItem("savedUserId"); // 저장된 아이디 삭제
                 }
-
                 window.location.href = "/";
             }
         } catch (error) {
