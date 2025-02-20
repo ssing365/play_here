@@ -19,7 +19,6 @@ import RegisterPreference from "./routes/RegisterPreference";
 import RegisterUser from "./routes/RegisterUser";
 import RegisterTerms from "./routes/RegisterTerms";
 import RegisterComplete from "./routes/RegisterComplete";
-import CoupleConnecter from "./couple/CoupleConnecter";
 
 function App() {
     return (

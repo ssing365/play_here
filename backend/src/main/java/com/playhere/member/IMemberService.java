@@ -37,5 +37,13 @@ public interface IMemberService {
 	public void updateCoupleStatus(@Param("userId") String userId, @Param("coupleId") int coupleId);
 	
 
+	// 선호도 수정
+	public void updateUserPreferences(String userId, List<Integer> preferenceIds);
+
+	// 현재 선호도 조회
+	public List<Integer> getUserPreferences(String userId);
+
+	// 기존 선호도 삭제
+	public void deleteUserPreferences(String userId);
 
 }

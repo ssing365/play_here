@@ -8,6 +8,7 @@ export const UserProvider = ({ children }) => {
     const [userInfo, setUserInfo] = useState(null);
 
     //기존코드 
+    //컴포넌트 마운트 시 실행 
     // useEffect(() => {
     //     const fetchUserInfo = async () => {
     //         try {
@@ -37,10 +38,7 @@ export const UserProvider = ({ children }) => {
         }
     };
 
-    // 컴포넌트 마운트 시 실행
-    useEffect(() => {
-        fetchUserInfo();
-    }, []);
+    
 
 
     return (

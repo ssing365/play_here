@@ -192,6 +192,7 @@
     justify-content: flex-end; /* 회원 탈퇴 버튼만 오른쪽 정렬 */
     width: 100%; /* 부모 컨테이너 너비 유지 */
     margin-top: 10px; /* 위쪽 간격 조정 */
+
 }
 
 .icon-hover {

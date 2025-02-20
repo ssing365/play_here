@@ -1,6 +1,7 @@
 import TopBar from "../components/TopBar";
 import "../css/MyPage.css"; // CSS 파일 import
 import 'bootstrap/dist/css/bootstrap.min.css';
+import Swal from "sweetalert2";
 
 import { useContext, useEffect, useRef, useState } from 'react';
 import { FormControl, Button, Container, Card, Modal } from 'react-bootstrap';
@@ -220,7 +221,12 @@ const ConnectCouple = () => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(coupleCode);
-    alert('커플코드가 복사되었습니다!');
+    Swal.fire({
+        text: '커플코드가 복사되었습니다.',
+        timer: 1000,
+        showConfirmButton: false,
+        position:'top',
+    })
   };
 
   return (
