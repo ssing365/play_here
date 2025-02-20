@@ -141,7 +141,7 @@ const RegisterTerms = () => {
           </Form.Group>
           <div className="d-flex justify-content-center mt-4">
             <Button variant="primary" type="submit">
-              제출
+              회원 정보 입력하기
             </Button>
           </div>
         </Form>

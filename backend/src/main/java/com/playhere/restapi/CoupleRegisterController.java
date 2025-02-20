@@ -3,15 +3,21 @@ package com.playhere.restapi;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.playhere.couple.CoupleCodeDTO;
 import com.playhere.couple.CoupleRegisterRequestDTO;
 import com.playhere.couple.CoupleRegistrationException;
+import com.playhere.couple.ICoupleCodeBusinessService;
 import com.playhere.couple.ICoupleRegisterBusinessService;
+import com.playhere.member.MemberDTO;
 
 @RestController
 @RequestMapping("/api/couple")
@@ -23,6 +29,52 @@ public class CoupleRegisterController {
         this.coupleRegisterService = coupleRegisterService;
     }
 
+    //초대자 정보 조회
+    @GetMapping("/inviter-info")
+    public ResponseEntity<?> getInviterInfo(@RequestParam("code") String code) {
+    	try {
+            MemberDTO inviterMember = coupleRegisterService.getInviterInfo(code);
+            if (inviterMember == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유효하지 않은 커플 코드입니다.");
+            }
+            
+
+            // JSON 형태로 응답
+            Map<String, String> response = Map.of(
+                "name", inviterMember.getName(),
+                "nickname", inviterMember.getNickname()
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+        }
+    }
+    
+    @GetMapping("/inviter-code-info")
+    public ResponseEntity<?> getInviterCodeInfo(@RequestParam("code") String code) {
+        try {
+            CoupleCodeDTO coupleCode = coupleRegisterService.getCoupleCodeByCode(code);
+            if (coupleCode == null) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유효하지 않은 커플 코드입니다.");
+            }
+
+            // JSON 형태로 응답
+            Map<String, Object> response = Map.of(
+                "userId", coupleCode.getUserId(),
+                "code", coupleCode.getCode(),
+                "updatedAt", coupleCode.getUpdatedAt().toString() // updatedAt 추가
+            );
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("서버 오류 발생");
+        }
+    }
+
+    
+    
+    //커플 연결
     @PostMapping("/register")
     public ResponseEntity<Map<String, String>> registerCouple(@RequestBody CoupleRegisterRequestDTO request) {
         Map<String, String> response = new HashMap<>();

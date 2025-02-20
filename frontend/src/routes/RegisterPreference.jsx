@@ -239,7 +239,7 @@ const RegisterPreference = () => {
                           </button>
                           <br />
                           <button
-                              onClick={() => navigate(-1)}
+                              onClick={handleSkip}
                               className="btn btn-secondary mt-2"
                           >
                               다음에 고르기

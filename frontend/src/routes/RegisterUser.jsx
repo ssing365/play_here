@@ -204,6 +204,12 @@ const RegisterUser = () => {
         return;
       }
     }
+    
+    // 아이디 중복 확인 체크
+    if (!isUserIdChecked) {
+      alert("아이디 중복 확인을 해주세요.");
+      return;
+    }
   
     // 기존 검증 로직
     

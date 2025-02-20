@@ -1,17 +1,20 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
 import "../css/Bar.css"
-import { useContext } from "react";
 import { UserContext } from '../contexts/UserContext';
 import axios from 'axios';
 
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
-    // context에서 로그인 상태, 유저 정보 가져오기
-    const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
+    // context에서 로그인 상태, 유저 정보, fetchUserInfo 포함해서 가져오기
+    const { userInfo, isLoggedIn, setIsLoggedIn, fetchUserInfo } = useContext(UserContext);
+
+    useEffect(() => {
+        fetchUserInfo();
+    }, []);
 
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const navigate = useNavigate();

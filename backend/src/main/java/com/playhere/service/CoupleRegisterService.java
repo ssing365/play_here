@@ -29,7 +29,23 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
         this.coupleCodeMapper = coupleCodeMapper;
         this.memberMapper = memberMapper;
     }
-
+    
+    //초대자 정보 조회 기능
+    public MemberDTO getInviterInfo(String coupleCode) {
+		CoupleCodeDTO inviter = coupleCodeMapper.findByCode(coupleCode);
+		if (inviter == null) {
+			return null;
+		}
+		return memberMapper.findByUserId(inviter.getUserId());
+	}
+    
+    @Override
+    public CoupleCodeDTO getCoupleCodeByCode(String code) {
+        return coupleCodeMapper.findByCode(code);
+    }
+    
+    
+    //커플 등록 기능
     @Override
     @Transactional
     public void registerCouple(String userId, String coupleCode) {
