@@ -13,7 +13,9 @@ const SearchFilter = ({
     searchWord,
     setSearchWord,
     activeSort,
-    setActiveSort
+    setActiveSort,
+    currentPage,
+    setCurrentPage
 }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(true); // 🔽 필터 펼침/접힘 상태
 
@@ -89,7 +91,7 @@ const SearchFilter = ({
                         }`}
                         onClick={() => {
                             setActiveSort("latest");
-                            fetchPlace();
+                            setCurrentPage(1);
                         }}
                     >
                         최신순
@@ -100,7 +102,7 @@ const SearchFilter = ({
                         }`}
                         onClick={() => {
                             setActiveSort("likes");
-                            fetchPlace();
+                            setCurrentPage(1);
                         }}
                     >
                         좋아요순

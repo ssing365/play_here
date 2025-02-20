@@ -8,6 +8,7 @@ import { UserContext } from "../contexts/UserContext";
 import { useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import SearchFilter from "../components/SearchList/SearchFilter";
+import qs from 'qs';
 
 const SearchList = () => {
     // useLocation을 이용해 navigate로 전달된 state를 추출
@@ -21,56 +22,65 @@ const SearchList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pagecount, setPagecount] = useState(0);
     const [activeSort, setActiveSort] = useState("latest"); // 최신순 or 좋아요순
+    const pageSize = 10;
 
     const { userInfo, isLoggedIn } = useContext(UserContext);
     const userId = userInfo?.userId;
 
-    const results = location.state || [];
-    console.log("resultesafsae~", results);
-    console.log("resultesafsae~", typeof results);
-    console.log("resultesafsae~", results.results);
+    const results = location.state;
 
-    // 컴포넌트 마운트 시 리스트 불러오기
-    // 만약 navigate로 전달받은 결과가 없다면, 서버에서 데이터를 가져옴
+    // 상단바에서 입력한 키워드로 렌더링 후 키워드 필터 검색창에 옮겨놓고 삭제.(필요)
     useEffect(() => {
-        if (!results) {
-            fetchPlace();
+        if (results && results.results) {
+          setPlaces(results.results);
+          setPagecount(results.results.length);
+          setSearchWord(results.keyword);
+          // 현재 URL의 state를 비워서 이후에는 results가 없도록 함.
+          navigate(location.pathname, { replace: true, state: {} });
         } else {
-            setPlaces(results.results);
-            setPagecount(results.results.length);
+          fetchPlace();
         }
-    }, [currentPage, searchCategory, searchLocation, activeSort, results]);
+      }, [currentPage, activeSort, results]);
 
     // 장소 리스트 불러오는 함수 분리
     const fetchPlace = async () => {
         try {
             const searchWordArray = searchWord ? searchWord.split(" ") : [];
-            console.log(searchWordArray);
-            console.log(searchWord);
-            const response = await axios.get(
-                `http://localhost:8586/placeList.do?pageNum=${currentPage}&searchWord=${searchWordArray}&searchLocation=${searchLocation}&searchCategory=${searchCategory}`,
-                {
-                    pageNum: currentPage,
-                    searchWord: searchWordArray,
-                    searchLocation: searchLocation,
-                    searchCategory: searchCategory,
-                }
-            );
-            let sortedData = response.data;
-
-            // 🔥 좋아요순 정렬 추가
+            // 공통 파라미터 구성
+            const params = {
+              searchWord: searchWordArray.join(" "),
+              searchLocation: searchLocation,
+              searchCategory: searchCategory,
+            };
+      
+            // 좋아요 정렬 시 새로운 엔드포인트 사용 (전체 결과 반환)
+            let url = "http://localhost:8586/placeList.do";
             if (activeSort === "likes") {
-                sortedData = sortedData.sort(
-                    (a, b) => Number(b.likes) - Number(a.likes)
-                );
+              url = "http://localhost:8586/placeListAll.do";
+            } else {
+              // 최신순 등은 기존 페이징 처리된 엔드포인트 사용
+              params.pageNum = currentPage;
             }
-
-            console.log("📌 정렬된 데이터:", sortedData);
-            setPlaces(sortedData);
-            setPagecount(sortedData.length);
-        } catch (error) {
+      
+            const response = await axios.get(url, { params,
+                paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+             });
+            let data = response.data;
+      
+            // 좋아요 정렬인 경우 클라이언트에서 정렬 후 페이징 처리
+            if (activeSort === "likes") {
+              data = data.sort((a, b) => Number(b.likes) - Number(a.likes));
+              const paginatedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+              setPlaces(paginatedData);
+              setPagecount(data.length);
+            } else {
+              setPlaces(data);
+              // 최신순의 경우 백엔드가 반환하는 데이터 수가 페이지당 건수이므로
+              setPagecount(data.length);
+            }
+          } catch (error) {
             console.error("장소 리스트 불러오기 실패:", error);
-        }
+          }
     };
 
     // 좋아요 클릭 시 처리
@@ -194,6 +204,8 @@ const SearchList = () => {
                 setSearchWord={setSearchWord}
                 activeSort={activeSort}
                 setActiveSort={setActiveSort}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
             />
 
             {/* 결과 리스트 */}
@@ -215,7 +227,7 @@ const SearchList = () => {
                         ) : (
                             <>
                                 <p>
-                                    검색 결과가
+                                    {results.keyword}에 대한 검색 결과가
                                     없습니다.
                                 </p>
                                 <p>

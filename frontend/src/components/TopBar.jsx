@@ -87,7 +87,7 @@ const TopBar = () => {
             );
             console.log(response.data)
             // 검색 결과를 searchList 페이지로 state를 통해 전달합니다.
-            navigate("/searchlist", { state: { results: response.data } });
+            navigate("/searchlist", { state: { results: response.data , keyword:searchKeyword } });
         } catch (error) {
             console.error("검색 실패:", error);
         }
