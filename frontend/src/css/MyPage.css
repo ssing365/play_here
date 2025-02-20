@@ -195,11 +195,35 @@
 
 }
 
-.icon-hover {
-    color: gray; /* 기본 색상 */
-    transition: color 0.3s ease; /* 색상 변화 부드럽게 */
-  }
-  
-  .icon-hover:hover {
-    color: #e91e63; /* 마우스를 올렸을 때 색상 */
-  }
+/*2025-02-20 추가*/
+/* Modal 버튼 스타일 */
+.modal-footer .btn-primary {
+    background: linear-gradient(135deg, #FFC7C7, #FF6B6B);
+    border: none;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(255, 107, 107, 0.5);
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-primary:hover {
+    background: linear-gradient(135deg, #FF6B6B, #FFC7C7);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(255, 107, 107, 0.7);
+}
+
+.modal-footer .btn-secondary {
+    background: #ddd;
+    border: none;
+    font-weight: bold;
+    padding: 10px 16px;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+}
+
+.modal-footer .btn-secondary:hover {
+    background: #ccc;
+    transform: translateY(-2px);
+}
+

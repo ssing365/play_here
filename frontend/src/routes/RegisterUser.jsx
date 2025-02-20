@@ -599,5 +599,5 @@ const RegisterUser = () => {
         </Container>
     );
 };
-}
+
 export default RegisterUser;

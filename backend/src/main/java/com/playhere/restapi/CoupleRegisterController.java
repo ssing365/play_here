@@ -1,5 +1,8 @@
 package com.playhere.restapi;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -59,11 +62,16 @@ public class CoupleRegisterController {
                 return ResponseEntity.status(HttpStatus.NOT_FOUND).body("유효하지 않은 커플 코드입니다.");
             }
 
+            //updatedAt을 ISO 8601 형식(UTC)으로 변환
+            String updatedAtISO = ZonedDateTime.ofInstant(
+                coupleCode.getUpdatedAt().toInstant(), ZoneId.of("UTC")
+            ).format(DateTimeFormatter.ISO_INSTANT);
+            
             // JSON 형태로 응답
             Map<String, Object> response = Map.of(
                 "userId", coupleCode.getUserId(),
                 "code", coupleCode.getCode(),
-                "updatedAt", coupleCode.getUpdatedAt().toString() // updatedAt 추가
+                "updatedAt", updatedAtISO // updatedAt 추가
             );
 
             return ResponseEntity.ok(response);

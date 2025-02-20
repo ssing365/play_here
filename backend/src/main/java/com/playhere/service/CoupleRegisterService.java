@@ -65,6 +65,11 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
         MemberDTO receiverMember = memberMapper.findByUserId(userId);
         System.out.println("[디버깅] 초대자 정보: " + inviterMember);
         System.out.println("[디버깅] 수락자 정보: " + receiverMember);
+        
+        //자기 자신을 커플로 추가하는 것 방지 
+        if (inviterId.equals(userId)) {
+            throw new CoupleRegistrationException("자기 자신을 초대할 수 없습니다.");
+        }
 
         if (inviterMember == null || receiverMember == null) {
             throw new CoupleRegistrationException("존재하지 않는 회원입니다.");

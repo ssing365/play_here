@@ -1,4 +1,4 @@
-import { useState, useEffect, useContext } from "react";
+import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import {
@@ -21,14 +21,8 @@ import axios from "axios";
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
-    // context에서 로그인 상태, 유저 정보, fetchUserInfo 포함해서 가져오기
-    const { userInfo, isLoggedIn, setIsLoggedIn, fetchUserInfo } = useContext(UserContext);
-
-    useEffect(() => {
-        fetchUserInfo();
-    }, []);
-
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    // context에서 로그인 상태, 유저 정보 가져오기
+    const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
     const navigate = useNavigate();
 
     // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
