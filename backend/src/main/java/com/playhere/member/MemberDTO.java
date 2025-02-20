@@ -21,6 +21,4 @@ public class MemberDTO {
     private int accountStatus;  // account_status 컬럼
     private Date createdAt;         // created_at 컬럼
     private Date updatedAt;         // updated_at 컬럼
-	
-
 }

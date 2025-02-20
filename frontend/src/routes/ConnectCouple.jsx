@@ -1,62 +1,54 @@
-import TopBar from "../components/TopBar";
-import "./css/MyPage.css"; // CSS 파일 import
+import TopBar from '../components/TopBar';
+import FetchCoupleCode from '../components/ConnectCouple/FetchCoupleCode';
+import RegisterCouple from '../components/ConnectCouple/RegisterCouple';
+
+import "../css/MyPage.css"; // CSS 파일 import
 import 'bootstrap/dist/css/bootstrap.min.css';
 
-import { useState } from 'react';
-import { FormControl, Button, Container, Card } from 'react-bootstrap';
-import { Link } from "react-router-dom";
-
-import { CiShare2 } from "react-icons/ci";
-
+import { Container, Card } from 'react-bootstrap';
+import { useContext, useEffect, useState } from 'react';
+import { UserContext } from '../contexts/UserContext';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const ConnectCouple = () => {
-  const [coupleCode, setCoupleCode] = useState('AE6EWX');
-  const [inputCode, setInputCode] = useState('');
+  const { userInfo, isLoggedIn } = useContext(UserContext);
+  const [coupleCode, setCoupleCode] = useState(null);
+  const navigate = useNavigate();
+  const location = useLocation();
+ 
+  // useEffect(() => {
+  //   // 유저 정보에서 커플 코드 확인
+  //   if (userInfo?.coupleCode) {
+  //     setCoupleCode(userInfo.coupleCode);
+  //   }
+  // }, [userInfo]);
 
-  const copyToClipboard = () => {
-    navigator.clipboard.writeText(coupleCode);
-    alert('커플코드가 복사되었습니다!');
-  };
+  useEffect(() => {
+    // 로그인하지 않은 경우, 로그인 페이지로 리디렉트하면서 현재 경로를 저장
+    if (!isLoggedIn) {
+        const currentPath = location.pathname + location.search;
+        navigate(`/login?redirect=${encodeURIComponent(currentPath)}`);
+        return;
+    }
+
+    // 유저 정보에서 커플 코드 확인
+    if (userInfo?.coupleCode) {
+      setCoupleCode(userInfo.coupleCode);
+    }
+  }, [isLoggedIn, userInfo, navigate, location]);
+
+
 
   return (
     <div>
-      {/* 상단바 */}
       <TopBar />
-
-      {/* 메인 컨테이너 */}
-      <Container className="mypage-container" >
-        <Card className="mypage-card text-center ">
-          
-          <h5>연결하시면 더 많은 서비스를 이용하실 수 있습니다!</h5>
-
-          <div className="my-4">
-            <h6>내 커플코드</h6>
-            <h3>{coupleCode}</h3>
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center'  }}>
-              <Button variant="secondary" onClick={copyToClipboard}>코드 복사하기 </Button>
-              <CiShare2  style={{ marginLeft: '8px' }}/>
-            </div>
+      <Container className="mypage-container">
+        <Card className="mypage-card text-center">
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            {/* 커플 코드가 COUPLE이 아니면 FetchCoupleCode 표시 */}
+            {coupleCode !== "COUPLE" && <FetchCoupleCode setCoupleCode={setCoupleCode} />}
+            <RegisterCouple coupleCode={coupleCode} />
           </div>
-
-          <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center'  }}>
-            <FormControl 
-              className="my-3 h-13 text-center"
-              placeholder="연결할 커플코드를 입력하세요"
-              value={inputCode}
-              style={{ width: '400px' }}
-              onChange={(e) => setInputCode(e.target.value)}
-            />
-            <Button className="menu-btn" style={{ width: '400px' }}>
-              💛 커플 연결하기 💛
-            </Button>
-          </div>
-
-
-
-          <Link to={"/"}>
-            <Button variant="outline-secondary" className="w-30 mt-4">다음에하기</Button>
-          </Link>
-          
         </Card>
       </Container>
     </div>
