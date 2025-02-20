@@ -56,7 +56,7 @@ const Search = () => {
             <TopBar />
             
             {/* 메인 컨테이너 */}
-            <Container className="mt-4">
+            <Container className="mt-5 mb-5">
                 {/* 지금 가기 좋은 곳 */}
                 {isLoggedIn ? (
                         <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
@@ -91,7 +91,7 @@ const Search = () => {
                 <Top5/>
 
                 {/* 주간 달력과 날씨 */}
-                <Row>
+                <Row className="mt-5">
                     {/* 행사 목록 (좌측 9칸) */}
                     <Col md={9}>
                         <h5><strong>이번 주 행사</strong></h5>

@@ -127,7 +127,7 @@ const SearchFilter = ({
                                         setSearchWord(e.target.value)
                                     }
                                     onKeyDown={handleKeyDown} // 엔터 검색 추가
-                                    className="search-input"
+                                    className="filter__search-input"
                                 />
                                 <button
                                     className="search-btn"

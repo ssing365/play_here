@@ -6,6 +6,7 @@ import "../css/MyPageLikes.css";
 import { Container, Button, Badge } from "react-bootstrap";
 import { Calendar, X, Check, Trash } from "lucide-react";
 import TopBar from "../components/TopBar";
+import Footer from '../components/Footer'
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -292,6 +293,7 @@ const MyPageLikes = () => {
                     ))
                 )}
             </Container>
+            <Footer/>
         </>
     );
 };

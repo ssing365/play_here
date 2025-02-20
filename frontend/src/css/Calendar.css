@@ -88,7 +88,7 @@
     justify-content: flex-end; /* 오른쪽 정렬 */
   }
   
-  .search-input {
+  .calendar__search-input {
     width: 25%; /* 너비 절반 정도로 줄임 */
     height: 35px;
     transition: opacity 0.3s ease-in-out;

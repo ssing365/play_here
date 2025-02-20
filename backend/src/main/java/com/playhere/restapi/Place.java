@@ -112,7 +112,6 @@ public class Place {
 
 	    // Service 호출 (MyBatis Mapper 연결)
 	    dao.addCalendar(placeId, coupleId, visitDate);
-		dao.InterestCancle(userId, placeId);
 	}
 	
 	@PostMapping("interestCancle.do")

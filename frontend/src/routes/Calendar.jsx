@@ -161,7 +161,7 @@ const Calendar = () => {
                             placeholder="데이트 검색"
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="search-input me-2"
+                            className="calendar__search-input me-2"
                         />
                         <FaSearch
                             className="search-icon"
