@@ -134,7 +134,7 @@ const SearchList = () => {
             }
         }
         Tag.push(
-            <div className="mb-4" key={places[i].place_id}>
+            <div className="mb-4" key={places[i].place_id} style={{cursor:"pointer"}}>
                 <Row>
                     <Col md={4}>
                         <div className="position-relative">

@@ -14,8 +14,7 @@ const SearchFilter = ({
     setSearchWord,
     activeSort,
     setActiveSort,
-    currentPage,
-    setCurrentPage
+    setCurrentPage,
 }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(true); // 🔽 필터 펼침/접힘 상태
 
@@ -145,9 +144,7 @@ const SearchFilter = ({
                         <div className="location-list">
                             <button
                                 className={`location-btn ${
-                                    searchCategory.includes(this)
-                                        ? "active"
-                                        : ""
+                                    searchLocation.length === 0 ? "active" : ""
                                 }`}
                                 onClick={() => setSearchLocation([])}
                             >
@@ -178,9 +175,7 @@ const SearchFilter = ({
                         <div className="category-list">
                             <button
                                 className={`category-btn ${
-                                    searchCategory.includes(this)
-                                        ? "active"
-                                        : ""
+                                    searchCategory.length === 0 ? "active" : ""
                                 }`}
                                 onClick={() => setSearchCategory([])}
                             >

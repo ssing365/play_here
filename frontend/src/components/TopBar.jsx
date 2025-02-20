@@ -101,7 +101,7 @@ const TopBar = () => {
 
     return (
         <>
-            <Navbar expand="md" bg="white" className="shadow-sm p-1 mb-4">
+            <Navbar expand="md" bg="white" className="shadow-sm p-1">
                 <Container fluid>
                     <Row className="w-100 align-items-center">
                         {/* 로고 (좌측) */}
@@ -225,10 +225,18 @@ const TopBar = () => {
                                             )}
                                         </Dropdown.Toggle>
 
-                                        <Dropdown.Menu>
+                                        <Dropdown.Menu className="custom-dropdown">
                                             <Dropdown.Item
                                                 as={Link}
                                                 to="/mypage"
+                                                style={
+                                                    location.pathname === "/mypage"
+                                                        ? {
+                                                            backgroundColor: "#ffe7e7",
+                                                            color:"#333"
+                                                          }
+                                                        : {}
+                                                }
                                             >
                                                 마이페이지
                                             </Dropdown.Item>
@@ -236,6 +244,14 @@ const TopBar = () => {
                                                 <Dropdown.Item
                                                     as={Link}
                                                     to="/connect-couple"
+                                                    style={
+                                                        location.pathname === "/connect-couple"
+                                                            ? {
+                                                                backgroundColor: "#ffe7e7",
+                                                                color:"#333"
+                                                              }
+                                                            : {}
+                                                    }
                                                 >
                                                     커플 연결하기
                                                 </Dropdown.Item>
@@ -243,6 +259,14 @@ const TopBar = () => {
                                                 <Dropdown.Item
                                                     as={Link}
                                                     to="/calendar"
+                                                    style={
+                                                        location.pathname === "/calendar"
+                                                            ? {
+                                                                backgroundColor: "#ffe7e7",
+                                                                color:"#333"
+                                                              }
+                                                            : {}
+                                                    }
                                                 >
                                                     커플 캘린더
                                                 </Dropdown.Item>
@@ -251,12 +275,28 @@ const TopBar = () => {
                                             <Dropdown.Item
                                                 as={Link}
                                                 to="/editpreference"
+                                                style={
+                                                    location.pathname === "/editpreference"
+                                                        ? {
+                                                            backgroundColor: "#ffe7e7",
+                                                            color:"#333"
+                                                          }
+                                                        : {}
+                                                }
                                             >
                                                 선호도 수정
                                             </Dropdown.Item>
                                             <Dropdown.Item
                                                 as={Link}
                                                 to="/mypagelikes"
+                                                style={
+                                                    location.pathname === "/mypagelikes"
+                                                        ? {
+                                                            backgroundColor: "#ffe7e7",
+                                                            color:"#333"
+                                                          }
+                                                        : {}
+                                                }
                                             >
                                                 좋아요 리스트
                                             </Dropdown.Item>
@@ -319,6 +359,14 @@ const TopBar = () => {
                                     as={Link}
                                     to="/search"
                                     className="text-gray-700 my-1"
+                                    style={
+                                        location.pathname === "/search"
+                                            ? {
+                                                  fontSize: "1.1rem",
+                                                  color: "#e91e63",
+                                              }
+                                            : { fontSize: "17px" }
+                                    }
                                 >
                                     탐색
                                 </Nav.Link>
@@ -326,6 +374,14 @@ const TopBar = () => {
                                     as={Link}
                                     to="/calendar"
                                     className="text-gray-700 my-1"
+                                    style={
+                                        location.pathname === "/calendar"
+                                            ? {
+                                                  fontSize: "1.1rem",
+                                                  color: "#e91e63",
+                                              }
+                                            : { fontSize: "17px" }
+                                    }
                                 >
                                     캘린더
                                 </Nav.Link>

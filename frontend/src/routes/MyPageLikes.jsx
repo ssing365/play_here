@@ -6,7 +6,7 @@ import "../css/MyPageLikes.css";
 import { Container, Button, Badge } from "react-bootstrap";
 import { Calendar, X, Check, Trash } from "lucide-react";
 import TopBar from "../components/TopBar";
-import Footer from '../components/Footer'
+import Footer from "../components/Footer";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 import { Navigate, useNavigate } from "react-router-dom";
@@ -39,6 +39,7 @@ const MyPageLikes = () => {
         }
     };
 
+    console.log(interests);
     useEffect(() => {
         fetchInterest();
     }, [userId]);
@@ -106,8 +107,8 @@ const MyPageLikes = () => {
 
     const continueOn = (placeName) => {
         return Swal.fire({
-            title : "좋아요 리스트에서 삭제할까요?",
-            text : placeName,
+            title: "좋아요 리스트에서 삭제할까요?",
+            text: placeName,
             icon: "warning",
 
             showCancelButton: true,
@@ -115,10 +116,9 @@ const MyPageLikes = () => {
             cancelButtonColor: "#666",
             confirmButtonText: "삭제",
             cancelButtonText: "취소",
-
-        }).then((result)=>{
-          if(result.isConfirmed) return true;
-          else return false;
+        }).then((result) => {
+            if (result.isConfirmed) return true;
+            else return false;
         });
     };
 
@@ -157,143 +157,165 @@ const MyPageLikes = () => {
     return (
         <>
             <TopBar />
-            <Container className="mt-5 mb-5">
-                <h4>
-                    {" "}
-                    <b>
-                        {userInfo?.nickname || "Loading..."}님의 좋아요 리스트
-                    </b>{" "}
-                </h4>
-            </Container>
-
-            <Container>
-                {interests.length === 0 ? (
-                    <p className="text-center mt-5">
-                        아직 좋아요한 장소가 없습니다.
-                    </p>
-                ) : (
-                    interests.map((interest, index) => (
-                        <div
-                            key={index}
-                            className="position-relative mb-5 d-flex align-items-center"
-                        >
-                            <img
-                                src={interest.image}
-                                alt={interest.name}
-                                className="rounded"
-                                style={{
-                                    width: "250px",
-                                    height: "200px",
-                                    objectFit: "cover",
-                                }}
-                            />
-                            <div className="ms-3">
-                                <div className="position-absolute top-0 start-0 m-2">
-                                    <Badge bg="dark" className="opacity-75">
-                                        {interest.category}
-                                    </Badge>
-                                </div>
-
-                                <div className="mt-2">
-                                    <h5>
-                                        <b>{interest.place_name}</b>
-                                    </h5>
-                                    <p className="mb-1">
-                                        {interest.location_short}
-                                    </p>
-                                    <p className="mb-1">
-                                        {interest.tags?.map((tag, i) => (
-                                            <Badge
-                                                bg="secondary"
-                                                className="me-1"
-                                                key={i}
-                                            >
-                                                {tag}
-                                            </Badge>
-                                        ))}
-                                    </p>
-                                    <p className="likes-container">
-                                        ❤ {interest.likes}
-                                    </p>
-
-                                    <div className="mt-3 d-flex gap-2">
-                                        {/* 캘린더에 추가 버튼 */}
-                                        <button
-                                            className="cal-add-btn d-flex align-items-center " // 한 줄로 정렬
-                                            onClick={() =>
-                                                handleDatePickerToggle(index)
-                                            }
-                                        >
-                                            <Calendar size={20} /> 캘린더에
-                                            추가하기
-                                        </button>
+            <div className="custom-background">
+                <Container className="custom-container">
+                <br />
+                    <h4>
+                        {" "}
+                        <b>
+                            {userInfo?.nickname || "Loading..."}님의 좋아요
+                            리스트
+                        </b>{" "}
+                    </h4>
+                    <br />
+                    <hr />
+                </Container>
+                <Container className="custom-container">
+                    {interests.length === 0 ? (
+                        <p className="text-center mt-5">
+                            아직 좋아요한 장소가 없습니다.
+                        </p>
+                    ) : (
+                        interests.map((interest, index) => (
+                            <div
+                                key={index}
+                                className="position-relative mb-5 d-flex align-items-center"
+                            >
+                                <img
+                                    src={interest.image}
+                                    alt={interest.name}
+                                    className="rounded"
+                                    style={{
+                                        width: "250px",
+                                        height: "200px",
+                                        objectFit: "cover",
+                                        cursor: "pointer",
+                                    }}
+                                    onClick={() =>
+                                        (window.location.href = `/place?id=${interest.place_id}`)
+                                    }
+                                />
+                                <div className="ms-3">
+                                    <div className="position-absolute top-0 start-0 m-2">
+                                        <Badge bg="dark" className="opacity-75">
+                                            {interest.category}
+                                        </Badge>
                                     </div>
 
-                                    {/* 선택된 날짜 표시 */}
-                                    {selectedDates[index] && (
-                                        <p className="text-muted mt-2">
-                                            📅{" "}
-                                            {selectedDates[
-                                                index
-                                            ]?.toLocaleDateString()}
-                                        </p>
-                                    )}
-
-                                    {openDatePickerIndex === index && (
-                                        <div
-                                            ref={datepickerRef}
-                                            className="datepicker-popup position-absolute p-3 bg-white border rounded shadow mt-2"
-                                            style={{ zIndex: 10 }}
+                                    <div className="mt-2">
+                                        <h5
+                                            onClick={() =>
+                                                (window.location.href = `/place?id=${interest.place_id}`)
+                                            }
+                                            style={{
+                                                cursor: "pointer",
+                                            }}
                                         >
-                                            {/* 캘린더 */}
-                                            <DatePicker
-                                                inline
-                                                dateFormat="yyyy-MM-dd"
-                                                selected={tempDate}
-                                                onChange={(date) =>
-                                                    setTempDate(date)
-                                                }
-                                            />
-
-                                            {/* 버튼 그룹 */}
-                                            <div className="d-flex justify-content-end gap-2 mt-2">
-                                                {/* ✅ 선택한 날짜 표시 */}
-                                                <p className="text-center fw-bold m-1">
-                                                    {tempDate
-                                                        ? tempDate.toLocaleDateString()
-                                                        : "날짜 선택"}
-                                                </p>
-                                                <Button
-                                                    className="add-btn p-2"
-                                                    size="sm"
-                                                    onClick={() =>
-                                                        handleConfirmDate(
-                                                            interest.place_id,
-                                                            tempDate
-                                                        )
-                                                    }
+                                            <b>{interest.place_name}</b>
+                                        </h5>
+                                        <p className="mb-1">
+                                            {interest.location_short}
+                                        </p>
+                                        <p className="mb-1">
+                                            {interest.tags?.map((tag, i) => (
+                                                <Badge
+                                                    bg="secondary"
+                                                    className="me-1"
+                                                    key={i}
                                                 >
-                                                    캘린더에 추가하기
-                                                </Button>
-                                            </div>
+                                                    {tag}
+                                                </Badge>
+                                            ))}
+                                        </p>
+                                        <p className="likes-container">
+                                            ❤ {interest.likes}
+                                        </p>
+
+                                        <div className="mt-3 d-flex gap-2">
+                                            {/* 캘린더에 추가 버튼 */}
+                                            <button
+                                                className="cal-add-btn d-flex align-items-center " // 한 줄로 정렬
+                                                onClick={() =>
+                                                    handleDatePickerToggle(
+                                                        index
+                                                    )
+                                                }
+                                            >
+                                                <Calendar size={20} /> 캘린더에
+                                                추가하기
+                                            </button>
                                         </div>
-                                    )}
+
+                                        {/* 선택된 날짜 표시 */}
+                                        {selectedDates[index] && (
+                                            <p className="text-muted mt-2">
+                                                📅{" "}
+                                                {selectedDates[
+                                                    index
+                                                ]?.toLocaleDateString()}
+                                            </p>
+                                        )}
+
+                                        {openDatePickerIndex === index && (
+                                            <div
+                                                ref={datepickerRef}
+                                                className="datepicker-popup position-absolute p-3 bg-white border rounded shadow mt-2"
+                                                style={{ zIndex: 10 }}
+                                            >
+                                                {/* 캘린더 */}
+                                                <DatePicker
+                                                    inline
+                                                    dateFormat="yyyy-MM-dd"
+                                                    selected={tempDate}
+                                                    onChange={(date) =>
+                                                        setTempDate(date)
+                                                    }
+                                                />
+
+                                                {/* 버튼 그룹 */}
+                                                <div className="d-flex justify-content-end gap-2 mt-2">
+                                                    {/* ✅ 선택한 날짜 표시 */}
+                                                    <p className="text-center fw-bold m-1">
+                                                        {tempDate
+                                                            ? tempDate.toLocaleDateString()
+                                                            : "날짜 선택"}
+                                                    </p>
+                                                    <Button
+                                                        className="add-btn p-2"
+                                                        size="sm"
+                                                        onClick={() =>
+                                                            handleConfirmDate(
+                                                                interest.place_id,
+                                                                tempDate
+                                                            )
+                                                        }
+                                                    >
+                                                        캘린더에 추가하기
+                                                    </Button>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
+                                <Button
+                                    variant="outline-danger" // 빨간색 Bootstrap 테마 사용
+                                    className="p-1 ms-auto" // 화면 오른쪽 끝으로 이동
+                                    onClick={() =>
+                                        interestDelete(
+                                            interest.place_id,
+                                            interest.place_name
+                                        )
+                                    }
+                                >
+                                    <Trash size={20} />
+                                </Button>
                             </div>
-                            <Button
-                                variant="outline-danger" // 빨간색 Bootstrap 테마 사용
-                                className="p-1 ms-auto" // 화면 오른쪽 끝으로 이동
-                                onClick={() =>
-                                    interestDelete(interest.place_id, interest.place_name)
-                                }
-                            >
-                                <Trash size={20} />
-                            </Button>
-                        </div>
-                    ))
-                )}
-            </Container>
-            <Footer/>
+                        ))
+                    )}
+                </Container>
+            </div>
+
+            <Footer />
         </>
     );
 };
