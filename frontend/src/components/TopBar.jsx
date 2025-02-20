@@ -24,6 +24,8 @@ const TopBar = () => {
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
     const navigate = useNavigate();
+    const location = useLocation();
+    const [searchKeyword, setSearchKeyword] = useState("");
 
     // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
     const profilePictureUrl =
@@ -62,18 +64,40 @@ const TopBar = () => {
 
                 showCancelButton: true,
                 confirmButtonText: "로그인 하기",
-                confirmButtonColor: '#e91e63',
+                confirmButtonColor: "#e91e63",
                 cancelButtonText: "닫기",
-                cancelButtonColor: '#666666',
-            }).then(result => {
-                if(result.isConfirmed){
-                    navigate("/login")
+                cancelButtonColor: "#666666",
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    navigate("/login");
                 }
             });
         }
     };
 
-    const location = useLocation();
+    const searchPlace = async (searchKeyword) => {
+        console.log(searchKeyword);
+        try {
+            searchKeyword ? searchKeyword.split(" ") : [];
+            const response = await axios.get(
+                `http://localhost:8586/placeList.do?searchWord=${searchKeyword}&searchLocation=&searchCategory=`,
+                {
+                    searchWord: searchKeyword,
+                }
+            );
+            console.log(response.data)
+            // 검색 결과를 searchList 페이지로 state를 통해 전달합니다.
+            navigate("/searchlist", { state: { results: response.data } });
+        } catch (error) {
+            console.error("검색 실패:", error);
+        }
+    };
+
+    // 폼 제출 핸들러 (엔터키 동작 포함)
+    const handleSubmit = (e) => {
+        e.preventDefault();
+        searchPlace(searchKeyword);
+    };
 
     return (
         <>
@@ -149,10 +173,21 @@ const TopBar = () => {
                                         type="text"
                                         placeholder="어떤 데이트를 하고 싶으신가요?"
                                         className="custom-input w-100"
+                                        onChange={(e) => {
+                                            setSearchKeyword(e.target.value);
+                                            console.log(searchKeyword);
+                                        }}
+                                        onKeyPress={(e) => {
+                                            if (e.key === "Enter") {
+                                                handleSubmit(e);
+                                            }
+                                        }}
                                     />
                                     <FaSearch
                                         className="search-icon"
-                                        onClick={() => navigate("/searchlist")}
+                                        onClick={() =>
+                                            searchPlace(searchKeyword)
+                                        }
                                     />
                                 </Form>
 

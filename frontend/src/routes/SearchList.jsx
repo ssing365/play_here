@@ -5,10 +5,14 @@ import { useContext, useEffect, useState } from "react";
 import { Container, Form, Button, Row, Col, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
+import { useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import SearchFilter from "../components/SearchList/SearchFilter";
 
 const SearchList = () => {
+    // useLocation을 이용해 navigate로 전달된 state를 추출
+    const location = useLocation();
+
     const [places, setPlaces] = useState([]);
     const [searchCategory, setSearchCategory] = useState([]);
     const [searchLocation, setSearchLocation] = useState([]);
@@ -21,16 +25,28 @@ const SearchList = () => {
     const { userInfo, isLoggedIn } = useContext(UserContext);
     const userId = userInfo?.userId;
 
+    const results = location.state || [];
+    console.log("resultesafsae~", results);
+    console.log("resultesafsae~", typeof results);
+    console.log("resultesafsae~", results.results);
+
     // 컴포넌트 마운트 시 리스트 불러오기
+    // 만약 navigate로 전달받은 결과가 없다면, 서버에서 데이터를 가져옴
     useEffect(() => {
-        fetchPlace();
-        console.log(activeSort);
-    }, [currentPage, searchCategory, searchLocation, activeSort]);
+        if (!results) {
+            fetchPlace();
+        } else {
+            setPlaces(results.results);
+            setPagecount(results.results.length);
+        }
+    }, [currentPage, searchCategory, searchLocation, activeSort, results]);
 
     // 장소 리스트 불러오는 함수 분리
     const fetchPlace = async () => {
         try {
             const searchWordArray = searchWord ? searchWord.split(" ") : [];
+            console.log(searchWordArray);
+            console.log(searchWord);
             const response = await axios.get(
                 `http://localhost:8586/placeList.do?pageNum=${currentPage}&searchWord=${searchWordArray}&searchLocation=${searchLocation}&searchCategory=${searchCategory}`,
                 {
@@ -44,9 +60,11 @@ const SearchList = () => {
 
             // 🔥 좋아요순 정렬 추가
             if (activeSort === "likes") {
-                sortedData = sortedData.sort((a, b) => Number(b.likes) - Number(a.likes));
+                sortedData = sortedData.sort(
+                    (a, b) => Number(b.likes) - Number(a.likes)
+                );
             }
-    
+
             console.log("📌 정렬된 데이터:", sortedData);
             setPlaces(sortedData);
             setPagecount(sortedData.length);
@@ -181,11 +199,33 @@ const SearchList = () => {
             {/* 결과 리스트 */}
             <Container>
                 {Tag.length === 0 ? (
-                    <div className="no-results">
-                        <p>"{searchWord}" 에 대한 검색 결과가 없습니다.</p>
-                        <p>
-                            검색조건과 철자를 확인해 보세요.
-                        </p>
+                    <div className="no-results mb-5">
+                        {searchWord ? (
+                            <>
+                                <p>
+                                    '{searchWord}' 에 대한 검색 결과가 없습니다.
+                                </p>
+                                <p>
+                                    <b>
+                                        검색조건과 철자를 확인하고 다시
+                                        검색해주세요.
+                                    </b>
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p>
+                                    검색 결과가
+                                    없습니다.
+                                </p>
+                                <p>
+                                    <b>
+                                        검색조건과 철자를 확인하고 다시
+                                        검색해주세요.
+                                    </b>
+                                </p>
+                            </>
+                        )}
                     </div>
                 ) : (
                     Tag

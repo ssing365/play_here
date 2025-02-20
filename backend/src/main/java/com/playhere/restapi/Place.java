@@ -40,7 +40,7 @@ public class Place {
 	    parameterDTO.setStart(start);
 	    parameterDTO.setEnd(end);
 
-//	    // 검색 위치와 검색어 처리
+//	    검색 위치와 검색어 처리
 	    ArrayList<String> searchLocation = parameterDTO.getSearchLocation();
 	    ArrayList<String> searchWord = parameterDTO.getSearchWord();
 	    ArrayList<String> searchCategory = parameterDTO.getSearchCategory();
