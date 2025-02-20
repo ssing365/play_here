@@ -28,6 +28,5 @@ button.d-flex {
 }
 
 .cal-add-btn:hover {
-    background-color: #ffeff0;
     box-shadow: 0 4px 10px #FFC7C7;
 }

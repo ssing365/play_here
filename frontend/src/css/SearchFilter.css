@@ -1,0 +1,150 @@
+/* 📌 필터 전체 컨테이너 */
+.filter-container {
+    display: flex;
+    flex-direction: column; /* 요소들을 세로로 배치 */
+    align-items: flex-end; /* 우측 정렬 */
+    width: 100%;
+    max-width: 40%; /* 원하는 최대 너비 설정 */
+    margin: 0 auto; /* 가운데 정렬 */
+}
+
+/* 📌 정렬 & 필터 버튼 영역 */
+.sort-filter-bar {
+    display: flex;
+    justify-content: flex-end; /* 오른쪽 정렬 */
+    gap: 15px;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+.sort-option {
+    cursor: pointer;
+    color: black;
+}
+
+.sort-option.active {
+    text-decoration: underline;
+    text-underline-offset : 4px;
+}
+
+/* 🔽 필터 토글 버튼 */
+.filter-toggle {
+    cursor: pointer;
+    font-weight: bold;
+}
+/* 📌 검색 & 카테고리선택 영역 */
+.search-filter {
+    background-color: #f9f9f9; /* 연한 배경색 */
+    padding: 20px;
+    border-radius: 10px;
+}
+
+/* 🔍 검색창 */
+.search-bar {
+    margin-bottom: 20px;
+}
+
+.search-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+}
+
+.search-input {
+    width: 100%;
+    height: 50px;
+    padding: 10px 40px 10px 12px; /* 오른쪽 여백 추가 */
+    border-radius: 5px;
+    border: 1px solid #333;
+}
+
+/* 🔍 돋보기 아이콘 버튼 */
+.search-btn {
+    position: absolute;
+    right: 10px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
+}
+
+/* 📌 섹션 제목 */
+.section-title {
+    font-weight: bold;
+    font-size: 16px;
+    margin-bottom: 10px;
+}
+
+/* 🏙️ 지역 버튼 */
+.location-list {
+    display: grid;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 8px;
+}
+.location-btn {
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    padding: 5px;
+}
+.location-btn:hover {
+    font-weight: bold;
+    color: #e91e63;
+}
+.location-btn.active {
+    font-weight: bold;
+    color: #e91e63;
+}
+
+/* 🎭 카테고리 버튼 */
+.category-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+.category-btn {
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 6px 12px;
+    font-size: 14px;
+    color: #333;
+}
+.category-btn:hover {
+    border: 1px solid #e91e63;
+    background-color: inherit;
+    font-weight: bold;
+    color: #e91e63;
+}
+.category-btn.active {
+    border: 1px solid #e91e63;
+    font-weight: bold;
+    color: #e91e63;
+}
+
+/* ✅ 버튼 그룹 */
+.button-group {
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    margin-top: 15px;
+}
+
+/* 🎨 확인 버튼 (맞춤 색상) */
+.btn-custom-pink {
+    background-color: #e91e63;
+    border-color: #e91e63;
+    color: #fff;
+}
+
+.btn-custom-pink:hover {
+    background-color: #d81b60;
+    border-color: #d81b60;
+}
+
+.no-results {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+    font-size: 16px;
+}
