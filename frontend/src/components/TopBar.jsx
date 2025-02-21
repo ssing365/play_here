@@ -11,11 +11,11 @@ import {
     Nav,
     Dropdown,
     Button,
-    Modal,
 } from "react-bootstrap";
 import "../css/Bar.css";
 import { useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
+import Swal from "sweetalert2";
 import axios from "axios";
 
 const TopBar = () => {
@@ -23,8 +23,6 @@ const TopBar = () => {
     const port = import.meta.env.VITE_PORT;
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
-
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const navigate = useNavigate();
 
     // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
@@ -45,9 +43,7 @@ const TopBar = () => {
             if (response.data === "logout success") {
                 // 로그인 상태 토글 및 UI 업데이트
                 setIsLoggedIn(false);
-                setShowModal(false);
-                navigate("/login");
-                alert("로그아웃 되었습니다.");
+                navigate("/search");
             }
         } catch (error) {
             console.error("로그아웃 오류:", error);
@@ -59,7 +55,21 @@ const TopBar = () => {
     const handleCalendarClick = (e) => {
         if (!isLoggedIn) {
             e.preventDefault(); // 기본 페이지 이동 막기
-            setShowModal(true); // 모달 표시
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 해주세요",
+                text: "캘린더를 이용하려면 로그인이 필요합니다.",
+
+                showCancelButton: true,
+                confirmButtonText: "로그인 하기",
+                confirmButtonColor: '#e91e63',
+                cancelButtonText: "닫기",
+                cancelButtonColor: '#666666',
+            }).then(result => {
+                if(result.isConfirmed){
+                    navigate("/login")
+                }
+            });
         }
     };
 
@@ -289,25 +299,6 @@ const TopBar = () => {
                     </Row>
                 </Container>
             </Navbar>
-
-            {/* 로그인 요청 모달 */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Body>캘린더를 이용하려면 로그인해야 합니다.</Modal.Body>
-                <Modal.Footer>
-                    <Button
-                        variant="secondary"
-                        onClick={() => setShowModal(false)}
-                    >
-                        닫기
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => navigate("/login")}
-                    >
-                        로그인하기
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </>
     );
 };

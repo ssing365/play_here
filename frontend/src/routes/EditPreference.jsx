@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { useLocation, useNavigate } from "react-router-dom";
 import "../css/preference.css";
 import TopBar from "../components/TopBar";
+import Swal from "sweetalert2";
 
 const RegisterPreference = () => {
     const location = useLocation();
@@ -55,11 +56,14 @@ const RegisterPreference = () => {
     };
 
     const handleSubmit = async () => {
-
         //선택된 선호도 ID들을 배열로 변환하기
         const selectedPreferences = Object.values(selected).flat();
         if (selectedPreferences.length === 0) {
-            alert("최소 하나 이상의 선호도를 선택해 주세요!");
+            Swal.fire({
+                text: "최소 한 개 이상의 선호도를 선택해주세요!",
+                timer: 1500,    
+                confirmButtonColor: "#e91e63",
+            });
             return;
         }
 
@@ -110,7 +114,8 @@ const RegisterPreference = () => {
             <div className="container">
                 <div className="d-flex mt-5 ">
                     <h4 style={{ fontWeight: "bold" }}>
-                        {userInfo.nickname}님의 선호도를 기반으로 데이트 장소를 추천해 드려요😊
+                        {userInfo.nickname}님의 선호도를 기반으로 데이트 장소를
+                        추천해 드려요😊
                     </h4>
                 </div>
                 <div className="text-muted mb-5">

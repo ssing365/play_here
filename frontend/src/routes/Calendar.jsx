@@ -9,36 +9,149 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import { v4 as uuidv4 } from "uuid"; // 드래그를 위한 고유한 ID 생성
+import axios from "axios";
 
 const Calendar = () => {
     const [date, setDate] = useState(new Date());
     const [showSearch, setShowSearch] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
-    const [selectedDate, setSelectedDate] = useState(null);
-    const [places, setPlaces] = useState({});
+    const [selectedDate, setSelectedDate] = useState(new Date());
+    const [places, setPlaces] = useState([]);
     const [newPlace, setNewPlace] = useState("");
     const [diaryEntry, setDiaryEntry] = useState("");
     const [editDiary, setEditDiary] = useState(false);
     const [diaryText, setDiaryText] = useState(diaryEntry || "");
+    const [yourDiaryText, setYourDiaryText] = useState(diaryEntry || "");
     const [showInput, setShowInput] = useState(false);
+    const [coupleInfo, setCoupleInfo] =useState(null);
+    const [ noDiary, setNoDiary ] = useState(false);
     const navigate = useNavigate();
     const today = new Date();
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
+    const userId = userInfo?.userId;
+    const coupleId = userInfo?.coupleId;
 
-    /* 캘린더 최초 렌더링 시 오늘 날짜 자동 클릭 */
+    
     useEffect(() => {
-        setSelectedDate(today.getDate());
-    }, []);
+        const coupleInfo = async () => {
+            if (coupleId) {
+                try {
+                    const response = await axios.post(
+                        "http://localhost:8586/coupleInfo.do",
+                        { coupleId, userId }
+                    );
+                    if (response.data.length > 0) {
+                        setCoupleInfo(response.data[0]);
+                    } else {
+                        setCoupleInfo({ nickname: "Unknown" }); // 기본값 설정
+                    }
+                } catch (error) {
+                    console.error("Error coupleInfo:", error);
+                }
+            }
+
+        };
+        coupleInfo();
+    }, []);  // coupleId 변경 시 실행
+    
+
+    useEffect(()=>{
+        const formattedDate = selectedDate.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).replace(/\. /g, "-").replace(".", ""); 
+        setPlaces([]);
+        visitList(formattedDate);
+        if (coupleInfo) {
+            diary(formattedDate);
+        }
+    },[selectedDate, coupleInfo])
+
+    // 일기 가져오기
+    const diary = async(formattedDate) => {
+        if (coupleId) {
+            const response1 = await axios.post("http://localhost:8586/Diary.do",
+            {couple_id:coupleId, diary_writer: userId ,diary_date : formattedDate});
+            if(response1.data.length > 0){
+            setDiaryText(response1.data[0].content);
+            }
+            else{
+                setDiaryText("");
+                setNoDiary(true);
+            }
+            const response2 = await axios.post("http://localhost:8586/Diary.do",
+            {couple_id:coupleId, diary_writer: coupleInfo.userId ,diary_date: formattedDate});
+            if(response2.data.length > 0){
+            setYourDiaryText(response2.data[0].content);
+            }
+            else{
+                setYourDiaryText("");
+            }
+        }
+    }
+
+
+    const visitList = async(formattedDate) =>{
+        try{
+            const response1 = await axios.post("http://localhost:8586/visitList.do", { visitDate: formattedDate, coupleId : coupleId })
+            setPlaces(response1.data); // 상태 업데이트
+        }
+        catch (error) {
+        console.error("Error visit list :", error);
+        }
+    };
+    
 
     /* 방문지 리스트 드래그 */
-    const onDragEnd = (result) => {
-        if (!result.destination) return;
-        const items = Array.from(places[selectedDate] || []);
-        const [reorderedItem] = items.splice(result.source.index, 1);
-        items.splice(result.destination.index, 0, reorderedItem);
-        setPlaces({ ...places, [selectedDate]: items });
+    const onDragEnd = async (result) => {
+        const { destination, source } = result;
+        const formattedDate = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).replace(/\. /g, "-").replace(".", ""); 
+     
+        // 드래그된 항목이 유효한 곳으로 드롭되지 않았다면, 아무런 동작을 하지 않음
+        if (!destination) {
+            return;
+        }
+    
+        // 항목이 동일한 위치로 드래그된 경우
+        if (destination.index === source.index) {
+            return;
+        }
+
+        const response1 = await axios.post("http://localhost:8586/visitList.do", { visitDate: formattedDate, coupleId : coupleId })
+
+        const placeIds = [...new Set(response1.data.map(item => item.place_id))];
+    
+
+        // 🔹 placeIds 배열 복사
+        const updatedPlaceIds = [...placeIds]; 
+
+        // 🔹 기존 위치에서 아이템 제거
+        const [removed] = updatedPlaceIds.splice(source.index, 1);
+
+        // 🔹 새로운 위치에 추가
+        updatedPlaceIds.splice(destination.index, 0, removed);
+
+        // 백엔드에 순서 변경된 placeIds 전달
+        try {
+            const response = await axios.post("http://localhost:8586/updateVisitOrder.do", {
+                placeIds: updatedPlaceIds,
+                coupleId: coupleId,
+                visitDate : formattedDate
+            });
+            console.log("순서 업데이트 성공:", response.data);
+            setPlaces([]);
+            visitList();
+        } catch (error) {
+            console.error("순서 업데이트 실패:", error);
+        }
     };
+    
 
     /* 방문지 추가 */
     const placeInput = document.getElementById("placeInput");
@@ -57,15 +170,21 @@ const Calendar = () => {
     };
 
     /* 방문지 삭제 */
-    const deletePlace = (placeId) => {
-        const updatedPlaces = places[selectedDate]?.filter(
-            (place) => place.id !== placeId
-        ); // 선택된 날짜에서 해당 placeId 제거
-
-        setPlaces({
-            ...places,
-            [selectedDate]: updatedPlaces, // 선택된 날짜의 places만 업데이트
-        });
+    const deletePlace = async(placeId) => {
+        console.log(placeId)
+        const formattedDate = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).replace(/\. /g, "-").replace(".", ""); 
+        try{
+            
+            await axios.post("http://localhost:8586/visitDelete.do", { visitDate: formattedDate, coupleId : coupleId, placeId : placeId })
+            visitList();
+        }
+        catch(error) {
+            console.error("삭제 요청 중 오류 발생:", error);
+        }
     };
 
     /* 방문지 수정 */
@@ -79,16 +198,6 @@ const Calendar = () => {
     // 수정 입력창 관리
     const [editId, setEditId] = useState(null);
     const [editText, setEditText] = useState("");
-
-    /* 지난날짜~오늘 / 예정 날짜 구분 */
-    const isPastOrToday = (selectedDate) => {
-        const selected = new Date(
-            date.getFullYear(),
-            date.getMonth(),
-            selectedDate
-        );
-        return selected <= today;
-    };
 
     /* 일기, 방문지 추가시 달력에 점 표시 */
     const tileContent = ({ date }) => {
@@ -105,17 +214,32 @@ const Calendar = () => {
     };
 
     /** 일기 저장 */
-    const saveDiary = () => {
+    const saveDiary =async() => {
         if (diaryText.trim()) {
             setDiaryEntry(diaryText);
         } else {
             setDiaryEntry("일기를 남겨주세요");
         }
         setEditDiary(false);
+        const formattedDate = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).replace(/\. /g, "-").replace(".", ""); 
+        if(noDiary){
+            await axios.post("http://localhost:8586/NewDiary.do",
+                {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryEntry});
+            setNoDiary(false);
+        }
+        else{
+            if (coupleId) {
+                await axios.post("http://localhost:8586/DiaryEdit.do",
+                {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryText});
+            }
+        }
+        diary();
     };
 
-    // 예정날짜 더미 : 지난 데이트 방문지, 추천 장소
-    const pastPlaces = ["백년옥 서초점", "프리퍼", "예술의전당"];
 
     /**커플 아니면 이용 못하게
      * if (userInfo?.coupleStatus === 0) {
@@ -139,7 +263,6 @@ const Calendar = () => {
     }
      * 
      */
-
     return (
         <>
             <TopBar />
@@ -150,9 +273,9 @@ const Calendar = () => {
                     className="calendar-column d-flex flex-column justify-content-between"
                 >
                     <h4 className="mb-3">
-                        {userInfo ? userInfo.nickname : "Loading..."} ♥ 커플
-                        상대 닉네임
+                        {userInfo ? userInfo.nickname : "Loading..."} ♥ {coupleInfo ? coupleInfo.nickname : "Loading..."}
                     </h4>
+
 
                     {/* 검색창과 돋보기 아이콘을 함께 묶은 박스 */}
                     <div className="search-container d-flex align-items-center justify-content-end mb-3">
@@ -172,7 +295,7 @@ const Calendar = () => {
                     <Cal
                         onChange={setDate}
                         value={date}
-                        onClickDay={(value) => setSelectedDate(value.getDate())}
+                        onClickDay={(value) => setSelectedDate(value)}
                         className="couple-calendar flex-grow-1"
                         tileContent={tileContent}
                     />
@@ -199,7 +322,7 @@ const Calendar = () => {
                             selectedDate && (
                                 <>
                                     <h4 className="today-date-title">
-                                        {date.getMonth() + 1}월 {selectedDate}일
+                                        {selectedDate.getMonth()+1}월 {selectedDate.getDate()}일
                                     </h4>
                                     <div className="d-flex align-items-center mb-3">
                                         <b>방문지 리스트</b>
@@ -219,179 +342,113 @@ const Calendar = () => {
                                         </Link>
                                     </div>
 
+                                    {/* 장소 리스트 렌더링 */}
                                     <DragDropContext onDragEnd={onDragEnd}>
                                         <Droppable droppableId="placesList">
                                             {(provided) => (
-                                                <ul
-                                                    {...provided.droppableProps}
-                                                    ref={provided.innerRef}
-                                                    className="list-unstyled"
-                                                >
-                                                    {places[selectedDate]?.map(
-                                                        (place, i) => (
-                                                            <Draggable
-                                                                key={place.id}
-                                                                draggableId={String(
-                                                                    place.id
-                                                                )}
-                                                                index={i}
-                                                            >
-                                                                {(provided) => (
-                                                                    <li
-                                                                        ref={
-                                                                            provided.innerRef
-                                                                        }
-                                                                        {...provided.draggableProps}
-                                                                        className="list-group-item d-flex align-items-center"
-                                                                    >
-                                                                        <span
-                                                                            {...provided.dragHandleProps}
-                                                                            className="me-2 p-1"
-                                                                            style={{
-                                                                                cursor: "grab",
+                                                <ul {...provided.droppableProps} ref={provided.innerRef} className="list-unstyled">
+                                                    {places?.map((place, i) => (
+                                                        <Draggable key={place.place_id} draggableId={String(place.place_id)} index={i}>
+                                                            {(provided) => (
+                                                                <li
+                                                                    ref={provided.innerRef}
+                                                                    {...provided.draggableProps}
+                                                                    className="list-group-item d-flex align-items-center"
+                                                                >
+                                                                    <span {...provided.dragHandleProps} className="me-2 p-1" style={{ cursor: "grab" }}>
+                                                                        ☰ {i + 1}.
+                                                                    </span>
+                                                                    {editId === place.place_id ? (
+                                                                        <input
+                                                                            type="text"
+                                                                            value={editText}
+                                                                            onChange={(e) => setEditText(e.target.value)}
+                                                                            onBlur={() => {
+                                                                                editPlace(place.place_id, editText);
+                                                                                setEditId(null);
                                                                             }}
-                                                                        >
-                                                                            ☰{" "}
-                                                                            {i +
-                                                                                1}
-                                                                            .{" "}
+                                                                            onKeyPress={(e) => {
+                                                                                if (e.key === "Enter") {
+                                                                                    editPlace(place.place_id, editText);
+                                                                                    setEditId(null);
+                                                                                }
+                                                                            }}
+                                                                            autoFocus
+                                                                        />
+                                                                    ) : (
+                                                                        <span onClick={() => {
+                                                                            setEditId(place.place_id);
+                                                                            setEditText(place.place_name);
+                                                                        }} className="me-2 p-1">
+                                                                            {place.place_name}  {/* ✅ 장소 이름 표시 */}
                                                                         </span>
-                                                                        {editId ===
-                                                                        place.id ? (
-                                                                            <input
-                                                                                type="text"
-                                                                                value={
-                                                                                    editText
-                                                                                }
-                                                                                onChange={(
-                                                                                    e
-                                                                                ) =>
-                                                                                    setEditText(
-                                                                                        e
-                                                                                            .target
-                                                                                            .value
-                                                                                    )
-                                                                                }
-                                                                                onBlur={() => {
-                                                                                    editPlace(
-                                                                                        place.id,
-                                                                                        editText
-                                                                                    );
-                                                                                    setEditId(
-                                                                                        null
-                                                                                    );
-                                                                                }} // 포커스 해제 시 저장
-                                                                                onKeyPress={(
-                                                                                    e
-                                                                                ) => {
-                                                                                    if (
-                                                                                        e.key ===
-                                                                                        "Enter"
-                                                                                    ) {
-                                                                                        editPlace(
-                                                                                            place.id,
-                                                                                            editText
-                                                                                        );
-                                                                                        setEditId(
-                                                                                            null
-                                                                                        );
-                                                                                    }
-                                                                                }}
-                                                                                autoFocus
-                                                                            />
-                                                                        ) : (
-                                                                            <span
-                                                                                onClick={() => {
-                                                                                    setEditId(
-                                                                                        place.id
-                                                                                    );
-                                                                                    setEditText(
-                                                                                        place.name
-                                                                                    );
-                                                                                }}
-                                                                                className="me-2 p-1"
-                                                                            >
-                                                                                {
-                                                                                    place.name
-                                                                                }
-                                                                            </span>
-                                                                        )}
-                                                                        <Button
-                                                                            variant="outline-danger"
-                                                                            size="sm"
-                                                                            className="ms-auto"
-                                                                            onClick={() =>
-                                                                                deletePlace(
-                                                                                    place.id
-                                                                                )
-                                                                            } // X 버튼 클릭 시 삭제
-                                                                        >
-                                                                            ✕
-                                                                        </Button>
-                                                                    </li>
-                                                                )}
-                                                            </Draggable>
-                                                        )
-                                                    )}
+                                                                    )}
+                                                                    <Button
+                                                                        variant="outline-danger"
+                                                                        size="sm"
+                                                                        className="ms-auto"
+                                                                        onClick={() => deletePlace(place.place_id)}
+                                                                    >
+                                                                        ✕
+                                                                    </Button>
+                                                                </li>
+                                                            )}
+                                                        </Draggable>
+                                                    ))}
                                                     {provided.placeholder}
                                                 </ul>
                                             )}
                                         </Droppable>
                                     </DragDropContext>
 
-                                    {showInput ? (
-                                        <div className="mt-2 d-flex align-items-center">
-                                            <input
-                                                type="text"
-                                                value={newPlace}
-                                                onChange={(e) =>
-                                                    setNewPlace(e.target.value)
-                                                }
-                                                placeholder="장소 입력"
-                                                className="form-control w-auto me-2"
-                                                id="placeInput"
-                                                onKeyPress={(e) =>
-                                                    e.key === "Enter" &&
-                                                    addPlace()
-                                                } // 엔터키 입력
-                                            />
-                                            <Button
-                                                onClick={addPlace}
-                                                className="add-btn"
-                                            >
-                                                추가
-                                            </Button>
-                                            <button
-                                                className="btn btn-outline-secondary"
-                                                onClick={() =>
-                                                    setShowInput(false)
-                                                }
-                                            >
-                                                취소
-                                            </button>
-                                        </div>
-                                    ) : places[selectedDate]?.length < 7 ||
-                                      places[selectedDate]?.length ==
-                                          undefined ? (
-                                        <a
-                                            href="#"
-                                            onClick={(e) => {
-                                                e.preventDefault();
-                                                setShowInput(true);
-                                            }}
-                                        >
-                                            + 방문지를 추가하세요 :)
-                                        </a>
+                                    <hr />
+
+                                    {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
+                                    {places?.length < 7 ? (
+                                        showInput ? (
+                                            <div className="mt-2 d-flex align-items-center">
+                                                <input
+                                                    type="text"
+                                                    value={newPlace}
+                                                    onChange={(e) => setNewPlace(e.target.value)}
+                                                    placeholder="장소 입력"
+                                                    className="form-control w-auto me-2"
+                                                    id="placeInput"
+                                                    onKeyPress={(e) => e.key === "Enter" && addPlace()}
+                                                />
+                                                <Button onClick={addPlace} className="add-btn">추가</Button>
+                                                <button
+                                                    className="btn btn-outline-secondary"
+                                                    onClick={() => setShowInput(false)}
+                                                >
+                                                    취소
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            places?.length < 7 || places?.length === undefined ? (
+                                                <a
+                                                    href="#"
+                                                    onClick={(e) => {
+                                                        e.preventDefault();
+                                                        setShowInput(true);
+                                                    }}
+                                                >
+                                                    + 방문지를 추가하세요 :)
+                                                </a>
+                                            ) : (
+                                                <span className="text-muted">방문지는 7개까지만 입력 가능합니다 :)</span>
+                                            )
+                                        )
                                     ) : (
-                                        <span className="text-muted">
-                                            {" "}
-                                            방문지는 7개까지만 입력 가능합니다
-                                            :)
-                                        </span>
+                                        <span className="text-muted">방문지는 7개까지만 입력 가능합니다 :)</span>
                                     )}
+
+
                                     <hr />
                                     <br />
-                                    {isPastOrToday(selectedDate) ? (
+
+
+                                    {selectedDate <= today ? (
                                         <>
                                             <Row>
                                                 <Col>
@@ -452,7 +509,7 @@ const Calendar = () => {
                                                                     cursor: "pointer",
                                                                 }}
                                                             >
-                                                                {diaryEntry ||
+                                                                {diaryText ||
                                                                     "일기를 남겨주세요"}
                                                             </p>
                                                         )}
@@ -462,12 +519,12 @@ const Calendar = () => {
                                                     <Card className="p-3">
                                                         <h6>
                                                             <b>
-                                                                커플 상대 닉네임
+                                                            {coupleInfo ? coupleInfo.nickname : "Loading..."}
                                                             </b>
                                                         </h6>
                                                         <p>
-                                                            오늘 여기를 가서
-                                                            행복했다.
+                                                        {yourDiaryText ||
+                                                                    "상대가 아직 일기를 남기지 않았어요"}
                                                         </p>
                                                     </Card>
                                                 </Col>
@@ -482,7 +539,7 @@ const Calendar = () => {
                                                             지난 데이트 방문지
                                                         </b>
                                                     </h6>
-                                                    <ul className="list-group mb-3">
+                                                    {/* <ul className="list-group mb-3">
                                                         {pastPlaces.map(
                                                             (place, index) => (
                                                                 <li
@@ -493,7 +550,7 @@ const Calendar = () => {
                                                                 </li>
                                                             )
                                                         )}
-                                                    </ul>
+                                                    </ul> */}
                                                 </Col>
                                                 <Col>
                                                     <h6>
