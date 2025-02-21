@@ -32,6 +32,7 @@ const MyPageLikes = () => {
                 { userId },
                 { headers: { "Content-Type": "application/json" } }
             );
+            console.log(response.data);
             setInterests(response.data || []);
         } catch (error) {
             console.error("장소 리스트 불러오기 실패:", error);
@@ -51,9 +52,15 @@ const MyPageLikes = () => {
         } else {
             setTempDate(selectedDates[index] || new Date()); // 기본값: 오늘 날짜
             setOpenDatePickerIndex(index);
+            setTimeout(() => {
+                if (datepickerRef.current) {
+                    datepickerRef.current.scrollIntoView({ behavior: "smooth", block: "center" });
+                }
+            }, 80); // 살짝 딜레이 줘서 자연스럽게 스크롤
         }
     };
 
+    // 캘린더에 일정 추가 submit
     const handleConfirmDate = async (placeId, visitDate) => {
         if (userInfo?.coupleStatus === 0) {
             // e.preventDefault(); // 기본 페이지 이동 막기
@@ -232,7 +239,8 @@ const MyPageLikes = () => {
                                         </p>
 
                                         <div className="mt-3 d-flex gap-2">
-                                            {/* 캘린더에 추가 버튼 */}
+                                            {/* 캘린더에 추가 버튼 */
+                                            console.log("dfdf",index)}
                                             <button
                                                 className="cal-add-btn d-flex align-items-center " // 한 줄로 정렬
                                                 onClick={() =>
@@ -241,7 +249,7 @@ const MyPageLikes = () => {
                                                     )
                                                 }
                                             >
-                                                <Calendar size={20} /> 캘린더에
+                                                <Calendar size={20} /> 캘린더에 일정
                                                 추가하기
                                             </button>
                                         </div>

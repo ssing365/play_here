@@ -150,7 +150,7 @@ const Calendar = () => {
                     className="calendar-column d-flex flex-column justify-content-between"
                 >
                     <h4 className="mb-3">
-                        {userInfo ? userInfo.nickname : "Loading..."} ♥ 커플
+                        {userInfo ? userInfo.nickname : "Loading..."} ❤ 커플
                         상대 닉네임
                     </h4>
 
