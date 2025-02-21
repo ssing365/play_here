@@ -47,16 +47,16 @@
 	
 	<select id="Diary" resultType="com.playhere.couple.CoupleDTO">
 		select * from couple_diary
-		where couple_id = #{couple_id} and diary_date = TO_DATE(#{diary_date},'YYYY-MM-DD') and diary_writer = #{diary_writer}
+		where couple_id = #{coupleId} and diary_date = TO_DATE(#{diaryDate},'YYYY-MM-DD') and diary_writer = #{diaryWriter}
 	</select>
 	
 	<update id="DiaryEdit">
 		update couple_diary set content = #{content}
-		where couple_id = #{couple_id} and diary_date = TO_DATE(#{diary_date},'YYYY-MM-DD') and diary_writer = #{diary_writer}
+		where couple_id = #{coupleId} and diary_date = TO_DATE(#{diaryDate},'YYYY-MM-DD') and diary_writer = #{diaryWriter}
 	</update>
 	
 	<insert id="NewDiary">
-		insert into couple_diary values(DIARY_SEQ.nextval,#{diary_writer}, #{couple_id}, #{content}, #{diary_date})
+		insert into couple_diary values(DIARY_SEQ.nextval,#{diaryWriter}, #{coupleId}, #{content}, #{diaryDate})
 	</insert>
 	
 </mapper>

@@ -20,20 +20,6 @@ import Swal from "sweetalert2";
 const SearchList = () => {
     const [places, setPlaces] = useState([]);
 
-    useEffect(() => {
-        const fetchPlace = async () => {
-            try {
-                const response = await axios.get(
-                    "http://localhost:8586/placeList.do"
-                );
-                console.log(response.data);
-                setPlaces(response.data); // 받아온 데이터를 상태에 저장
-            } catch (error) {
-                console.error("Error fetching places:", error);
-            }
-        };
-        fetchPlace();
-    },[]);    
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const [searchCategory, setSearchCategory] = useState([]);
     const [searchLocation, setSearchLocation] = useState([]);
@@ -41,10 +27,10 @@ const SearchList = () => {
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [pagecount, setPagecount] = useState(0);
-
+    
     const { userInfo, isLoggedIn } = useContext(UserContext);
     const userId = userInfo?.userId;
-
+    
     // 장소 리스트 불러오는 함수 분리
     const fetchPlace = async () => {
         try {
@@ -52,6 +38,7 @@ const SearchList = () => {
             const response = await axios.get(`http://localhost:8586/placeList.do?pageNum=${currentPage}&searchWord=${searchWordArray}&searchLocation=${searchLocation}&searchCategory=${searchCategory}`,
                 {pageNum:currentPage, searchWord:searchWordArray, searchLocation : searchLocation, searchCategory : searchCategory}
             );
+            console.log(response.data);
             setPlaces(response.data);
             setPagecount(response.data.length);
         } catch (error) {
@@ -160,14 +147,14 @@ const SearchList = () => {
             }
         }
         Tag.push(
-            <div className="mb-4" key={places[i].place_id}>
+            <div className="mb-4" key={places[i].placeId}>
                 <Row>
                     <Col md={4}>
                         <div className="position-relative">
                             <img
                                 src={places[i].image}
                                 onClick={() =>
-                                    (window.location.href = `/place?id=${places[i].place_id}`)
+                                    (window.location.href = `/place?id=${places[i].placeId}`)
                                 }
                                 alt="장소 이미지"
                                 className="rounded w-100"
@@ -191,10 +178,10 @@ const SearchList = () => {
                                     <h5
                                         className="mb-1"
                                         onClick={() =>
-                                            (window.location.href = `/place?id=${places[i].place_id}`)
+                                            (window.location.href = `/place?id=${places[i].placeId}`)
                                         }
                                     >
-                                        {places[i].place_name}
+                                        {places[i].placeName}
                                     </h5>
                                     <div className="text-muted small">
                                         {places[i].location_short}
@@ -208,7 +195,7 @@ const SearchList = () => {
                                     variant="outline-danger"
                                     size="sm"
                                     onClick={(e) =>
-                                        handleLikeClick(places[i].place_id, e)
+                                        handleLikeClick(places[i].placeId, e)
                                     }
                                 >
                                     ♥ {places[i].likes}

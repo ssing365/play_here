@@ -41,26 +41,30 @@ public class LoginController {
 //	로그인
 	@PostMapping("/login")
 	public ResponseEntity<String> login(@RequestBody MemberDTO member, HttpServletResponse response) {
-	    System.out.println("요청 받은 userId: " + member.getUserId());
+		System.out.println("[백엔드] 로그인 API 호출됨");
+		System.out.println("요청 받은 userId: " + member.getUserId());
 	    System.out.println("요청 받은 password: " + member.getPassword());
 
+	    //유저 인증하기 
 	    MemberDTO user = dao.login(member.getUserId(), member.getPassword());
 		
 		if(user!=null) {
+			 System.out.println("[백엔드] 로그인 성공");
 			// ✅ JWT 토큰 생성
             String jwt = jwtUtil.generateToken(member.getUserId());
-
+            System.out.println("[백엔드] 발급된 JWT: " + jwt);
             // ✅ HttpOnly 쿠키에 저장
             Cookie cookie = new Cookie("token", jwt);
             cookie.setHttpOnly(true);
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 1시간
             cookie.setSecure(false); // 🚨 로컬 개발 환경에서는 false
-            cookie.setDomain("localhost"); // 필요 시 추가
+            //cookie.setDomain("localhost"); // 필요 시 추가
             response.addCookie(cookie);
 
             return ResponseEntity.ok("success");
 		} else {
+			System.out.println("[백엔드] 로그인 실패");
 			return ResponseEntity.status(401).body("fail");
 		}	
 	}

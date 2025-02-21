@@ -97,6 +97,10 @@
 	    )
 	</insert>
 	
+	<select id="CheckCalendar" resultType="int">
+		select count(*) from couple_visit
+		where couple_id = #{coupleId} and place_id = #{placeId} and visit_date = #{visitDate}
+	</select>
 	
 	
 	

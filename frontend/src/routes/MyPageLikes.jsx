@@ -72,29 +72,46 @@ const MyPageLikes = () => {
             });
         } else {
             try {
-                await axios.post("http://localhost:8586/addCalendar.do", {
+                const response = await axios.post("http://localhost:8586/addCalendar.do", {
                     placeId,
                     coupleId,
-                    visitDate,
-                    userId,
+                    visitDate
                 });
+                const check = response.data;
                 setOpenDatePickerIndex(null); // DatePicker 닫기
                 fetchInterest(); // 최신 데이터 반영
-                // 성공 알림
-                Swal.fire({
-                    title: "캘린더에 성공적으로 추가되었습니다!",
-                    icon: "success",
-
-                    showCancelButton: true,
-                    confirmButtonColor: "#e91e63",
-                    cancelButtonColor: "#666",
-                    confirmButtonText: "캘린더 보러가기",
-                    cancelButtonText: "닫기",
-                }).then((result) => {
-                    if (result.isConfirmed) {
-                        navigate("/calendar");
-                    }
-                });
+                if(check===1){
+                    Swal.fire({
+                        title: "캘린더에 성공적으로 추가되었습니다!",
+                        icon: "success",
+    
+                        showCancelButton: true,
+                        confirmButtonColor: "#e91e63",
+                        cancelButtonColor: "#666",
+                        confirmButtonText: "캘린더 보러가기",
+                        cancelButtonText: "닫기",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate("/calendar");
+                        }
+                    });
+                }
+                else{
+                    Swal.fire({
+                        title: "이미 방문리스트에 존재합니다!",
+                        icon: "warning",
+    
+                        showCancelButton: true,
+                        confirmButtonColor: "#e91e63",
+                        cancelButtonColor: "#666",
+                        confirmButtonText: "캘린더 보러가기",
+                        cancelButtonText: "닫기",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate("/calendar");
+                        }
+                    });
+                }
             } catch (error) {
                 console.error("캘린더 추가 요청 중 오류 발생:", error);
                 alert("캘린더 추가 중 오류가 발생했습니다."); // 실패 알림
@@ -267,7 +284,7 @@ const MyPageLikes = () => {
                                                     size="sm"
                                                     onClick={() =>
                                                         handleConfirmDate(
-                                                            interest.place_id,
+                                                            interest.placeId,
                                                             tempDate
                                                         )
                                                     }
@@ -283,7 +300,7 @@ const MyPageLikes = () => {
                                 variant="outline-danger" // 빨간색 Bootstrap 테마 사용
                                 className="p-1 ms-auto" // 화면 오른쪽 끝으로 이동
                                 onClick={() =>
-                                    interestDelete(interest.place_id, interest.place_name)
+                                    interestDelete(interest.placeId, interest.placeName)
                                 }
                             >
                                 <Trash size={20} />

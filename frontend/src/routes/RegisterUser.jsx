@@ -198,48 +198,43 @@ const RegisterUser = () => {
         }
     };
 
+
     const handleSubmit = async (e) => {
-        e.preventDefault();
+    e.preventDefault();
+  
+    // 필수 입력 필드 검증
+    const requiredFields = ['user_id', 'password', 'confirmPassword', 'name', 'nickname', 'email'];
+    for (const field of requiredFields) {
+      if (!formData[field].trim()) {
+        alert(`"${field}" 항목을 입력해 주세요.`);
+        return;
+      }
+    }
+    
+    // 아이디 중복 확인 체크
+    if (!isUserIdChecked) {
+      alert("아이디 중복 확인을 해주세요.");
+      return;
+    }
+  
+    // 기존 검증 로직
+    
+    // 아이디 형식 재검증
+    if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
+      alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
+      return;
+    }
+    // 비밀번호 형식 재검증
+    if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(formData.password)) {
+      alert("비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다.");
+      return;
+    }
+    //비밀번호와 비밀번호 확인 일치 여부 검증
+    if (formData.password !== formData.confirmPassword) {
+      alert("비밀번호가 일치하지 않습니다.");
+      return;
+    }
 
-        // 필수 입력 필드 검증
-        const requiredFields = [
-            "user_id",
-            "password",
-            "confirmPassword",
-            "name",
-            "nickname",
-            "email",
-        ];
-        for (const field of requiredFields) {
-            if (!formData[field].trim()) {
-                alert(`"${field}" 항목을 입력해 주세요.`);
-                return;
-            }
-        }
-
-        // 기존 검증 로직
-
-        // 아이디 형식 재검증
-        if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
-            alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
-            return;
-        }
-        // 비밀번호 형식 재검증
-        if (
-            !/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(
-                formData.password
-            )
-        ) {
-            alert(
-                "비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다."
-            );
-            return;
-        }
-        //비밀번호와 비밀번호 확인 일치 여부 검증
-        if (formData.password !== formData.confirmPassword) {
-            alert("비밀번호가 일치하지 않습니다.");
-            return;
-        }
 
         // JSON으로 변환할 데이터에서 profile_picture 제거
         const { profile_picture, ...formDataWithoutFile } = formData;

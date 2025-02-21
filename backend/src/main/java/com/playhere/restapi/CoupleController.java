@@ -68,19 +68,18 @@ public class CoupleController {
 	
 	@PostMapping("/Diary.do")
 	public List<CoupleDTO> Diary(@RequestBody CoupleDTO request) {
-		String diary_date = request.getDiary_date();
-	    String couple_id = request.getCouple_id();
-	    String diary_writer = request.getDiary_writer();
-
+		String diary_date = request.getDiaryDate();
+	    String couple_id = request.getCoupleId();
+	    String diary_writer = request.getDiaryWriter();
 	    
 		return dao.Diary(couple_id, diary_writer, diary_date);
 	}
 	
 	@PostMapping("/DiaryEdit.do")
 	public void DiaryEdit(@RequestBody CoupleDTO request) {
-		String diary_date = request.getDiary_date();
-		String couple_id = request.getCouple_id();
-		String diary_writer = request.getDiary_writer();
+		String diary_date = request.getDiaryDate();
+		String couple_id = request.getCoupleId();
+		String diary_writer = request.getDiaryWriter();
 		String content = request.getContent();
 		
 		dao.DiaryEdit(couple_id, diary_writer, diary_date,content);

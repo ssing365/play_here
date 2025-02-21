@@ -73,7 +73,7 @@ const Calendar = () => {
     const diary = async(formattedDate) => {
         if (coupleId) {
             const response1 = await axios.post("http://localhost:8586/Diary.do",
-            {couple_id:coupleId, diary_writer: userId ,diary_date : formattedDate});
+            {coupleId:coupleId, diaryWriter: userId ,diaryDate : formattedDate});
             if(response1.data.length > 0){
                 setNoDiary(false);
                 setDiaryText(response1.data[0].content);
@@ -83,7 +83,7 @@ const Calendar = () => {
                 setNoDiary(true);
             }
             const response2 = await axios.post("http://localhost:8586/Diary.do",
-            {couple_id:coupleId, diary_writer: coupleInfo.userId ,diary_date: formattedDate});
+            {coupleId:coupleId, diaryWriter: coupleInfo.userId ,diaryDate: formattedDate});
             if(response2.data.length > 0){
             setYourDiaryText(response2.data[0].content);
             }
@@ -97,6 +97,7 @@ const Calendar = () => {
     const visitList = async(formattedDate) =>{
         try{
             const response1 = await axios.post("http://localhost:8586/visitList.do", { visitDate: formattedDate, coupleId : coupleId })
+            console.log(response1.data);
             setPlaces(response1.data); // 상태 업데이트
         }
         catch (error) {
@@ -126,7 +127,7 @@ const Calendar = () => {
 
         const response1 = await axios.post("http://localhost:8586/visitList.do", { visitDate: formattedDate, coupleId : coupleId })
 
-        const placeIds = [...new Set(response1.data.map(item => item.place_id))];
+        const placeIds = [...new Set(response1.data.map(item => item.placeId))];
     
 
         // 🔹 placeIds 배열 복사
@@ -181,7 +182,7 @@ const Calendar = () => {
         try{
             
             await axios.post("http://localhost:8586/visitDelete.do", { visitDate: formattedDate, coupleId : coupleId, placeId : placeId })
-            visitList();
+            visitList(formattedDate);
         }
         catch(error) {
             console.error("삭제 요청 중 오류 발생:", error);
@@ -230,13 +231,13 @@ const Calendar = () => {
 
         if(noDiary){
             await axios.post("http://localhost:8586/NewDiary.do",
-                {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryText});
+                {coupleId:coupleId, diaryWriter: userId ,diaryDate:formattedDate, content: diaryText});
             setNoDiary(false);
         }
         else{
             if (coupleId) {
                 await axios.post("http://localhost:8586/DiaryEdit.do",
-                {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryText});
+                {coupleId:coupleId, diaryWriter: userId ,diaryDate:formattedDate, content: diaryText});
             }
         }
         diary(formattedDate);
@@ -350,7 +351,7 @@ const Calendar = () => {
                                             {(provided) => (
                                                 <ul {...provided.droppableProps} ref={provided.innerRef} className="list-unstyled">
                                                     {places?.map((place, i) => (
-                                                        <Draggable key={place.place_id} draggableId={String(place.place_id)} index={i}>
+                                                        <Draggable key={place.placeId} draggableId={String(place.placeId)} index={i}>
                                                             {(provided) => (
                                                                 <li
                                                                     ref={provided.innerRef}
@@ -360,18 +361,18 @@ const Calendar = () => {
                                                                     <span {...provided.dragHandleProps} className="me-2 p-1" style={{ cursor: "grab" }}>
                                                                         ☰ {i + 1}.
                                                                     </span>
-                                                                    {editId === place.place_id ? (
+                                                                    {editId === place.placeId ? (
                                                                         <input
                                                                             type="text"
                                                                             value={editText}
                                                                             onChange={(e) => setEditText(e.target.value)}
                                                                             onBlur={() => {
-                                                                                editPlace(place.place_id, editText);
+                                                                                editPlace(place.placeId, editText);
                                                                                 setEditId(null);
                                                                             }}
                                                                             onKeyPress={(e) => {
                                                                                 if (e.key === "Enter") {
-                                                                                    editPlace(place.place_id, editText);
+                                                                                    editPlace(place.placeId, editText);
                                                                                     setEditId(null);
                                                                                 }
                                                                             }}
@@ -379,17 +380,17 @@ const Calendar = () => {
                                                                         />
                                                                     ) : (
                                                                         <span onClick={() => {
-                                                                            setEditId(place.place_id);
-                                                                            setEditText(place.place_name);
+                                                                            setEditId(place.placeId);
+                                                                            setEditText(place.placeName);
                                                                         }} className="me-2 p-1">
-                                                                            {place.place_name}  {/* ✅ 장소 이름 표시 */}
+                                                                            {place.placeName}  {/* ✅ 장소 이름 표시 */}
                                                                         </span>
                                                                     )}
                                                                     <Button
                                                                         variant="outline-danger"
                                                                         size="sm"
                                                                         className="ms-auto"
-                                                                        onClick={() => deletePlace(place.place_id)}
+                                                                        onClick={() => deletePlace(place.placeId)}
                                                                     >
                                                                         ✕
                                                                     </Button>
@@ -403,7 +404,7 @@ const Calendar = () => {
                                         </Droppable>
                                     </DragDropContext>
 
-                                    <hr />
+                                    
 
                                     {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
                                     {places?.length < 7 ? (

@@ -5,18 +5,20 @@ import { useLocation, useNavigate } from "react-router-dom";
 import "../css/preference.css";
 import TopBar from "../components/TopBar";
 import Swal from "sweetalert2";
+import axios from "axios";
 
-const RegisterPreference = () => {
+const EditPreference = () => {
     const location = useLocation();
     const navigate = useNavigate();
-    const [userId, setUserId] = useState("");
-    const [categories, setCategories] = useState([]);
-
-    // context에서 로그인 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
+    const [categories, setCategories] = useState([]);
+    // 최종 selected state: { "먹기": [3, 15, ...], "마시기": [8,9,...], ... }
+    const [selected, setSelected] = useState({});
+    // 백엔드에서 받은 원본 단순 id 배열
+    const [rawSelected, setRawSelected] = useState([]);
 
+    //JSON 파일에서 categories.json 불러오기
     useEffect(() => {
-        //JSON 파일에서 categories.json 불러오기
         fetch("/data/categories.json")
             .then((res) => {
                 if (!res.ok) {
@@ -27,15 +29,59 @@ const RegisterPreference = () => {
             .then((data) => setCategories(data))
             .catch((error) => {
                 console.error("카테고리 데이터 로드 실패:", error);
-                alert(
-                    "카테고리 데이터를 불러올 수 없습니다. 회원가입을 완료합니다."
-                );
-                navigate("register-complete"); //회원가입 성공 페이지로 이동
+                alert("카테고리 데이터를 불러올 수 없습니다.");
+                navigate("/mypage");
             });
-    }, [location.state, navigate]); // ✅ state만 의존성으로 사용
+    }, [navigate]); // ✅ state만 의존성으로 사용
 
-    const [selected, setSelected] = useState({});
+    // 현재 사용자의 선호도 불러오기
+    useEffect(() => {
+        if (userInfo?.userId) {
+            axios
+                .get(
+                    `http://localhost:8586/api/user/${userInfo.userId}/preferences`
+                )
+                .then((response) => {
+                    setRawSelected(response.data); // response.data: 선호도 id 배열
+                    console.log("rawSelected:", response.data);
+                })
+                .catch((error) => {
+                    console.error("현재 선호도 로드 실패:", error);
+                    alert(
+                        "선호도를 불러오는데 실패했습니다. 다시 시도해주세요"
+                    );
+                });
+        }
+    }, [location.state, userInfo?.userId]);
 
+    // categories와 rawSelected이 모두 로드된 후, rawSelected을 selected 객체로 변환
+    useEffect(() => {
+        if (categories.length > 0 && rawSelected.length > 0) {
+            // id → 카테고리 title 매핑 생성
+            const idToCategory = {};
+            categories.forEach((category) => {
+                // categories.json의 구조에 따라 category.items 존재
+                category.items.forEach((item) => {
+                    idToCategory[item.id] = category.title;
+                });
+            });
+            // 변환: 각 id가 속한 카테고리별로 그룹화
+            const transformedSelected = {};
+            rawSelected.forEach((id) => {
+                const catTitle = idToCategory[id];
+                if (catTitle) {
+                    if (transformedSelected[catTitle]) {
+                        transformedSelected[catTitle].push(id);
+                    } else {
+                        transformedSelected[catTitle] = [id];
+                    }
+                }
+            });
+            setSelected(transformedSelected);
+        }
+    }, [categories, rawSelected]);
+
+    // 아이콘 클릭 시, 선택 토글
     const handleClick = (categoryTitle, item) => {
         setSelected((prevState) => {
             const currentCategory = prevState[categoryTitle] || [];
@@ -61,23 +107,22 @@ const RegisterPreference = () => {
         if (selectedPreferences.length === 0) {
             Swal.fire({
                 text: "최소 한 개 이상의 선호도를 선택해주세요!",
-                timer: 1500,    
+                timer: 1500,
                 confirmButtonColor: "#e91e63",
             });
             return;
         }
 
-        /*
         const preferencesToSend = selectedPreferences.map((preferenceId) => ({
-            userId: userId, // 각 선호도에 userId 추가
+            userId: userInfo?.userId, // 각 선호도에 userId 추가
             preferenceId: preferenceId,
         }));
 
         try {
             const response = await fetch(
-                "http://localhost:8586/join/preference.do",
+                `http://localhost:8586/api/user/${userInfo.userId}/preferences`,
                 {
-                    method: "POST",
+                    method: "PUT",
                     headers: {
                         "Content-Type": "application/json",
                     },
@@ -92,20 +137,24 @@ const RegisterPreference = () => {
             //서버 응답 JSON 데이터 읽기
             const result = await response.json();
             if (result.result === 1) {
-                alert("선호도 정보가 저장되었습니다.");
-                //회원가입 성공 페이지 이동
-                navigate("/register-complete");
-                //로컬스토리지에 저장된 userId 삭제하기
-                localStorage.removeItem("userId");
+                // Swal이 완료된 후 페이지 이동
+                Swal.fire({
+                    title: "선호도 정보가 수정되었습니다.",
+                    icon: "success",
+                    timer: 1500,
+                    showConfirmButton: false,
+                }).then(() => {
+                    navigate("/mypage");
+                });
             } else {
-                alert("선호도 저장에 실패했습니다. 다시 시도해주세요");
+                alert("선호도 수정에 실패했습니다. 다시 시도해주세요");
             }
         } catch (error) {
-            console.error("회원 선호도 저장 서버 요청 오류:", error);
+            console.error("선호도 수정 서버 요청 오류:", error);
             alert(
-                "서버 오류로 선호도를 저장하지 못했습니다. 다시 시도해주세요."
+                "서버 오류로 선호도를 수정하지 못했습니다. 다시 시도해주세요."
             );
-        }*/
+        }
     };
 
     return (
@@ -114,7 +163,7 @@ const RegisterPreference = () => {
             <div className="container">
                 <div className="d-flex mt-5 ">
                     <h4 style={{ fontWeight: "bold" }}>
-                        {userInfo.nickname}님의 선호도를 기반으로 데이트 장소를
+                        {userInfo?.nickname}님의 선호도를 기반으로 데이트 장소를
                         추천해 드려요😊
                     </h4>
                 </div>
@@ -235,4 +284,4 @@ const RegisterPreference = () => {
     );
 };
 
-export default RegisterPreference;
+export default EditPreference;

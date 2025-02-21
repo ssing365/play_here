@@ -22,19 +22,19 @@ const EditProfile = () => {
     const [preview, setPreview] = useState(null);
     const imageSrc =
         preview ||
-        (userInfo.profilePicture
-            ? `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
+        (userInfo?.profilePicture
+            ? `http://${remoteIp}:${port}/image/${userInfo?.profilePicture}`
             : null);
 
     // 유저 정보 편집 상태로 관리하기
     const [editedUser, setEditedUser] = useState({
-        profilePicture: userInfo.profilePicture,
-        nickname: userInfo.nickname,
-        email: userInfo.email,
-        birthDate: userInfo.birthDate,
-        postcode: userInfo.zipcode,
-        address: userInfo.address,
-        detailAddress: userInfo.detailAddress,
+        profilePicture: userInfo?.profilePicture,
+        nickname: userInfo?.nickname,
+        email: userInfo?.email,
+        birthDate: userInfo?.birthDate,
+        postcode: userInfo?.zipcode,
+        address: userInfo?.address,
+        detailAddress: userInfo?.detailAddress,
     });
 
     // 입력값 변경 핸들러
@@ -92,7 +92,7 @@ const EditProfile = () => {
             // 예시로 백엔드 API에 PUT 혹은 POST 요청으로 수정 정보를 전송
             // PUT 요청으로 전송 (PUT도 FormData 전송 가능)
             const response = await axios.put(
-                "http://localhost:8586/api/user-update",
+                "/api/user-update",
                 formDataToSubmit,
                 {
                     headers: {
@@ -340,7 +340,7 @@ const EditProfile = () => {
                             </div>
                         </form>
                         <hr className="divider" />
-                        {userInfo.coupleStatus ? <CoupleDisconnect /> : <></>}
+                        {userInfo?.coupleStatus ? <CoupleDisconnect /> : <></>}
                     </div>
                 </div>
                 <MemberWithdrawal />
