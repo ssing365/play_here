@@ -55,6 +55,7 @@ const Top5 = () => {
     },[])
 
 
+    
     return (
         <>
             <Carousel className="mt-5 mb-5" indicators={false} controls={false}>
@@ -107,6 +108,9 @@ const Top5 = () => {
                                         duration: 0.5,
                                         ease: "easeInOut",
                                     }}
+                                    onClick={() =>
+                                        (window.location.href = `/place?id=${top5[index].place_id}`)
+                                    }
                                 />
                             </AnimatePresence>
                         </Col>

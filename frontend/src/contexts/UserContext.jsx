@@ -18,6 +18,7 @@ export const UserProvider = ({ children }) => {
                 console.error("사용자 정보 가져오기 오류:", error);
                 setIsLoggedIn(false);
             }
+            
         };
         fetchUserInfo();
     }, []);
