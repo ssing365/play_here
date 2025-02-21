@@ -11,7 +11,7 @@ import org.apache.ibatis.annotations.Param;
 public interface IPlaceService {
 	//리스트 출력
 	public List<PlaceDTO> list(ParameterDTO parameterDTO);
-	public List<PlaceDTO> view(String PlaceId);
+	public List<PlaceDTO> view(int PlaceId);
 	public int Interestcheck(@Param("userId") String userId, @Param("placeId") String placeId);
 	public void placeLikeAdd(@Param("placeId") String placeId);
 	public void placeLikeCancle(@Param("placeId") String placeId);

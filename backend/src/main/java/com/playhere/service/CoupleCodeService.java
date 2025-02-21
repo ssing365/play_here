@@ -26,8 +26,9 @@ public class CoupleCodeService implements ICoupleCodeBusinessService {
 	
 	@Override
 	public CoupleCodeDTO getCoupleCode(String userId) {
+		System.out.println("💡 [디버깅] getCoupleCode() 실행 - userId: " + userId);
 		CoupleCodeDTO coupleCodeDTO = coupleCodeMapper.findByUserId(userId);
-		
+		 System.out.println("💡 [디버깅] findByUserId 결과: " + coupleCodeDTO);
 		//이미 커플이면 "COUPLE" 코드 반환 (갱신x)
 		if (coupleCodeDTO != null && "COUPLE".equals(coupleCodeDTO.getCode())) {
 			return coupleCodeDTO;

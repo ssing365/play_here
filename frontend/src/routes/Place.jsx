@@ -213,7 +213,7 @@ function Place() {
                 <Container className="content-container">
                     <img
                         src={place.image}
-                        alt={place.place_name}
+                        alt={place.placeName}
                         className="w-100 rounded-3 mb-4"
                         style={{
                             height: "500px",
@@ -225,7 +225,7 @@ function Place() {
                     <Row className="g-4">
                         {/* 기본 정보 */}
                         <Col md={6}>
-                            <h2 className="fw-bold">{place.place_name}</h2>
+                            <h2 className="fw-bold">{place.placeName}</h2>
                             <p className="text-muted">{place.location_short}</p>
                             <div className="hashtags">
                                 {hashTag.map((tag, index) => {

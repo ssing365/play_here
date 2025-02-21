@@ -4,7 +4,7 @@ import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
 import KakaoLoginButton from "../components/Login/KakaoLogin.jsx";
 import NaverLoginButton from "../components/Login/NaverLogin.jsx";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
 
@@ -16,6 +16,7 @@ const Login = () => {
     const passwordRef = useRef(null);
     const rememberMeRef = useRef(null);
     const navigate = useNavigate();
+    const location = useLocation();
 
     // ✅ 1. 페이지 로드 시 localStorage에서 아이디 불러오기
     useEffect(() => {
@@ -49,7 +50,14 @@ const Login = () => {
                 } else {
                     localStorage.removeItem("savedUserId"); // 저장된 아이디 삭제
                 }
-                window.location.href = "/";
+
+                // 리디렉트 처리 수정
+                const redirectPath = new URLSearchParams(location.search).get("redirect");
+                if (redirectPath) {
+                    window.location.href = redirectPath;
+                } else {
+                    window.location.href = "/";
+                }
             }
         } catch (error) {
             if (error.response && error.response.status === 401) {

@@ -94,6 +94,13 @@
         WHERE user_id = #{userId}
     </update>
     
+    <!-- member 테이블의 couple_id, couple_status 업데이트 -->
+	<update id="updateCoupleStatus" parameterType="map">
+	    UPDATE member
+	    SET couple_id = #{coupleId}, couple_status = 1
+	    WHERE user_id = #{userId}
+	</update>
+
     <!-- 선호도 수정  -->
     <update id="updateUserPreferences">
     	DELETE FROM user_preference WHERE user_id = 
@@ -109,5 +116,4 @@
 	<delete id="deleteUserPreferences" parameterType="String">
 	    DELETE FROM user_preference WHERE user_id = #{userId}
 	</delete>
-
 </mapper>

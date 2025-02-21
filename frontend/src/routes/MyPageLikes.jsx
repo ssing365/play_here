@@ -199,7 +199,7 @@ const MyPageLikes = () => {
                                         cursor: "pointer",
                                     }}
                                     onClick={() =>
-                                        (window.location.href = `/place?id=${interest.place_id}`)
+                                        (window.location.href = `/place?id=${interest.placeId}`)
                                     }
                                 />
                                 <div className="ms-3">
@@ -212,13 +212,13 @@ const MyPageLikes = () => {
                                     <div className="mt-2">
                                         <h5
                                             onClick={() =>
-                                                (window.location.href = `/place?id=${interest.place_id}`)
+                                                (window.location.href = `/place?id=${interest.placeId}`)
                                             }
                                             style={{
                                                 cursor: "pointer",
                                             }}
                                         >
-                                            <b>{interest.place_name}</b>
+                                            <b>{interest.placeName}</b>
                                         </h5>
                                         <p className="mb-1">
                                             {interest.location_short}
@@ -293,7 +293,7 @@ const MyPageLikes = () => {
                                                         size="sm"
                                                         onClick={() =>
                                                             handleConfirmDate(
-                                                                interest.place_id,
+                                                                interest.placeId,
                                                                 tempDate
                                                             )
                                                         }
@@ -310,8 +310,8 @@ const MyPageLikes = () => {
                                     className="p-1 ms-auto" // 화면 오른쪽 끝으로 이동
                                     onClick={() =>
                                         interestDelete(
-                                            interest.place_id,
-                                            interest.place_name
+                                            interest.placeId,
+                                            interest.placeName
                                         )
                                     }
                                 >

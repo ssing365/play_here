@@ -43,6 +43,7 @@
 		)
 		WHERE rNum BETWEEN #{start} AND #{end}
 	</select>
+	
 
 	
 	<select id="view" resultType="com.playhere.place.PlaceDTO">

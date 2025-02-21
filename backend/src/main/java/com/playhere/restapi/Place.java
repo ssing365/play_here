@@ -78,7 +78,7 @@ public class Place {
 	    }
 
 	@GetMapping("/placeView.do")
-	public List<PlaceDTO> placeView(@RequestParam("id") String PlaceId){
+	public List<PlaceDTO> placeView(@RequestParam("id") int PlaceId){
 		return dao.view(PlaceId);
 	}
 	

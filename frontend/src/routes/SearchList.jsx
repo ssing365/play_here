@@ -48,7 +48,7 @@ const SearchList = () => {
             const searchWordArray = searchWord ? searchWord.split(" ") : [];
             // 공통 파라미터 구성
             const params = {
-              searchWord: searchWordArray.join(" "),
+              searchWord: searchWordArray,
               searchLocation: searchLocation,
               searchCategory: searchCategory,
             };
@@ -65,6 +65,8 @@ const SearchList = () => {
             const response = await axios.get(url, { params,
                 paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
              });
+            console.log(response);
+            console.log(response.data);
             let data = response.data;
       
             // 좋아요 정렬인 경우 클라이언트에서 정렬 후 페이징 처리
@@ -134,14 +136,18 @@ const SearchList = () => {
             }
         }
         Tag.push(
-            <div className="mb-4" key={places[i].place_id} style={{cursor:"pointer"}}>
+            <div className="mb-4" key={places[i].placeId} style={{cursor:"pointer"}}>
                 <Row>
                     <Col md={4}>
                         <div className="position-relative">
                             <img
                                 src={places[i].image}
-                                onClick={() =>
-                                    (window.location.href = `/place?id=${places[i].place_id}`)
+                                onClick={() =>{
+                                    console.log(places[i])
+                                    window.location.href = `/place?id=${places[i].placeId}`;
+                                    
+                                }
+                                    
                                 }
                                 alt="장소 이미지"
                                 className="rounded w-100"
@@ -160,10 +166,10 @@ const SearchList = () => {
                                     <h5
                                         className="mb-1"
                                         onClick={() =>
-                                            (window.location.href = `/place?id=${places[i].place_id}`)
+                                            (window.location.href = `/place?id=${places[i].placeId}`)
                                         }
                                     >
-                                        {places[i].place_name}
+                                        {places[i].placeName}
                                     </h5>
                                     <div className="text-muted small">
                                         {places[i].location_short}
@@ -177,7 +183,7 @@ const SearchList = () => {
                                     variant="outline-danger"
                                     size="sm"
                                     onClick={(e) =>
-                                        handleLikeClick(places[i].place_id, e)
+                                        handleLikeClick(places[i].placeId, e)
                                     }
                                 >
                                     ♥ {places[i].likes}
