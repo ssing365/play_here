@@ -8,7 +8,11 @@ import io.github.cdimascio.dotenv.Dotenv;
 public class BackendApplication {
 
 	public static void main(String[] args) {
-		Dotenv dotenv = Dotenv.load(); //.env 파일 로드
+		Dotenv dotenv = Dotenv.configure()
+                .directory("src/main/resources")  // .env 파일 위치 지정
+                .ignoreIfMalformed()
+                .ignoreIfMissing()
+                .load();
 		
 		//DB정보
 		System.setProperty("DATABASE_URL", dotenv.get("DATABASE_URL"));
