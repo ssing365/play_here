@@ -39,8 +39,10 @@ const Login = () => {
                 { userId, password },
                 { withCredentials: true }
             );
+            console.log(response)
+            console.log(response.data);
 
-            if (response.data === "success") {
+            if (response.status === 200) {
                 // ✅ 3. 아이디 저장 또는 삭제
                 if (rememberMe) {
                     localStorage.setItem("savedUserId", userId); // 아이디 저장
