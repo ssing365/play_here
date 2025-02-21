@@ -1,0 +1,16 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 100">
+  <!-- 배경 원 -->
+  <circle cx="50" cy="50" r="40" fill="#FF6B6B"/>
+  
+  <!-- 위치 핀 모양 (하얀색) -->
+  <path d="M50 20 C35 20, 25 35, 25 45 C25 65, 50 80, 50 80 C50 80, 75 65, 75 45 C75 35, 65 20, 50 20" 
+        fill="white"/>
+  
+  <!-- 하트 모양 -->
+  <path d="M50 35 C45 30, 35 30, 35 40 C35 45, 50 55, 50 55 C50 55, 65 45, 65 40 C65 30, 55 30, 50 35"
+        fill="#e91e63"/>
+  
+  <!-- 텍스트 -->
+  <text x="110" y="45" font-family="Arial" font-size="28" font-weight="bold" fill="#333333">여기놀자</text>
+  <text x="110" y="70" font-family="Arial" font-size="16" fill="#666666">PLAY HERE</text>
+</svg>

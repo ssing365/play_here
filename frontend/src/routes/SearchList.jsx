@@ -1,33 +1,134 @@
-import Navbar from "../components/Navbar";
 
+import axios from "axios";
+import TopBar from "../components/TopBar";
 import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Nav, Form, Button, Row, Col, Badge } from "react-bootstrap";
+import { useContext, useEffect, useState } from "react";
+import { Container, Nav, Form, Button, Row, Col, Badge, Modal } from "react-bootstrap";
+import { useNavigate } from "react-router-dom";
+import { UserContext } from "../contexts/UserContext";
 
-//!! npm install react-bootstrap bootstrap 해야됨 !!
-const App = () => {
+const SearchList = () => {
+
+    const [places, setPlaces] = useState([]);
+
+    useEffect(()=>{
+        const fetchPlace = async() =>{
+        try {
+            const response = await axios.get("http://localhost:8586/placeList.do");
+            console.log(response.data);
+            setPlaces(response.data);  // 받아온 데이터를 상태에 저장
+        } catch (error) {
+            console.error("Error fetching places:", error);
+        }
+        }
+        fetchPlace();
+    },[]);    
+    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const navigate = useNavigate();
+    
+
+    const { userInfo, isLoggedIn} = useContext(UserContext);
+    const userId = userInfo?.userId
+    
+    // 장소 리스트 불러오는 함수 분리
+    const fetchPlace = async () => {
+        try {
+            const response = await axios.get("http://localhost:8586/placeList.do");
+            setPlaces(response.data);
+        } catch (error) {
+            console.error("장소 리스트 불러오기 실패:", error);
+        }
+    };
+
+    // 컴포넌트 마운트 시 리스트 불러오기
+    useEffect(() => {
+        fetchPlace();
+    }, []);
+
+    // 좋아요 클릭 시 처리
+    const handleLikeClick = async (PlaceId, e) => {
+        console.log(isLoggedIn);
+        if (!isLoggedIn) {
+            e.preventDefault(); // 기본 페이지 이동 막기
+            setShowModal(true); // 모달 표시
+        } else {
+            try {
+                await axios.post("http://localhost:8586/placeLike.do", { PlaceId, userId });
+                fetchPlace(); // 좋아요 누른 후 최신 데이터 반영
+            } catch (error) {
+                console.error("좋아요 요청 중 오류 발생:", error);
+            }
+        }
+    };
+
+    let Tag = [];
+    
+    for(let i=0; i<places.length;i++){
+
+        let cateTag = [];
+        if (places[i].hashtag) {
+
+            for(let j=0;j<places[i].hashtag.length;j++){
+                cateTag.push(
+                    <Badge
+                    bg="light"
+                    text="dark"
+                    className="me-1"
+                    key={places[i].hashtag[j]}
+                    >
+                        {places[i].hashtag[j]}
+                    </Badge>
+                )
+            }
+        }
+        Tag.push(
+            <div className="mb-4" key={places[i].place_id}>
+                    <Row>
+                        <Col md={4}>
+                            <div className="position-relative">
+                                <img
+                                    src={places[i].image}
+                                    onClick={()=>window.location.href=`/place?id=${places[i].place_id}`}
+                                    alt="장소 이미지"
+                                    className="rounded w-100"
+                                    style={{ height:"300px", objectFit: "cover", width: "100%"}}
+                                />
+                                <div className="position-absolute top-0 start-0 m-2">
+                                    <Badge bg="dark" className="opacity-75">
+                                        검색
+                                    </Badge>
+                                </div>
+                            </div>
+                        </Col>
+                        <Col md={8}>
+                            <div className="h-100 d-flex flex-column justify-content-center">
+                                <div className="d-flex justify-content-between align-items-start mb-2">
+                                    <div>
+                                        <h5 className="mb-1" onClick={()=>window.location.href=`/place?id=${places[i].place_id}`}>{places[i].place_name}</h5>
+                                        <div className="text-muted small">
+                                            {places[i].location_short} 
+                                        </div>
+
+                                        <div className="text-muted small mb-2">
+                                            {cateTag}
+                                        </div>
+                                    </div>
+                                    <Button variant="outline-danger" size="sm"
+                                    onClick={(e)=>handleLikeClick(places[i].place_id,e)}
+                                    >
+                                        ♥ {places[i].likes}
+                                    </Button>
+                                </div>
+                            </div>
+                        </Col>
+                    </Row>
+                </div>
+        )
+    }
+
     return (
         <>
-            {/*
-            네비게이션 바
-            <Navbar bg="light" expand="lg" className="mb-3">
-                <Container>
-                <Navbar.Brand href="#">여기놀자</Navbar.Brand>
-                <Navbar.Toggle aria-controls="basic-navbar-nav" />
-                <Navbar.Collapse id="basic-navbar-nav">
-                    <Nav className="me-auto">
-                    <Nav.Link href="#">탐색</Nav.Link>
-                    <Nav.Link href="#">캘린더</Nav.Link>
-                    </Nav>
-                    <Form className="d-flex">
-                    <Form.Control type="search" placeholder="어떤 데이트를 하고 싶으신가요?" className="me-2" />
-                    <Button variant="outline-success">검색</Button>
-                    </Form>
-                </Navbar.Collapse>
-                </Container>
-            </Navbar>
-            */}
-            <Navbar />
-
+            <TopBar />
             {/* 카테고리 필터 */}
             <Container className="mb-4">
                 <div className="d-flex justify-content-center">
@@ -114,63 +215,29 @@ const App = () => {
 
             {/* 결과 리스트 */}
             <Container>
-                <div className="mb-4">
-                    <Row>
-                        <Col md={4}>
-                            <div className="position-relative">
-                                <img
-                                    src="https://image.toast.com/aaaaaqx/catchtable/shopmenu/smROLHx_6mjlRTyatx4bSkA/mrolhx_6mjlrtyatx4bska_2491910562504681.png"
-                                    alt="장소 이미지"
-                                    className="rounded w-100 h-auto"
-                                    style={{ objectFit: "cover" }}
-                                />
-                                <div className="position-absolute top-0 start-0 m-2">
-                                    <Badge bg="dark" className="opacity-75">
-                                        검색
-                                    </Badge>
-                                </div>
-                            </div>
-                        </Col>
-                        <Col md={8}>
-                            <div className="h-100 d-flex flex-column justify-content-center">
-                                <div className="d-flex justify-content-between align-items-start mb-2">
-                                    <div>
-                                        <h5 className="mb-1">연남토마</h5>
-                                        <div className="text-muted small mb-2">
-                                            <Badge
-                                                bg="light"
-                                                text="dark"
-                                                className="me-1"
-                                            >
-                                                클린컨텐츠
-                                            </Badge>
-                                            <Badge
-                                                bg="light"
-                                                text="dark"
-                                                className="me-1"
-                                            >
-                                                코리안
-                                            </Badge>
-                                            <Badge bg="light" text="dark">
-                                                피자파스타
-                                            </Badge>
-                                        </div>
-                                        <div className="text-muted small">
-                                            ⭐ 4.3 (30) · 마포구 연남동 · 13km ·
-                                            11,000원 대
-                                        </div>
-                                    </div>
-                                    <Button variant="outline-danger" size="sm">
-                                        ♥ 좋아요
-                                    </Button>
-                                </div>
-                            </div>
-                        </Col>
-                    </Row>
-                </div>
+                {Tag}
             </Container>
+
+            {/* 로그인 요청 모달 */}
+            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
+                <Modal.Body>관심리스트를 이용하려면 로그인해야 합니다.</Modal.Body>
+                <Modal.Footer>
+                    <Button
+                        variant="secondary"
+                        onClick={() => setShowModal(false)}
+                    >
+                        닫기
+                    </Button>
+                    <Button
+                        variant="primary"
+                        onClick={() => navigate("/login")}
+                    >
+                        로그인하기
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };
 
-export default App;
+export default SearchList;

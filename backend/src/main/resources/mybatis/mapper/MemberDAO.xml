@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.playhere.member.IMemberService">
+
+	<!-- 아이디 중복확인 -->
+	<select id="idcheck" parameterType="java.lang.String" resultType="int">
+		SELECT COUNT(*) FROM member WHERE user_id = #{userId}
+	</select>
+	
+	<!-- 회원가입 -->
+	<insert id="insertMemberinfo" parameterType="com.playhere.member.MemberDTO">
+	INSERT INTO member 
+    (user_id, password, name, nickname, email
+    <if test="zipcode != null">, zipcode</if>
+    <if test="address != null">, address</if>
+    <if test="detailAddress != null">, detail_address</if>
+    <if test="profilePicture != null">, profile_picture</if>
+    <if test="birthDate != null">, birth_date</if>)
+    VALUES 
+    (#{userId}, #{password}, #{name}, #{nickname}, #{email}
+    <if test="zipcode != null">, #{zipcode}</if>
+    <if test="address != null">, #{address}</if>
+    <if test="detailAddress != null">, #{detailAddress}</if>
+    <if test="profilePicture != null">, #{profilePicture}</if>
+    <if test="birthDate != null">, #{birthDate}</if>)
+	</insert>
+	
+	<!-- 회원 선호도 입력  -->
+	<insert id="insertUserPreferences" parameterType="java.util.List">
+		INSERT ALL
+		<foreach collection="list" item="item">
+			INTO user_preference (user_id, preference_id)
+    		VALUES (#{item.userId}, #{item.preferenceId})	
+    	</foreach>
+    	SELECT * FROM DUAL
+	</insert>
+
+
+	<!-- 로그인 -->
+	<select id="login" resultType="com.playhere.member.MemberDTO">
+        SELECT * FROM member WHERE user_id = #{userId} AND password = #{password}
+    </select>
+
+	<!-- 로그인유저 정보 찾기  -->
+	<select id="findByUserId" resultType="com.playhere.member.MemberDTO">
+        SELECT 
+        user_id AS userId, 
+        password, 
+        name, 
+        nickname, 
+        email, 
+        birth_date AS birthDate, 
+        zipcode, 
+        address, 
+        detail_address AS detailAddress, 
+        profile_picture AS profilePicture,
+        couple_id AS coupleId, 
+        couple_status AS coupleStatus, 
+        account_status AS accountStatus, 
+        created_at AS createdAt, 
+        updated_at AS updatedAt
+    FROM member 
+    WHERE user_id = #{userId}
+    </select>
+    
+    <!-- 정보 수정 -->
+    <update id="updateUser" parameterType="com.playhere.member.MemberDTO">
+        UPDATE member
+        SET
+            nickname = #{nickname},
+            email = #{email},
+            birth_date = #{birthDate},
+            address = #{address},
+            detail_address = #{detailAddress},
+            zipcode = #{zipcode},
+            profile_picture = #{profilePicture, jdbcType=VARCHAR}
+        WHERE user_id = #{userId}
+    </update>
+    
+    <!-- 커플 끊기 -->
+    <update id="disconnectCouple" parameterType="String">
+        UPDATE member
+        SET couple_status = 0
+        WHERE user_id = #{userId}
+    </update>
+
+	<!-- 회원 탈퇴 -->
+    <update id="withdrawUser" parameterType="String">
+        UPDATE member
+        SET account_status = 0
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

@@ -1,0 +1,33 @@
+
+
+button.d-flex {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .likes-container {
+    display: inline-block;
+    border: 0.2px solid #e91e63;
+    background-color: #fff;
+    border-radius: 5px; 
+    padding: 3px 8px ;
+    font-size: 14px;
+  }
+
+  .cal-add-btn {
+    background-color: white;
+    border: 1.5px solid #333;
+    color: #000000;
+    padding: 10px;
+    width: 100%;
+    border-radius: 10px;
+    font-size: 15px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.cal-add-btn:hover {
+    background-color: #ffeff0;
+    box-shadow: 0 4px 10px #FFC7C7;
+}

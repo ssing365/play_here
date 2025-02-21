@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.playhere;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
@@ -7,6 +7,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,12 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api/weather")
 public class WeatherController {
+	
+	@Value("${weather.api.key}")
+	private String weatherApiKey;
 
     @GetMapping("/today")
     public ResponseEntity<String> getTodayWeather() {
         String weatherData = "";
         try {
-            String apiKey = "Bm6eKdiRSgb3O2AXfTZSVIExh5YwMimrsxV0VKLjHbooj4i%2FzwE8dS1jSrPw7rMeQeb%2Bp%2Bif6DwvvOJo42NAKw%3D%3D"; // 실제 API 키 사용
+            String apiKey = weatherApiKey; // 환경변수 사용
 
             // 현재 날짜 및 단기예보 발표 시간 설정 (TMN, TMX는 0500 이후)
             String baseDate = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMdd"));
