@@ -41,7 +41,12 @@ const Login = () => {
                 { withCredentials: true }
             );
 
-            if (response.data === "success") {
+            // ✅ 1️⃣ 응답 데이터 체크
+            if (response.data.message) {
+                alert(response.data.message); // ⚠️ "상대방이 커플을 끊었습니다." 알림 띄우기
+            }
+
+            // if (response.data === "success") {
                 // ✅ 3. 아이디 저장 또는 삭제
                 if (rememberMe) {
                     localStorage.setItem("savedUserId", userId); // 아이디 저장
@@ -56,7 +61,7 @@ const Login = () => {
                 } else {
                     window.location.href = "/";
                 }
-            }
+            // }
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 Swal.fire({
@@ -64,6 +69,12 @@ const Login = () => {
                     text: "아이디 또는 비밀번호가 올바르지 않습니다.",
                     timer: 1000,
                     showConfirmButton: false,
+                });
+            }else if (error.response && error.response.status === 403) {
+                Swal.fire({
+                    icon: "error",
+                    text: "이 계정은 탈퇴한 회원입니다. 로그인할 수 없습니다.",
+                    showConfirmButton: true,
                 });
             } else {
                 console.error("로그인 오류:", error);

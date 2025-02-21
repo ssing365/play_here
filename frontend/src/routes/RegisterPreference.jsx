@@ -69,9 +69,9 @@ const RegisterPreference = () => {
     };
 
     //다음에 고르기를 누르면 회원가입 성공 페이지로 이동
-    const handleSkip = () => {
-        navigate("/register-complete");
-    };
+    // const handleSkip = () => {
+    //     navigate("/register-complete");
+    // };
 
     const handleSubmit = async () => {
         if (!userId) {

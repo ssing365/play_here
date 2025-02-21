@@ -41,7 +41,9 @@
 
 	<!-- 로그인 -->
 	<select id="login" resultType="com.playhere.member.MemberDTO">
-        SELECT * FROM member WHERE user_id = #{userId} AND password = #{password}
+        SELECT * FROM member 
+        	WHERE user_id = #{userId} 
+        		AND password = #{password} 
     </select>
 
 	<!-- 로그인유저 정보 찾기  -->
@@ -98,6 +100,13 @@
 	<update id="updateCoupleStatus" parameterType="map">
 	    UPDATE member
 	    SET couple_id = #{coupleId}, couple_status = 1
+	    WHERE user_id = #{userId}
+	</update>
+	
+	<!-- couple_status 가 2인 회원(일방적으로 커플 끊긴 사람) 0으로 다시 바꾸기 -->
+	<update id="updateCoupleStatus2to0" parameterType="map">
+	    UPDATE member
+		Set couple_status = 0
 	    WHERE user_id = #{userId}
 	</update>
 
