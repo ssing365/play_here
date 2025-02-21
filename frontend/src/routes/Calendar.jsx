@@ -75,7 +75,8 @@ const Calendar = () => {
             const response1 = await axios.post("http://localhost:8586/Diary.do",
             {couple_id:coupleId, diary_writer: userId ,diary_date : formattedDate});
             if(response1.data.length > 0){
-            setDiaryText(response1.data[0].content);
+                setNoDiary(false);
+                setDiaryText(response1.data[0].content);
             }
             else{
                 setDiaryText("");
@@ -146,7 +147,7 @@ const Calendar = () => {
             });
             console.log("순서 업데이트 성공:", response.data);
             setPlaces([]);
-            visitList();
+            visitList(formattedDate);
         } catch (error) {
             console.error("순서 업데이트 실패:", error);
         }
@@ -226,9 +227,10 @@ const Calendar = () => {
             month: "2-digit",
             day: "2-digit",
         }).replace(/\. /g, "-").replace(".", ""); 
+
         if(noDiary){
             await axios.post("http://localhost:8586/NewDiary.do",
-                {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryEntry});
+                {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryText});
             setNoDiary(false);
         }
         else{
@@ -237,7 +239,7 @@ const Calendar = () => {
                 {couple_id:coupleId, diary_writer: userId ,diary_date:formattedDate, content: diaryText});
             }
         }
-        diary();
+        diary(formattedDate);
     };
 
 
