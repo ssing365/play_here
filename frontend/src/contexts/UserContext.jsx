@@ -21,6 +21,7 @@ export const UserProvider = ({ children }) => {
             } finally {
                 setIsLoading(false);  // 추가
             }
+            
         };
         fetchUserInfo();
     }, []);

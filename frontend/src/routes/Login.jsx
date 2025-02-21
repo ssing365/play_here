@@ -40,13 +40,10 @@ const Login = () => {
                 { userId, password },
                 { withCredentials: true }
             );
+            console.log(response)
+            console.log(response.data);
 
-            // ✅ 1️⃣ 응답 데이터 체크
-            if (response.data.message) {
-                alert(response.data.message); // ⚠️ "상대방이 커플을 끊었습니다." 알림 띄우기
-            }
-
-            // if (response.data === "success") {
+            if (response.status === 200) {
                 // ✅ 3. 아이디 저장 또는 삭제
                 if (rememberMe) {
                     localStorage.setItem("savedUserId", userId); // 아이디 저장
@@ -61,7 +58,7 @@ const Login = () => {
                 } else {
                     window.location.href = "/";
                 }
-            // }
+            }
         } catch (error) {
             if (error.response && error.response.status === 401) {
                 Swal.fire({
