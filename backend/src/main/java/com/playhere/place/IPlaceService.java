@@ -20,6 +20,8 @@ public interface IPlaceService {
 	public List<PlaceDTO> top5();
 	public List<PlaceDTO> interests(@Param("userId") String userId);
 	public void addCalendar(@Param("placeId") String placeId, @Param("coupleId") String coupleId, @Param("visitDate") Date visitDate);
+	public int CheckCalendar(@Param("placeId") String placeId, @Param("coupleId") String coupleId, @Param("visitDate") Date visitDate);
+	
 	public List<PlaceDTO> listAll(ParameterDTO parameterDTO);
 	public List<PlaceDTO> listLikes(ParameterDTO parameterDTO);
 }

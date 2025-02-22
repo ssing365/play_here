@@ -109,7 +109,7 @@ const Top5 = () => {
                                         ease: "easeInOut",
                                     }}
                                     onClick={() =>
-                                        (window.location.href = `/place?id=${top5[index].place_id}`)
+                                        (window.location.href = `/place?id=${top5[index].placeId}`)
                                     }
                                 />
                             </AnimatePresence>

@@ -54,6 +54,7 @@ public class Place {
 	    System.out.println("end: " + parameterDTO.getEnd());
 
 	    // DAO 메서드 호출하여 필터링된 장소 리스트 반환
+	    System.out.println(dao.list(parameterDTO));
 	    return dao.list(parameterDTO);
 	}
 	
@@ -138,8 +139,7 @@ public class Place {
 	}
 	
 	@PostMapping("/addCalendar.do")
-	public void addCalendar(@RequestBody Map<String, String> requestBody) {
-		String userId = requestBody.get("userId");
+	public String addCalendar(@RequestBody Map<String, String> requestBody) {
 		String placeId = requestBody.get("placeId");
 		String coupleId = requestBody.get("coupleId");
 		System.out.println("placeId : "+placeId);
@@ -148,14 +148,18 @@ public class Place {
 		String visitDateStr = requestBody.get("visitDate");
 		LocalDate localDate = LocalDate.parse(visitDateStr.split("T")[0]); // "T" 이후 시간 제거
 		Date visitDate = Date.valueOf(localDate); // java.sql.Date 변환
-		
-		System.out.println("visitDateStr: " + visitDateStr); // 원본 문자열 확인
-		System.out.println("localDate: " + localDate); // LocalDate 변환 결과
-		System.out.println("visitDate (sql.Date): " + visitDate); // 최종 변환된 값
-
-
-	    // Service 호출 (MyBatis Mapper 연결)
-	    dao.addCalendar(placeId, coupleId, visitDate);
+		if(dao.CheckCalendar(placeId, coupleId, visitDate)==1) {
+			return "0";
+		}
+		else {
+			System.out.println("visitDateStr: " + visitDateStr); // 원본 문자열 확인
+			System.out.println("localDate: " + localDate); // LocalDate 변환 결과
+			System.out.println("visitDate (sql.Date): " + visitDate); // 최종 변환된 값
+			
+			dao.addCalendar(placeId, coupleId, visitDate);
+			return "1";
+			}
+	
 	}
 	
 	@PostMapping("interestCancel.do")

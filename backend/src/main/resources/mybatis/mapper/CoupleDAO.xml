@@ -59,4 +59,7 @@
 		insert into couple_diary values(DIARY_SEQ.nextval,#{diaryWriter}, #{coupleId}, #{content}, #{diaryDate})
 	</insert>
 	
+	<select id="SearchPlace" resultType="com.playhere.place.PlaceDTO">
+		select place_id, place_name, location from place
+	</select>
 </mapper>

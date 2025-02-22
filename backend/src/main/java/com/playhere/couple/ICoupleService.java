@@ -28,4 +28,5 @@ public interface ICoupleService {
          @Param("diaryWriter") String diary_writer, 
          @Param("diaryDate") String diary_date,
          @Param("content") String content);
+   public List<PlaceDTO> SearchPlace();
 }

@@ -1,10 +1,10 @@
-import { useState, useContext, useEffect } from "react";
+import { useState, useContext, useEffect, useRef } from "react";
 import TopBar from "../components/TopBar";
 import Cal from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../css/Calendar.css";
 import { FaSearch } from "react-icons/fa";
-import { Button, Form, Row, Col, Card, Container } from "react-bootstrap";
+import { Button, Form, Row, Col, Card, Container, DropdownItem, Dropdown } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
@@ -17,12 +17,10 @@ const Calendar = () => {
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [places, setPlaces] = useState([]);
-    const [newPlace, setNewPlace] = useState("");
     const [diaryEntry, setDiaryEntry] = useState("");
     const [editDiary, setEditDiary] = useState(false);
     const [diaryText, setDiaryText] = useState(diaryEntry || "");
     const [yourDiaryText, setYourDiaryText] = useState(diaryEntry || "");
-    const [showInput, setShowInput] = useState(false);
     const [coupleInfo, setCoupleInfo] = useState(null);
     const [noDiary, setNoDiary] = useState(false);
     const navigate = useNavigate();
@@ -31,6 +29,120 @@ const Calendar = () => {
     const { userInfo } = useContext(UserContext);
     const userId = userInfo?.userId;
     const coupleId = userInfo?.coupleId;
+
+    //장소 자동완성
+    const [newPlace, setNewPlace] = useState('');
+  const [placeList, setPlaceList] = useState([]);
+  const [filteredPlaces, setFilteredPlaces] = useState([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [selectedPlaceId, setSelectedPlaceId] = useState(null);
+
+  // 입력창 표시 여부 (버튼 클릭 시 토글)
+  const [showInput, setShowInput] = useState(false);
+
+  // refs
+  const containerRef = useRef(null);
+  const inputRef = useRef(null);
+
+  // API에서 장소 목록 가져오기
+  useEffect(() => {
+    const fetchPlaces = async () => {
+      try {
+        const response = await axios.get("http://localhost:8586/SearchPlace.do");
+        console.log("Fetched places:", response.data);
+        // API 응답이 배열이라고 가정
+        setPlaceList(response.data);
+      } catch (error) {
+        console.error("Error fetching places:", error);
+      }
+    };
+    fetchPlaces();
+  }, []);
+
+  // 입력값(newPlace)이 바뀔 때마다 필터링
+  useEffect(() => {
+    if (newPlace.trim() === '') {
+      setFilteredPlaces([]);
+      setShowDropdown(false);
+    } else {
+      const filtered = placeList.filter((place) =>
+        place.placeName.toLowerCase().includes(newPlace.toLowerCase())
+      );
+      setFilteredPlaces(filtered);
+      setShowDropdown(filtered.length > 0);
+    }
+  }, [newPlace, placeList]);
+
+  // 외부 클릭 시 dropdown 닫기
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (containerRef.current && !containerRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, []);
+
+  // 입력창 변경 이벤트
+  const handleInputChange = (e) => {
+    setNewPlace(e.target.value);
+    setSelectedPlaceId(null);
+  };
+
+  // Enter 키 입력 처리
+  const handleKeyPress = (e) => {
+    if (e.key === "Enter") {
+      if (selectedPlaceId) {
+        addPlace({ placeId: selectedPlaceId, placeName: newPlace });
+      } else {
+        const matchedPlace = placeList.find((place) =>
+          place.placeName.toLowerCase() === newPlace.toLowerCase()
+        );
+        if (matchedPlace) {
+          setSelectedPlaceId(matchedPlace.placeId);
+          addPlace({ placeId: matchedPlace.placeId, placeName: matchedPlace.placeName });
+        } else {
+          console.log("일치하는 장소가 없습니다.");
+        }
+      }
+      setShowDropdown(false);
+    }
+  };
+
+  // 드롭다운 항목 클릭 처리
+  const handleSelectPlace = (place) => {
+    setNewPlace(place.placeName);
+    setSelectedPlaceId(place.placeId);
+    setShowDropdown(false);
+    addPlace({ placeId: place.placeId, placeName: place.placeName });
+  };
+
+  // 장소 추가 함수 
+  const addPlace = async(placeObj) => {
+    const formattedDate = selectedDate
+            .toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .replace(/\. /g, "-")
+            .replace(".", "");
+    console.log("추가할 장소:", placeObj);
+
+    await axios.post("http://localhost:8586/addCalendar.do", {
+        placeId : placeObj.placeId,
+        coupleId,
+        visitDate : formattedDate
+    });
+    visitList(formattedDate);
+    // 추가 후 입력값 초기화
+    setNewPlace('');
+    // 포커스 처리 (ref null 체크)
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  };
 
     useEffect(() => {
         const coupleInfo = async () => {
@@ -72,31 +184,22 @@ const Calendar = () => {
     // 일기 가져오기
     const diary = async (formattedDate) => {
         if (coupleId) {
-            const response1 = await axios.post(
-                "http://localhost:8586/Diary.do",
-                {
-                    coupleId: coupleId,
-                    diaryWriter: userId,
-                    diaryDate: formattedDate,
-                }
-            );
-            if (response1.data.length > 0) {
+            const response1 = await axios.post("http://localhost:8586/Diary.do",
+            {coupleId:coupleId, diaryWriter: userId ,diaryDate : formattedDate});
+            if(response1.data.length > 0){
+                setNoDiary(false);
                 setDiaryText(response1.data[0].content);
-            } else {
+            }
+            else{
                 setDiaryText("");
                 setNoDiary(true);
             }
-            const response2 = await axios.post(
-                "http://localhost:8586/Diary.do",
-                {
-                    coupleId: coupleId,
-                    diaryWriter: coupleInfo.userId,
-                    diaryDate: formattedDate,
-                }
-            );
-            if (response2.data.length > 0) {
-                setYourDiaryText(response2.data[0].content);
-            } else {
+            const response2 = await axios.post("http://localhost:8586/Diary.do",
+            {coupleId:coupleId, diaryWriter: coupleInfo.userId ,diaryDate: formattedDate});
+            if(response2.data.length > 0){
+            setYourDiaryText(response2.data[0].content);
+            }
+            else{
                 setYourDiaryText("");
             }
         }
@@ -168,47 +271,42 @@ const Calendar = () => {
             );
             console.log("순서 업데이트 성공:", response.data);
             setPlaces([]);
-            visitList();
+            visitList(formattedDate);
         } catch (error) {
             console.error("순서 업데이트 실패:", error);
         }
     };
 
     /* 방문지 추가 */
-    const placeInput = document.getElementById("placeInput");
-    const addPlace = () => {
-        // 최대 7개
-        if (newPlace.trim() && (places[selectedDate]?.length || 0) < 7) {
-            const newPlaceObj = { id: uuidv4().toString(), name: newPlace };
-            setPlaces({
-                ...places,
-                [selectedDate]: [...(places[selectedDate] || []), newPlaceObj],
-            });
-            setNewPlace("");
-            setShowInput(false);
-            placeInput.focus();
-        }
-    };
+    // const placeInput = document.getElementById("placeInput");
+    // const addPlace = () => {
+    //     // 최대 7개
+    //     if (newPlace.trim() && (places[selectedDate]?.length || 0) < 7) {
+    //         const newPlaceObj = { id: uuidv4().toString(), name: newPlace };
+    //         setPlaces({
+    //             ...places,
+    //             [selectedDate]: [...(places[selectedDate] || []), newPlaceObj],
+    //         });
+    //         setNewPlace("");
+    //         setShowInput(false);
+    //         placeInput.focus();
+    //     }
+    // };
 
     /* 방문지 삭제 */
-    const deletePlace = async (placeId) => {
-        console.log(placeId);
-        const formattedDate = date
-            .toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            })
-            .replace(/\. /g, "-")
-            .replace(".", "");
-        try {
-            await axios.post("http://localhost:8586/visitDelete.do", {
-                visitDate: formattedDate,
-                coupleId: coupleId,
-                placeId: placeId,
-            });
-            visitList();
-        } catch (error) {
+    const deletePlace = async(placeId) => {
+        console.log(placeId)
+        const formattedDate = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).replace(/\. /g, "-").replace(".", ""); 
+        try{
+            
+            await axios.post("http://localhost:8586/visitDelete.do", { visitDate: formattedDate, coupleId : coupleId, placeId : placeId })
+            visitList(formattedDate);
+        }
+        catch(error) {
             console.error("삭제 요청 중 오류 발생:", error);
         }
     };
@@ -247,21 +345,15 @@ const Calendar = () => {
             setDiaryEntry("일기를 남겨주세요");
         }
         setEditDiary(false);
-        const formattedDate = date
-            .toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            })
-            .replace(/\. /g, "-")
-            .replace(".", "");
-        if (noDiary) {
-            await axios.post("http://localhost:8586/NewDiary.do", {
-                coupleId: coupleId,
-                diaryWriter: userId,
-                diaryDate: formattedDate,
-                content: diaryEntry,
-            });
+        const formattedDate = date.toLocaleDateString("ko-KR", {
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+        }).replace(/\. /g, "-").replace(".", ""); 
+
+        if(noDiary){
+            await axios.post("http://localhost:8586/NewDiary.do",
+                {coupleId:coupleId, diaryWriter: userId ,diaryDate:formattedDate, content: diaryText});
             setNoDiary(false);
         } else {
             if (coupleId) {
@@ -273,7 +365,7 @@ const Calendar = () => {
                 });
             }
         }
-        diary();
+        diary(formattedDate);
     };
 
     return (
@@ -487,28 +579,46 @@ const Calendar = () => {
                                         {places?.length < 7 ? (
                                             showInput ? (
                                                 <div className="mt-2 d-flex align-items-center">
-                                                    <input
-                                                        type="text"
-                                                        value={newPlace}
-                                                        onChange={(e) =>
-                                                            setNewPlace(
-                                                                e.target.value
-                                                            )
-                                                        }
-                                                        placeholder="장소 입력"
-                                                        className="form-control w-auto me-2"
-                                                        id="placeInput"
-                                                        onKeyPress={(e) =>
-                                                            e.key === "Enter" &&
-                                                            addPlace()
-                                                        }
-                                                    />
-                                                    <Button
-                                                        onClick={addPlace}
-                                                        className="add-btn"
+                                                {/* 자동완성 input + dropdown */}
+                                                <div style={{ position: 'relative', display: 'inline-block' }} ref={containerRef}>
+                                                <input
+                                                    ref={inputRef}
+                                                    type="text"
+                                                    value={newPlace}
+                                                    onChange={handleInputChange}
+                                                    placeholder="장소 입력"
+                                                    className="form-control w-auto me-2"
+                                                    onKeyPress={handleKeyPress}
+                                                />
+                                                {showDropdown && filteredPlaces.length > 0 && (
+                                                    <ul
+                                                    className="dropdown-menu show"
+                                                    style={{
+                                                        position: "absolute",
+                                                        top: "100%",
+                                                        left: 0,
+                                                        width: "100%",
+                                                        maxHeight: "350px",
+                                                        overflow: "auto",
+                                                        zIndex: 1000,
+                                                        border: "1px solid #ccc",
+                                                        backgroundColor: "#fff"
+                                                    }}
                                                     >
-                                                        추가
-                                                    </Button>
+                                                    {filteredPlaces.map((place, index) => (
+                                                        <li key={index}>
+                                                        <button
+                                                            type="button"
+                                                            className="dropdown-item"
+                                                            onClick={() => handleSelectPlace(place)}
+                                                        >
+                                                            {place.placeName}
+                                                        </button>
+                                                        </li>
+                                                    ))}
+                                                    </ul>
+                                                )}
+                                                </div>
                                                     <button
                                                         className="btn btn-outline-secondary"
                                                         onClick={() =>
