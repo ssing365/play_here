@@ -1,14 +1,21 @@
 import { useState, useContext, useEffect, useRef } from "react";
 import TopBar from "../components/TopBar";
+import Diary from "../components/Calendar/Diary";
 import Cal from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../css/Calendar.css";
 import { FaSearch } from "react-icons/fa";
-import { Button, Form, Row, Col, Card, Container, DropdownItem, Dropdown } from "react-bootstrap";
+import {
+    Button,
+    Form,
+    Row,
+    Col,
+    Card,
+    Container,
+} from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
-import { useNavigate, Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
-import { v4 as uuidv4 } from "uuid"; // 드래그를 위한 고유한 ID 생성
 import axios from "axios";
 
 const Calendar = () => {
@@ -23,104 +30,122 @@ const Calendar = () => {
     const [yourDiaryText, setYourDiaryText] = useState(diaryEntry || "");
     const [coupleInfo, setCoupleInfo] = useState(null);
     const [noDiary, setNoDiary] = useState(false);
-    const navigate = useNavigate();
     const today = new Date();
+    const location = useLocation();
+
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
     const userId = userInfo?.userId;
     const coupleId = userInfo?.coupleId;
 
-    //장소 자동완성
-    const [newPlace, setNewPlace] = useState('');
-  const [placeList, setPlaceList] = useState([]);
-  const [filteredPlaces, setFilteredPlaces] = useState([]);
-  const [showDropdown, setShowDropdown] = useState(false);
-  const [selectedPlaceId, setSelectedPlaceId] = useState(null);
-
-  // 입력창 표시 여부 (버튼 클릭 시 토글)
-  const [showInput, setShowInput] = useState(false);
-
-  // refs
-  const containerRef = useRef(null);
-  const inputRef = useRef(null);
-
-  // API에서 장소 목록 가져오기
-  useEffect(() => {
-    const fetchPlaces = async () => {
-      try {
-        const response = await axios.get("http://localhost:8586/SearchPlace.do");
-        console.log("Fetched places:", response.data);
-        // API 응답이 배열이라고 가정
-        setPlaceList(response.data);
-      } catch (error) {
-        console.error("Error fetching places:", error);
-      }
-    };
-    fetchPlaces();
-  }, []);
-
-  // 입력값(newPlace)이 바뀔 때마다 필터링
-  useEffect(() => {
-    if (newPlace.trim() === '') {
-      setFilteredPlaces([]);
-      setShowDropdown(false);
-    } else {
-      const filtered = placeList.filter((place) =>
-        place.placeName.toLowerCase().includes(newPlace.toLowerCase())
-      );
-      setFilteredPlaces(filtered);
-      setShowDropdown(filtered.length > 0);
-    }
-  }, [newPlace, placeList]);
-
-  // 외부 클릭 시 dropdown 닫기
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (containerRef.current && !containerRef.current.contains(event.target)) {
-        setShowDropdown(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, []);
-
-  // 입력창 변경 이벤트
-  const handleInputChange = (e) => {
-    setNewPlace(e.target.value);
-    setSelectedPlaceId(null);
-  };
-
-  // Enter 키 입력 처리
-  const handleKeyPress = (e) => {
-    if (e.key === "Enter") {
-      if (selectedPlaceId) {
-        addPlace({ placeId: selectedPlaceId, placeName: newPlace });
-      } else {
-        const matchedPlace = placeList.find((place) =>
-          place.placeName.toLowerCase() === newPlace.toLowerCase()
-        );
-        if (matchedPlace) {
-          setSelectedPlaceId(matchedPlace.placeId);
-          addPlace({ placeId: matchedPlace.placeId, placeName: matchedPlace.placeName });
-        } else {
-          console.log("일치하는 장소가 없습니다.");
+    // 다른 페이지에서 전달된 날짜를 읽어와 상태 업데이트
+    useEffect(() => {
+        if (location.state && location.state.selectedDate) {
+            setSelectedDate(new Date(location.state.selectedDate));
         }
-      }
-      setShowDropdown(false);
-    }
-  };
+    }, [location]);
 
-  // 드롭다운 항목 클릭 처리
-  const handleSelectPlace = (place) => {
-    setNewPlace(place.placeName);
-    setSelectedPlaceId(place.placeId);
-    setShowDropdown(false);
-    addPlace({ placeId: place.placeId, placeName: place.placeName });
-  };
+    //장소 자동완성
+    const [newPlace, setNewPlace] = useState("");
+    const [placeList, setPlaceList] = useState([]);
+    const [filteredPlaces, setFilteredPlaces] = useState([]);
+    const [showDropdown, setShowDropdown] = useState(false);
+    const [selectedPlaceId, setSelectedPlaceId] = useState(null);
 
-  // 장소 추가 함수 
-  const addPlace = async(placeObj) => {
-    const formattedDate = selectedDate
+    // 입력창 표시 여부 (버튼 클릭 시 토글)
+    const [showInput, setShowInput] = useState(false);
+
+    // refs
+    const containerRef = useRef(null);
+    const inputRef = useRef(null);
+
+    // API에서 장소 목록 가져오기
+    useEffect(() => {
+        const fetchPlaces = async () => {
+            try {
+                const response = await axios.get(
+                    "http://localhost:8586/SearchPlace.do"
+                );
+                console.log("Fetched places:", response.data);
+                // API 응답이 배열이라고 가정
+                setPlaceList(response.data);
+            } catch (error) {
+                console.error("Error fetching places:", error);
+            }
+        };
+        fetchPlaces();
+    }, []);
+
+    // 입력값(newPlace)이 바뀔 때마다 필터링
+    useEffect(() => {
+        if (newPlace.trim() === "") {
+            setFilteredPlaces([]);
+            setShowDropdown(false);
+        } else {
+            const filtered = placeList.filter((place) =>
+                place.placeName.toLowerCase().includes(newPlace.toLowerCase())
+            );
+            setFilteredPlaces(filtered);
+            setShowDropdown(filtered.length > 0);
+        }
+    }, [newPlace, placeList]);
+
+    // 외부 클릭 시 dropdown 닫기
+    useEffect(() => {
+        const handleClickOutside = (event) => {
+            if (
+                containerRef.current &&
+                !containerRef.current.contains(event.target)
+            ) {
+                setShowDropdown(false);
+            }
+        };
+        document.addEventListener("mousedown", handleClickOutside);
+        return () =>
+            document.removeEventListener("mousedown", handleClickOutside);
+    }, []);
+
+    // 입력창 변경 이벤트
+    const handleInputChange = (e) => {
+        setNewPlace(e.target.value);
+        setSelectedPlaceId(null);
+    };
+
+    // Enter 키 입력 처리
+    const handleKeyPress = (e) => {
+        if (e.key === "Enter") {
+            if (selectedPlaceId) {
+                addPlace({ placeId: selectedPlaceId, placeName: newPlace });
+            } else {
+                const matchedPlace = placeList.find(
+                    (place) =>
+                        place.placeName.toLowerCase() === newPlace.toLowerCase()
+                );
+                if (matchedPlace) {
+                    setSelectedPlaceId(matchedPlace.placeId);
+                    addPlace({
+                        placeId: matchedPlace.placeId,
+                        placeName: matchedPlace.placeName,
+                    });
+                } else {
+                    console.log("일치하는 장소가 없습니다.");
+                }
+            }
+            setShowDropdown(false);
+        }
+    };
+
+    // 드롭다운 항목 클릭 처리
+    const handleSelectPlace = (place) => {
+        setNewPlace(place.placeName);
+        setSelectedPlaceId(place.placeId);
+        setShowDropdown(false);
+        addPlace({ placeId: place.placeId, placeName: place.placeName });
+    };
+
+    // 장소 추가 함수
+    const addPlace = async (placeObj) => {
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -128,21 +153,21 @@ const Calendar = () => {
             })
             .replace(/\. /g, "-")
             .replace(".", "");
-    console.log("추가할 장소:", placeObj);
+        console.log("추가할 장소:", placeObj);
 
-    await axios.post("http://localhost:8586/addCalendar.do", {
-        placeId : placeObj.placeId,
-        coupleId,
-        visitDate : formattedDate
-    });
-    visitList(formattedDate);
-    // 추가 후 입력값 초기화
-    setNewPlace('');
-    // 포커스 처리 (ref null 체크)
-    if (inputRef.current) {
-      inputRef.current.focus();
-    }
-  };
+        await axios.post("http://localhost:8586/addCalendar.do", {
+            placeId: placeObj.placeId,
+            coupleId,
+            visitDate: formattedDate,
+        });
+        visitList(formattedDate);
+        // 추가 후 입력값 초기화
+        setNewPlace("");
+        // 포커스 처리 (ref null 체크)
+        if (inputRef.current) {
+            inputRef.current.focus();
+        }
+    };
 
     useEffect(() => {
         const coupleInfo = async () => {
@@ -184,22 +209,32 @@ const Calendar = () => {
     // 일기 가져오기
     const diary = async (formattedDate) => {
         if (coupleId) {
-            const response1 = await axios.post("http://localhost:8586/Diary.do",
-            {coupleId:coupleId, diaryWriter: userId ,diaryDate : formattedDate});
-            if(response1.data.length > 0){
+            const response1 = await axios.post(
+                "http://localhost:8586/Diary.do",
+                {
+                    coupleId: coupleId,
+                    diaryWriter: userId,
+                    diaryDate: formattedDate,
+                }
+            );
+            if (response1.data.length > 0) {
                 setNoDiary(false);
                 setDiaryText(response1.data[0].content);
-            }
-            else{
+            } else {
                 setDiaryText("");
                 setNoDiary(true);
             }
-            const response2 = await axios.post("http://localhost:8586/Diary.do",
-            {coupleId:coupleId, diaryWriter: coupleInfo.userId ,diaryDate: formattedDate});
-            if(response2.data.length > 0){
-            setYourDiaryText(response2.data[0].content);
-            }
-            else{
+            const response2 = await axios.post(
+                "http://localhost:8586/Diary.do",
+                {
+                    coupleId: coupleId,
+                    diaryWriter: coupleInfo.userId,
+                    diaryDate: formattedDate,
+                }
+            );
+            if (response2.data.length > 0) {
+                setYourDiaryText(response2.data[0].content);
+            } else {
                 setYourDiaryText("");
             }
         }
@@ -294,19 +329,24 @@ const Calendar = () => {
     // };
 
     /* 방문지 삭제 */
-    const deletePlace = async(placeId) => {
-        console.log(placeId)
-        const formattedDate = date.toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-        }).replace(/\. /g, "-").replace(".", ""); 
-        try{
-            
-            await axios.post("http://localhost:8586/visitDelete.do", { visitDate: formattedDate, coupleId : coupleId, placeId : placeId })
+    const deletePlace = async (placeId) => {
+        console.log(placeId);
+        const formattedDate = date
+            .toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .replace(/\. /g, "-")
+            .replace(".", "");
+        try {
+            await axios.post("http://localhost:8586/visitDelete.do", {
+                visitDate: formattedDate,
+                coupleId: coupleId,
+                placeId: placeId,
+            });
             visitList(formattedDate);
-        }
-        catch(error) {
+        } catch (error) {
             console.error("삭제 요청 중 오류 발생:", error);
         }
     };
@@ -345,15 +385,22 @@ const Calendar = () => {
             setDiaryEntry("일기를 남겨주세요");
         }
         setEditDiary(false);
-        const formattedDate = date.toLocaleDateString("ko-KR", {
-            year: "numeric",
-            month: "2-digit",
-            day: "2-digit",
-        }).replace(/\. /g, "-").replace(".", ""); 
+        const formattedDate = date
+            .toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .replace(/\. /g, "-")
+            .replace(".", "");
 
-        if(noDiary){
-            await axios.post("http://localhost:8586/NewDiary.do",
-                {coupleId:coupleId, diaryWriter: userId ,diaryDate:formattedDate, content: diaryText});
+        if (noDiary) {
+            await axios.post("http://localhost:8586/NewDiary.do", {
+                coupleId: coupleId,
+                diaryWriter: userId,
+                diaryDate: formattedDate,
+                content: diaryText,
+            });
             setNoDiary(false);
         } else {
             if (coupleId) {
@@ -400,8 +447,10 @@ const Calendar = () => {
 
                         <Cal
                             onChange={setDate}
-                            value={date}
-                            onClickDay={(value) => setSelectedDate(value)}
+                            value={selectedDate}
+                            onClickDay={(value) => {
+                                setSelectedDate(value)
+                            }}
                             className="couple-calendar flex-grow-1"
                             tileContent={tileContent}
                         />
@@ -436,7 +485,7 @@ const Calendar = () => {
                                             <Link
                                                 to="/map"
                                                 state={{
-                                                    selectedDate: selectedDate
+                                                    selectedDate: selectedDate,
                                                 }}
                                             >
                                                 <Button
@@ -488,6 +537,7 @@ const Calendar = () => {
                                                                                 ☰{" "}
                                                                                 {i +
                                                                                     1}
+
                                                                                 .
                                                                             </span>
                                                                             {editId ===
@@ -574,51 +624,83 @@ const Calendar = () => {
                                             </Droppable>
                                         </DragDropContext>
 
-
                                         {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
                                         {places?.length < 7 ? (
                                             showInput ? (
                                                 <div className="mt-2 d-flex align-items-center">
-                                                {/* 자동완성 input + dropdown */}
-                                                <div style={{ position: 'relative', display: 'inline-block' }} ref={containerRef}>
-                                                <input
-                                                    ref={inputRef}
-                                                    type="text"
-                                                    value={newPlace}
-                                                    onChange={handleInputChange}
-                                                    placeholder="장소 입력"
-                                                    className="form-control w-auto me-2"
-                                                    onKeyPress={handleKeyPress}
-                                                />
-                                                {showDropdown && filteredPlaces.length > 0 && (
-                                                    <ul
-                                                    className="dropdown-menu show"
-                                                    style={{
-                                                        position: "absolute",
-                                                        top: "100%",
-                                                        left: 0,
-                                                        width: "100%",
-                                                        maxHeight: "350px",
-                                                        overflow: "auto",
-                                                        zIndex: 1000,
-                                                        border: "1px solid #ccc",
-                                                        backgroundColor: "#fff"
-                                                    }}
+                                                    {/* 자동완성 input + dropdown */}
+                                                    <div
+                                                        style={{
+                                                            position:
+                                                                "relative",
+                                                            display:
+                                                                "inline-block",
+                                                        }}
+                                                        ref={containerRef}
                                                     >
-                                                    {filteredPlaces.map((place, index) => (
-                                                        <li key={index}>
-                                                        <button
-                                                            type="button"
-                                                            className="dropdown-item"
-                                                            onClick={() => handleSelectPlace(place)}
-                                                        >
-                                                            {place.placeName}
-                                                        </button>
-                                                        </li>
-                                                    ))}
-                                                    </ul>
-                                                )}
-                                                </div>
+                                                        <input
+                                                            ref={inputRef}
+                                                            type="text"
+                                                            value={newPlace}
+                                                            onChange={
+                                                                handleInputChange
+                                                            }
+                                                            placeholder="장소 입력"
+                                                            className="form-control w-auto me-2"
+                                                            onKeyPress={
+                                                                handleKeyPress
+                                                            }
+                                                        />
+                                                        {showDropdown &&
+                                                            filteredPlaces.length >
+                                                                0 && (
+                                                                <ul
+                                                                    className="dropdown-menu show"
+                                                                    style={{
+                                                                        position:
+                                                                            "absolute",
+                                                                        top: "100%",
+                                                                        left: 0,
+                                                                        width: "100%",
+                                                                        maxHeight:
+                                                                            "350px",
+                                                                        overflow:
+                                                                            "auto",
+                                                                        zIndex: 1000,
+                                                                        border: "1px solid #ccc",
+                                                                        backgroundColor:
+                                                                            "#fff",
+                                                                    }}
+                                                                >
+                                                                    {filteredPlaces.map(
+                                                                        (
+                                                                            place,
+                                                                            index
+                                                                        ) => (
+                                                                            <li
+                                                                                key={
+                                                                                    index
+                                                                                }
+                                                                            >
+                                                                                <button
+                                                                                    type="button"
+                                                                                    className="dropdown-item"
+                                                                                    onClick={() =>
+                                                                                        handleSelectPlace(
+                                                                                            place
+                                                                                        )
+                                                                                    }
+                                                                                >
+                                                                                    {
+                                                                                        place.placeName
+                                                                                    }
+                                                                                </button>
+                                                                            </li>
+                                                                        )
+                                                                    )}
+                                                                </ul>
+                                                            )}
+                                                    </div>
                                                     <button
                                                         className="btn btn-outline-secondary"
                                                         onClick={() =>
@@ -657,87 +739,17 @@ const Calendar = () => {
 
                                         {selectedDate <= today ? (
                                             <>
-                                                <Row>
-                                                    <Col>
-                                                        <Card className="p-3 mb-2">
-                                                            <h6>
-                                                                <b>내 일기</b>
-                                                            </h6>
-                                                            {editDiary ? (
-                                                                <div>
-                                                                    <Form.Control
-                                                                        as="textarea"
-                                                                        rows={3}
-                                                                        value={
-                                                                            diaryText
-                                                                        }
-                                                                        onChange={(
-                                                                            e
-                                                                        ) =>
-                                                                            setDiaryText(
-                                                                                e
-                                                                                    .target
-                                                                                    .value
-                                                                            )
-                                                                        }
-                                                                        onKeyPress={(
-                                                                            e
-                                                                        ) => {
-                                                                            if (
-                                                                                e.key ===
-                                                                                "Enter"
-                                                                            ) {
-                                                                                e.preventDefault();
-                                                                                saveDiary();
-                                                                            }
-                                                                        }}
-                                                                        autoFocus
-                                                                    />
-                                                                    <div className="d-flex justify-content-end mt-2">
-                                                                        <Button
-                                                                            onClick={
-                                                                                saveDiary
-                                                                            }
-                                                                            className="add-btn"
-                                                                        >
-                                                                            저장
-                                                                        </Button>
-                                                                    </div>
-                                                                </div>
-                                                            ) : (
-                                                                <p
-                                                                    onClick={() =>
-                                                                        setEditDiary(
-                                                                            true
-                                                                        )
-                                                                    }
-                                                                    className="text-muted"
-                                                                    style={{
-                                                                        cursor: "pointer",
-                                                                    }}
-                                                                >
-                                                                    {diaryText ||
-                                                                        "일기를 남겨주세요"}
-                                                                </p>
-                                                            )}
-                                                        </Card>
-                                                    </Col>
-                                                    <Col>
-                                                        <Card className="p-3">
-                                                            <h6>
-                                                                <b>
-                                                                    {coupleInfo
-                                                                        ? coupleInfo.nickname
-                                                                        : "Loading..."}
-                                                                </b>
-                                                            </h6>
-                                                            <p>
-                                                                {yourDiaryText ||
-                                                                    "상대가 아직 일기를 남기지 않았어요"}
-                                                            </p>
-                                                        </Card>
-                                                    </Col>
-                                                </Row>
+                                                <Diary 
+                                                diary={diary}
+                                                editDiary={editDiary}
+                                                setEditDiary={setEditDiary}
+                                                coupleInfo={coupleInfo}
+                                                diaryEntry={diaryEntry}
+                                                saveDiary={saveDiary}
+                                                diaryText={diaryText}
+                                                yourDiaryText={yourDiaryText}
+                                                setDiaryText={setDiaryText}
+                                                />
                                             </>
                                         ) : (
                                             <>
