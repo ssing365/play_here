@@ -2,60 +2,89 @@ import axios from "axios";
 import TopBar from "../components/TopBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useContext, useEffect, useState } from "react";
-import {
-    Container,
-    Nav,
-    Form,
-    Button,
-    Row,
-    Col,
-    Badge,
-} from "react-bootstrap";
+import { Container, Form, Button, Row, Col, Badge } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
+import { useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
+import SearchFilter from "../components/SearchList/SearchFilter";
+import qs from 'qs';
 
-
-//!! npm install react-bootstrap bootstrap 해야됨 !!
 const SearchList = () => {
-    const [places, setPlaces] = useState([]);
+    // useLocation을 이용해 navigate로 전달된 state를 추출
+    const location = useLocation();
 
     const [showModal, setShowModal] = useState(false); // 모달 표시 상태
+    const [places, setPlaces] = useState([]);
     const [searchCategory, setSearchCategory] = useState([]);
     const [searchLocation, setSearchLocation] = useState([]);
-    const [searchWord,setSearchWord] = useState();
+    const [searchWord, setSearchWord] = useState();
     const navigate = useNavigate();
     const [currentPage, setCurrentPage] = useState(1);
     const [pagecount, setPagecount] = useState(0);
-    
+    const [activeSort, setActiveSort] = useState("latest"); // 최신순 or 좋아요순
+    const pageSize = 10;
+
     const { userInfo, isLoggedIn } = useContext(UserContext);
     const userId = userInfo?.userId;
-    
+
+    const results = location.state;
+
+    // 상단바에서 입력한 키워드로 렌더링 후 키워드 필터 검색창에 옮겨놓고 삭제.(필요)
+    useEffect(() => {
+        if (results && results.results) {
+          setPlaces(results.results);
+          setPagecount(results.results.length);
+          setSearchWord(results.keyword);
+          // 현재 URL의 state를 비워서 이후에는 results가 없도록 함.
+          navigate(location.pathname, { replace: true, state: {} });
+        } else {
+          fetchPlace();
+        }
+      }, [currentPage, activeSort, results]);
+
     // 장소 리스트 불러오는 함수 분리
     const fetchPlace = async () => {
         try {
             const searchWordArray = searchWord ? searchWord.split(" ") : [];
-            const response = await axios.get(`http://localhost:8586/placeList.do?pageNum=${currentPage}&searchWord=${searchWordArray}&searchLocation=${searchLocation}&searchCategory=${searchCategory}`,
-                {pageNum:currentPage, searchWord:searchWordArray, searchLocation : searchLocation, searchCategory : searchCategory}
-            );
+            // 공통 파라미터 구성
+            const params = {
+              searchWord: searchWordArray,
+              searchLocation: searchLocation,
+              searchCategory: searchCategory,
+            };
+      
+            // 좋아요 정렬 시 새로운 엔드포인트 사용 (전체 결과 반환)
+            let url = "http://localhost:8586/placeList.do";
+            if (activeSort === "likes") {
+              url = "http://localhost:8586/placeListAll.do";
+            } else {
+              // 최신순 등은 기존 페이징 처리된 엔드포인트 사용
+              params.pageNum = currentPage;
+            }
+      
+            const response = await axios.get(url, { params,
+                paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
+             });
+            console.log(response);
             console.log(response.data);
-            setPlaces(response.data);
-            setPagecount(response.data.length);
-        } catch (error) {
+            let data = response.data;
+      
+            // 좋아요 정렬인 경우 클라이언트에서 정렬 후 페이징 처리
+            if (activeSort === "likes") {
+              data = data.sort((a, b) => Number(b.likes) - Number(a.likes));
+              const paginatedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
+              setPlaces(paginatedData);
+              setPagecount(data.length);
+            } else {
+              setPlaces(data);
+              // 최신순의 경우 백엔드가 반환하는 데이터 수가 페이지당 건수이므로
+              setPagecount(data.length);
+            }
+          } catch (error) {
             console.error("장소 리스트 불러오기 실패:", error);
-        }
+          }
     };
-
-    // 컴포넌트 마운트 시 리스트 불러오기
-    useEffect(() => {
-        fetchPlace();
-    }, []);
-
-
-    useEffect(() => {
-        fetchPlace();
-    }, [currentPage]);
-
 
     // 좋아요 클릭 시 처리
     const handleLikeClick = async (PlaceId, e) => {
@@ -89,45 +118,6 @@ const SearchList = () => {
         }
     };
 
-    const handleLocationClick = (location) => {
-        setSearchLocation((prev) => {
-            const newLocations = prev.includes(location)
-                ? prev.filter((item) => item !== location) // 선택 해제
-                : [...prev, location]; // 선택 추가
-            return newLocations;
-        });
-    };
-    
-    // ✅ searchLocation이 변경되면 자동으로 fetchPlace 실행
-    useEffect(() => {
-        if (searchLocation !== undefined) {
-            fetchPlace();
-        }
-    }, [searchLocation]);
-    
-
-    const handleCategoryClick = (category) => {
-        setSearchCategory((prev) => {
-            const newCategories = prev.includes(category)
-                ? prev.filter((item) => item !== category) // 선택 해제
-                : [...prev, category]; // 선택 추가
-
-                console.log(newCategories);
-            return newCategories;
-        });
-    };
-
-    useEffect(() => {
-        fetchPlace();
-    }, [searchCategory]);
-    
-    const locations = [
-        "서울", "부산", "대구", "인천", "광주", "대전", "울산", "세종", 
-        "경기", "강원", "충북", "충남", "경북", "경남", "전북", "전남", "제주"
-    ];
-
-    const mainCateList = ["먹기", "놀기", "걷기", "마시기", "보기"];
-
     let Tag = [];
 
     for (let i = 0; i < places.length; i++) {
@@ -147,14 +137,18 @@ const SearchList = () => {
             }
         }
         Tag.push(
-            <div className="mb-4" key={places[i].placeId}>
+            <div className="mb-4" key={places[i].placeId} style={{cursor:"pointer"}}>
                 <Row>
                     <Col md={4}>
                         <div className="position-relative">
                             <img
                                 src={places[i].image}
-                                onClick={() =>
-                                    (window.location.href = `/place?id=${places[i].placeId}`)
+                                onClick={() =>{
+                                    console.log(places[i])
+                                    window.location.href = `/place?id=${places[i].placeId}`;
+                                    
+                                }
+                                    
                                 }
                                 alt="장소 이미지"
                                 className="rounded w-100"
@@ -164,11 +158,6 @@ const SearchList = () => {
                                     width: "100%",
                                 }}
                             />
-                            <div className="position-absolute top-0 start-0 m-2">
-                                <Badge bg="dark" className="opacity-75">
-                                    검색
-                                </Badge>
-                            </div>
                         </div>
                     </Col>
                     <Col md={8}>
@@ -211,119 +200,83 @@ const SearchList = () => {
     return (
         <>
             <TopBar />
-            {/* 카테고리 필터 */}
-            <Container className="mb-4">
-                <div className="d-flex justify-content-center">
-                    <Nav variant="pills" defaultActiveKey="all" className="mb-3">
-                        <Nav.Item>
-                            <Nav.Link eventKey="all" onClick={() => handleCategoryClick("all")}>
-                                전체
-                            </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="restaurant" onClick={() => handleCategoryClick("restaurant")}>
-                                식당&카페
-                            </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="attractions" onClick={() => handleCategoryClick("attractions")}>
-                                가볼 만한 곳
-                            </Nav.Link>
-                        </Nav.Item>
-                        <Nav.Item>
-                            <Nav.Link eventKey="events" onClick={() => handleCategoryClick("events")}>
-                                축제ㆍ공연ㆍ행사
-                            </Nav.Link>
-                        </Nav.Item>
-                    </Nav>
-                </div>
-                <div className="d-flex justify-content-end mb-3">
-                    <Button variant="outline-secondary" className="me-2">
-                        관련도순
-                    </Button>
-                    <Button variant="outline-secondary" className="me-2">
-                        최신순
-                    </Button>
-                    <Button variant="outline-secondary">인기순</Button>
-                </div>
-            </Container>
-
-            {/* 검색 필터 */}
-            <Container>
-                <div className="border p-3 mb-4">
-                    <h5>지역</h5>
-                    <div>
-                        {locations.map((location) => (
-                            <Button
-                                key={location}
-                                variant={searchLocation.includes(location) ? "primary" : "outline-secondary"}
-                                onClick={() => handleLocationClick(location)}
-                                className="m-1"
-                            >
-                                #{location}
-                            </Button>
-                        ))}
-                    </div>
-                    <hr />
-                    <h5>카테고리</h5>
-                    <div className="mb-3 d-flex flex-wrap gap-2">
-                        {mainCateList.map((cate) => (
-                            <Button
-                            key={cate}
-                            variant={searchCategory.includes(cate) ? "primary" : "outline-secondary"}
-                            onClick={() => handleCategoryClick(cate)}
-                            >
-                            #{cate}
-                            </Button>
-                        ))}
-                        </div>
-                    <Form className="d-flex" onSubmit={(e) => e.preventDefault()}>
-                        <Form.Control
-                            type="text"
-                            placeholder="검색어 입력"
-                            className="me-2"
-                            value={searchWord || ""}
-                            onChange={(e) => {setSearchWord(e.target.value);
-                            }}
-                        />
-                        <Button variant="primary" 
-                        onClick={() => fetchPlace()}>확인</Button>
-                    </Form>
-                </div>
-            </Container>
+            {/* Filter */}
+            <SearchFilter
+                fetchPlace={fetchPlace}
+                searchCategory={searchCategory}
+                setSearchCategory={setSearchCategory}
+                searchLocation={searchLocation}
+                setSearchLocation={setSearchLocation}
+                searchWord={searchWord}
+                setSearchWord={setSearchWord}
+                activeSort={activeSort}
+                setActiveSort={setActiveSort}
+                currentPage={currentPage}
+                setCurrentPage={setCurrentPage}
+            />
 
             {/* 결과 리스트 */}
             <Container>
-                {Tag}
+                {Tag.length === 0 ? (
+                    <div className="no-results mb-5">
+                        {searchWord ? (
+                            <>
+                                <p>
+                                    '{searchWord}' 에 대한 검색 결과가 없습니다.
+                                </p>
+                                <p>
+                                    <b>
+                                        검색조건과 철자를 확인하고 다시
+                                        검색해주세요.
+                                    </b>
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <p>
+                                    {results.keyword}에 대한 검색 결과가
+                                    없습니다.
+                                </p>
+                                <p>
+                                    <b>
+                                        검색조건과 철자를 확인하고 다시
+                                        검색해주세요.
+                                    </b>
+                                </p>
+                            </>
+                        )}
+                    </div>
+                ) : (
+                    Tag
+                )}
             </Container>
 
             {/* 페이지 네비게이션 */}
             <Container className="d-flex justify-content-center my-4">
-
                 {/* 페이지 버튼들 */}
                 {/* 이전 페이지 버튼 */}
                 {currentPage > 1 && (
                     <>
-                    <Button
-                        variant="outline-secondary"
-                        className="mx-1"
-                        onClick={() => {
-                            setCurrentPage(currentPage - 1);
-                            fetchPlace();
-                        }}
-                    >
-                        이전
-                    </Button>
-                    <Button
-                        variant="outline-secondary"
-                        className="mx-1"
-                        onClick={() => {
-                            setCurrentPage(currentPage-1);  // 현재 페이지를 클릭한 경우에도 fetchPlace 실행
-                            fetchPlace();
-                        }}
-                    >
-                        {currentPage-1}
-                    </Button>
+                        <Button
+                            variant="outline-secondary"
+                            className="mx-1"
+                            onClick={() => {
+                                setCurrentPage(currentPage - 1);
+                                fetchPlace();
+                            }}
+                        >
+                            이전
+                        </Button>
+                        <Button
+                            variant="outline-secondary"
+                            className="mx-1"
+                            onClick={() => {
+                                setCurrentPage(currentPage - 1); // 현재 페이지를 클릭한 경우에도 fetchPlace 실행
+                                fetchPlace();
+                            }}
+                        >
+                            {currentPage - 1}
+                        </Button>
                     </>
                 )}
 
@@ -331,7 +284,7 @@ const SearchList = () => {
                     variant="outline-secondary"
                     className="mx-1"
                     onClick={() => {
-                        setCurrentPage(currentPage);  // 현재 페이지를 클릭한 경우에도 fetchPlace 실행
+                        setCurrentPage(currentPage); // 현재 페이지를 클릭한 경우에도 fetchPlace 실행
                         fetchPlace();
                     }}
                     active
@@ -342,35 +295,31 @@ const SearchList = () => {
                 {/* 다음 페이지 버튼 */}
                 {pagecount === 10 && (
                     <>
-                    <Button
-                        variant="outline-secondary"
-                        className="mx-1"
-                        onClick={() => {
-                            setCurrentPage(currentPage+1);  // 현재 페이지를 클릭한 경우에도 fetchPlace 실행
-                            fetchPlace();
-                        }}
-                    >
-                        {currentPage+1}
-                    </Button>
+                        <Button
+                            variant="outline-secondary"
+                            className="mx-1"
+                            onClick={() => {
+                                setCurrentPage(currentPage + 1); // 현재 페이지를 클릭한 경우에도 fetchPlace 실행
+                                fetchPlace();
+                            }}
+                        >
+                            {currentPage + 1}
+                        </Button>
 
-                    <Button
-                        variant="outline-secondary"
-                        className="mx-1"
-                        onClick={() => {
-                            const newPage = currentPage + 1;
-                            setCurrentPage(newPage);
-                            fetchPlace(newPage);
-                        }}
-                    >
-                        다음
-                    </Button>
-                    
+                        <Button
+                            variant="outline-secondary"
+                            className="mx-1"
+                            onClick={() => {
+                                const newPage = currentPage + 1;
+                                setCurrentPage(newPage);
+                                fetchPlace(newPage);
+                            }}
+                        >
+                            다음
+                        </Button>
                     </>
-
                 )}
-
             </Container>
-
         </>
     );
 };

@@ -4,12 +4,14 @@ package com.playhere.restapi;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.playhere.couple.CoupleDTO;
 import com.playhere.couple.ICoupleService;
+import com.playhere.place.PlaceDTO;
 
 
 @RestController
@@ -95,7 +97,10 @@ public class CoupleController {
 		dao.NewDiary(couple_id, diary_writer, diary_date,content);
 	}
 	
-
+	@GetMapping("/SearchPlace.do")
+	public List<PlaceDTO> SearchPlace() {
+		return dao.SearchPlace();
+	}
 	
 
 }

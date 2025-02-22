@@ -7,24 +7,24 @@ import lombok.Data;
 
 @Data
 public class PlaceDTO {
-	private String placeId;
-	private String placeName;
-	private String location;
-	private String location_short;
-	private String descript;
-	private String time;
-	private String parking;
-	private String call;
-	private String Link;
-	private String image;
-	private String longitude;
-	private String latitude;
-	private String placenameOnmap;
-	private String registDate;
-	private String editDate;
-	private String likes;
-	private String mainCate;
-	private List<String> hashtag;
+   private String placeId;
+   private String placeName;
+   private String location;
+   private String location_short;
+   private String descript;
+   private String time;
+   private String parking;
+   private String call;
+   private String Link;
+   private String image;
+   private String longitude;
+   private String latitude;
+   private String placenameOnmap;
+   private String registDate;
+   private String editDate;
+   private String likes;
+   private String mainCate;
+   private List<String> hashtag;
 	
 	public void setHashtag(String hashtagStr) {
 		if (hashtagStr != null) {

@@ -13,7 +13,7 @@ const Footer = () => {
     ];
 
     return (
-        <footer className="text-center py-4 bg-light" style={{marginTop:"120px"}}>
+        <footer className="text-center py-4 bg-light" style={{marginTop:"200px"}}>
             <p className="mb-2">여기놀자를 SNS에서 만나보세요!</p>
             <div className="d-flex justify-content-center gap-3 text-dark">
                 <AiOutlineInstagram className="fs-4" />
