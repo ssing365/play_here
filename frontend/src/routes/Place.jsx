@@ -3,11 +3,12 @@ import { Button, Card, Container, Row, Col } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { Heart, Share, MapPin } from "lucide-react";
 import axios from "axios";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import TopBar from "../components/TopBar";
 import Swal from "sweetalert2";
 import "../css/Place.css";
+
 
 const { kakao } = window;
 
@@ -312,7 +313,7 @@ function Place() {
                                     variant="success"
                                     onClick={handleDatePickerToggle}
                                 >
-                                    캘린더에 일정 추가하기
+                                    📅 캘린더에 일정 추가하기
                                 </Button>
 
                                 {openDatePicker && (
@@ -382,8 +383,9 @@ function Place() {
                         <Card.Body>
                             <p>
                                 <strong>주소 : </strong>
-                                {place?.location}
+                                {place?.location} <Link to={place.link} target="_blank">카카오맵 바로가기</Link>
                             </p>
+                            
                             <div
                                 id="map"
                                 className="position-relative bg-secondary rounded-3"

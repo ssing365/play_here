@@ -88,9 +88,9 @@ public class CoupleController {
 	
 	@PostMapping("/NewDiary.do")
 	public void NewDiary(@RequestBody Map<String, String> requestBody) {
-		String couple_id = requestBody.get("couple_id");
-		String diary_date = requestBody.get("diary_date");
-		String diary_writer = requestBody.get("diary_writer");
+		String couple_id = requestBody.get("coupleId");
+		String diary_date = requestBody.get("diaryDate");
+		String diary_writer = requestBody.get("diaryWriter");
 		String content = requestBody.get("content");
 		
 		dao.NewDiary(couple_id, diary_writer, diary_date,content);

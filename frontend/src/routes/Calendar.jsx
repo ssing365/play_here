@@ -102,6 +102,7 @@ const Calendar = () => {
         }
     };
 
+    /* 방문지 리스트 출력 */
     const visitList = async (formattedDate) => {
         try {
             const response1 = await axios.post(
@@ -275,28 +276,6 @@ const Calendar = () => {
         diary();
     };
 
-    /**커플 아니면 이용 못하게
-     * if (userInfo?.coupleStatus === 0) {
-        return (
-            <div className="muted-overlay">
-                <div className="muted-message text-center">
-                    <h6>캘린더를 이용하려면 커플 연결을 해야합니다 :(</h6>
-                    <Link to="/connect-couple">
-                        <button className="mt-3 couple-btn">
-                            커플 연동하기
-                        </button>
-                    </Link>
-                    <Link to="/search">
-                        <button className="mt-3 btn btn-outline-secondary">
-                            홈으로
-                        </button>
-                    </Link>
-                </div>
-            </div>
-        );
-    }
-     * 
-     */
     return (
         <>
             <TopBar />
@@ -365,8 +344,7 @@ const Calendar = () => {
                                             <Link
                                                 to="/map"
                                                 state={{
-                                                    month: date.getMonth() + 1,
-                                                    selectedDate: selectedDate,
+                                                    selectedDate: selectedDate
                                                 }}
                                             >
                                                 <Button
@@ -504,7 +482,6 @@ const Calendar = () => {
                                             </Droppable>
                                         </DragDropContext>
 
-                                        <hr />
 
                                         {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
                                         {places?.length < 7 ? (
