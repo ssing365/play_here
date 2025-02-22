@@ -25,6 +25,7 @@ public class PlaceDTO {
    private String likes;
    private String mainCate;
    private List<String> hashtag;
+   private String likeStatus;
 	
 	public void setHashtag(String hashtagStr) {
 		if (hashtagStr != null) {

@@ -16,6 +16,7 @@ function Place() {
     const [openDatePicker, setOpenDatePicker] = useState(false);
     const [tempDate, setTempDate] = useState(null); // 임시 날짜 저장
     //const [selectedDates, setSelectedDates] = useState({}); // 최종 선택된 날짜
+    const [liked, setLiked] = useState(false);
     const location = useLocation();
     const navigate = useNavigate();
     const { userInfo, isLoggedIn } = useContext(UserContext);
@@ -58,20 +59,36 @@ function Place() {
         marker.setMap(map);
     }, [place]);
 
+    const fetchPlace = async () => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8586/placeView.do?id=${placeId}`
+            );
+            console.log(response.data);
+            setPlace(response.data[0]); // 받아온 데이터를 상태에 저장
+        } catch (error) {
+            console.error("Error fetching place:", error);
+        }
+    };
+    // 좋아요 상태 확인
+    if (!userInfo?.userId) {
+        console.log("userInfo가 아직 로드되지 않음");
+        return;
+    }
+    axios
+        .get(`http://localhost:8586/likeStatus.do`, {
+            params: { userId, placeId },
+        })
+        .then((response) => {
+            setLiked(response.data);
+        })
+        .catch((error) => {
+            console.error("Error fetching like status:", error);
+        });
     useEffect(() => {
-        const fetchPlace = async () => {
-            try {
-                const response = await axios.get(
-                    `http://localhost:8586/placeView.do?id=${placeId}`
-                );
-                console.log(response.data);
-                setPlace(response.data[0]); // 받아온 데이터를 상태에 저장
-            } catch (error) {
-                console.error("Error fetching place:", error);
-            }
-        };
+        
         fetchPlace();
-    }, [placeId]);
+    }, [userInfo, placeId]);
 
     useEffect(() => {
         function handleClickOutside(event) {
@@ -110,26 +127,49 @@ function Place() {
             });
         } else {
             try {
-                const response = await axios.post(
-                    "http://localhost:8586/placeLike.do",
-                    {
-                        PlaceId,
-                        userId,
+                if (!liked) {
+                    const response = await axios.post(
+                        "http://localhost:8586/placeLike.do",
+                        {
+                            PlaceId,
+                            userId,
+                        }
+                    );
+                    if (response.status === 200) {
+                        Swal.fire({
+                            title: "좋아요 리스트에 추가되었습니다",
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
                     }
-                );
-                if (response.status === 200) {
-                    Swal.fire({
-                        title: "좋아요 리스트에 추가되었습니다",
-                        icon: "success",
-                        timer: 1500,
-                        showConfirmButton: false,
-                    });
+                } else {
+                    // 좋아요가 현재 false이면 좋아요 취소 호출 (interestCancel.do)
+                    const response = await axios.post(
+                        "http://localhost:8586/placeLike.do",
+                        {
+                            PlaceId,
+                            userId,
+                        }
+                    );
+                    if (response.status === 200) {
+                        Swal.fire({
+                            title: "좋아요가 취소되었습니다",
+                            icon: "success",
+                            timer: 1500,
+                            showConfirmButton: false,
+                        });
+                    }
                 }
+                // UI 업데이트: 좋아요 상태 토글
+                setLiked(!liked);
             } catch (error) {
                 alert("좋아요에 실패했습니다. 잠시후 다시 시도해주세요.");
                 console.error("좋아요 요청 중 오류 발생:", error);
             }
+            
         }
+        fetchPlace();
     };
 
     // 캘린더 열기/닫기
@@ -198,9 +238,9 @@ function Place() {
     };
 
     let hashTag = [];
-    if (place.hashtag) {
-        for (let j = 0; j < place.hashtag.length; j++) {
-            hashTag.push(<p className="text-secondary">{place.hashtag[j]}</p>);
+    if (place?.hashtag) {
+        for (let j = 0; j < place?.hashtag.length; j++) {
+            hashTag.push(<p className="text-secondary">{place?.hashtag[j]}</p>);
         }
     }
 
@@ -212,8 +252,8 @@ function Place() {
                 {/* 본문 */}
                 <Container className="content-container">
                     <img
-                        src={place.image}
-                        alt={place.placeName}
+                        src={place?.image}
+                        alt={place?.placeName}
                         className="w-100 rounded-3 mb-4"
                         style={{
                             height: "500px",
@@ -225,8 +265,10 @@ function Place() {
                     <Row className="g-4">
                         {/* 기본 정보 */}
                         <Col md={6}>
-                            <h2 className="fw-bold">{place.placeName}</h2>
-                            <p className="text-muted">{place.location_short}</p>
+                            <h2 className="fw-bold">{place?.placeName}</h2>
+                            <p className="text-muted">
+                                {place?.location_short}
+                            </p>
                             <div className="hashtags">
                                 {hashTag.map((tag, index) => {
                                     return (
@@ -244,13 +286,26 @@ function Place() {
                             >
                                 <Share size={20} />
                             </Button>
-                            <Button
-                                variant="outline-danger"
-                                className="me-2"
-                                onClick={(e) => handleLikeClick(placeId, e)}
-                            >
-                                <Heart size={20} />
-                            </Button>
+                            {liked ? (
+                                <Button
+                                    variant="danger"
+                                    className="sm me-2"
+                                    onClick={(e) => handleLikeClick(placeId, e)}
+                                >
+                                    ❤ {place.likes}
+                                </Button>
+                                
+                            ) : (
+                                <Button
+                                    variant="outline-danger"
+                                    className="sm me-2"
+                                    onClick={(e) => handleLikeClick(placeId, e)}
+                                >
+                                    ❤ {place.likes}
+                                </Button>
+                                
+                            )}
+
                             {/* ✅ 캘린더 버튼만 감싸서 위치 기준 조정 */}
                             <div className="calendar-container position-relative d-inline-block">
                                 <Button
@@ -307,17 +362,17 @@ function Place() {
                     <Card className="mt-4">
                         <Card.Body>
                             <p>
-                                <strong>시간 : </strong> {place.time}
+                                <strong>시간 : </strong> {place?.time}
                             </p>
                             <p>
-                                <strong>휴무 : </strong> {place.dayoff}
+                                <strong>휴무 : </strong> {place?.dayoff}
                             </p>
                             <p>
-                                <strong>주차 : </strong> {place.parking}
+                                <strong>주차 : </strong> {place?.parking}
                             </p>
                             <p>
                                 <strong>연락처 : </strong>
-                                {place.call}
+                                {place?.call}
                             </p>
                         </Card.Body>
                     </Card>
@@ -327,7 +382,7 @@ function Place() {
                         <Card.Body>
                             <p>
                                 <strong>주소 : </strong>
-                                {place.location}
+                                {place?.location}
                             </p>
                             <div
                                 id="map"
@@ -347,7 +402,7 @@ function Place() {
                     {/* 근처 다른 장소 */}
                     <h3 className="mt-4">근처 다른 장소</h3>
                     <Row className="g-3 flex-nowrap overflow-auto">
-                        {[1, 2, 3, 4, 5].map((i) => (
+                        {[1, 2, 3, 4].map((i) => (
                             <Col key={i} xs={6} md={3}>
                                 <Card>
                                     <div

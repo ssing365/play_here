@@ -13,5 +13,6 @@ public class ParameterDTO {
 	private ArrayList<String> searchCategory;
 	private int start;
 	private int end;
+	private String userId;
 	
 }

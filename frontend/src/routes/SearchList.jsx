@@ -3,12 +3,13 @@ import TopBar from "../components/TopBar";
 import "bootstrap/dist/css/bootstrap.min.css";
 import { useContext, useEffect, useState } from "react";
 import { Container, Form, Button, Row, Col, Badge } from "react-bootstrap";
+import { Heart } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import { useLocation } from "react-router-dom";
 import Swal from "sweetalert2";
 import SearchFilter from "../components/SearchList/SearchFilter";
-import qs from 'qs';
+import qs from "qs";
 
 const SearchList = () => {
     // useLocation을 이용해 navigate로 전달된 state를 추출
@@ -22,7 +23,6 @@ const SearchList = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [pagecount, setPagecount] = useState(0);
     const [activeSort, setActiveSort] = useState("latest"); // 최신순 or 좋아요순
-    const pageSize = 10;
 
     const { userInfo, isLoggedIn } = useContext(UserContext);
     const userId = userInfo?.userId;
@@ -32,15 +32,15 @@ const SearchList = () => {
     // 상단바에서 입력한 키워드로 렌더링 후 키워드 필터 검색창에 옮겨놓고 삭제.(필요)
     useEffect(() => {
         if (results && results.results) {
-          setPlaces(results.results);
-          setPagecount(results.results.length);
-          setSearchWord(results.keyword);
-          // 현재 URL의 state를 비워서 이후에는 results가 없도록 함.
-          navigate(location.pathname, { replace: true, state: {} });
+            setPlaces(results.results);
+            setPagecount(results.results.length);
+            setSearchWord(results.keyword);
+            // 현재 URL의 state를 비워서 이후에는 results가 없도록 함.
+            navigate(location.pathname, { replace: true, state: {} });
         } else {
-          fetchPlace();
+            fetchPlace();
         }
-      }, [currentPage, activeSort, results]);
+    }, [currentPage, activeSort, results]);
 
     // 장소 리스트 불러오는 함수 분리
     const fetchPlace = async () => {
@@ -48,41 +48,32 @@ const SearchList = () => {
             const searchWordArray = searchWord ? searchWord.split(" ") : [];
             // 공통 파라미터 구성
             const params = {
-              searchWord: searchWordArray,
-              searchLocation: searchLocation,
-              searchCategory: searchCategory,
+                searchWord: searchWordArray,
+                searchLocation: searchLocation,
+                searchCategory: searchCategory,
+                pageNum: currentPage,
+                userId: userId,
             };
-      
-            // 좋아요 정렬 시 새로운 엔드포인트 사용 (전체 결과 반환)
+
+            // 좋아요 정렬 시 새로운 엔드포인트 사용
             let url = "http://localhost:8586/placeList.do";
             if (activeSort === "likes") {
-              url = "http://localhost:8586/placeListAll.do";
-            } else {
-              // 최신순 등은 기존 페이징 처리된 엔드포인트 사용
-              params.pageNum = currentPage;
+                url = "http://localhost:8586/placeListAll.do";
             }
-      
-            const response = await axios.get(url, { params,
-                paramsSerializer: params => qs.stringify(params, { arrayFormat: 'repeat' }),
-             });
+
+            const response = await axios.get(url, {
+                params,
+                paramsSerializer: (params) =>
+                    qs.stringify(params, { arrayFormat: "repeat" }), // 배열을 repeat 방식으로 직렬
+            });
             console.log(response);
             console.log(response.data);
-            let data = response.data;
-      
-            // 좋아요 정렬인 경우 클라이언트에서 정렬 후 페이징 처리
-            if (activeSort === "likes") {
-              data = data.sort((a, b) => Number(b.likes) - Number(a.likes));
-              const paginatedData = data.slice((currentPage - 1) * pageSize, currentPage * pageSize);
-              setPlaces(paginatedData);
-              setPagecount(data.length);
-            } else {
-              setPlaces(data);
-              // 최신순의 경우 백엔드가 반환하는 데이터 수가 페이지당 건수이므로
-              setPagecount(data.length);
-            }
-          } catch (error) {
+
+            setPlaces(response.data);
+            setPagecount(response.data.length);
+        } catch (error) {
             console.error("장소 리스트 불러오기 실패:", error);
-          }
+        }
     };
 
     // 좋아요 클릭 시 처리
@@ -136,19 +127,19 @@ const SearchList = () => {
             }
         }
         Tag.push(
-            <div className="mb-4" key={places[i].placeId} style={{cursor:"pointer"}}>
+            <div
+                className="mb-4"
+                key={places[i].placeId}
+                style={{ cursor: "pointer" }}
+            >
                 <Row>
                     <Col md={4}>
                         <div className="position-relative">
                             <img
                                 src={places[i].image}
-                                onClick={() =>{
-                                    console.log(places[i])
+                                onClick={() => {
                                     window.location.href = `/place?id=${places[i].placeId}`;
-                                    
-                                }
-                                    
-                                }
+                                }}
                                 alt="장소 이미지"
                                 className="rounded w-100"
                                 style={{
@@ -179,15 +170,41 @@ const SearchList = () => {
                                         {cateTag}
                                     </div>
                                 </div>
-                                <Button
+                                {places[i].likeStatus == "liked" ? (
+                                    <Button
+                                        variant="danger"
+                                        size="sm"
+                                        onClick={(e) =>
+                                            handleLikeClick(
+                                                places[i].placeId,
+                                                e
+                                            )
+                                        }
+                                    >
+                                        ❤ {places[i].likes}
+                                    </Button>
+                                ) : (
+                                    <Button
+                                        variant="outline-danger"
+                                        size="sm"
+                                        onClick={(e) =>
+                                            handleLikeClick(
+                                                places[i].placeId,
+                                                e
+                                            )
+                                        }
+                                    >
+                                        ❤ {places[i].likes}
+                                    </Button>
+                                )}
+
+                                {/* <Button
                                     variant="outline-danger"
-                                    size="sm"
-                                    onClick={(e) =>
-                                        handleLikeClick(places[i].placeId, e)
-                                    }
+                                    className="me-2"
+                                    onClick={(e) => handleLikeClick(places[i].placeId, e)}
                                 >
-                                    ♥ {places[i].likes}
-                                </Button>
+                                    <Heart size={20}/>{places[i].likes}
+                                </Button> */}
                             </div>
                         </div>
                     </Col>
@@ -233,7 +250,7 @@ const SearchList = () => {
                         ) : (
                             <>
                                 <p>
-                                    {results.keyword}에 대한 검색 결과가
+                                    {results?.keyword}에 대한 검색 결과가
                                     없습니다.
                                 </p>
                                 <p>

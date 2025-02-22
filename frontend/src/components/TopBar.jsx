@@ -17,6 +17,7 @@ import { useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
 import Swal from "sweetalert2";
 import axios from "axios";
+import qs from "qs";
 
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
@@ -76,18 +77,30 @@ const TopBar = () => {
     };
 
     const searchPlace = async (searchKeyword) => {
-        console.log(searchKeyword);
         try {
-            searchKeyword ? searchKeyword.split(" ") : [];
+            // 검색어를 공백 기준 배열로 변환 (빈 배열이면 조건문에서 무시됨)
+            const searchWordArray = searchKeyword
+                ? searchKeyword.split(" ")
+                : [];
             const response = await axios.get(
-                `http://localhost:8586/placeList.do?searchWord=${searchKeyword}&searchLocation=&searchCategory=`,
+                `http://localhost:8586/placeList.do`,
                 {
-                    searchWord: searchKeyword,
+                    params: {
+                        searchWord: searchWordArray, // 배열 전달
+                        searchLocation: [],
+                        searchCategory: [],
+                        pageNum : 1,
+                        userId: userInfo?.userId,
+                    },
+                    paramsSerializer: (params) =>
+                                        qs.stringify(params, { arrayFormat: "repeat" }),
                 }
             );
-            console.log(response.data)
+            console.log(response.data);
             // 검색 결과를 searchList 페이지로 state를 통해 전달합니다.
-            navigate("/searchlist", { state: { results: response.data , keyword:searchKeyword } });
+            navigate("/searchlist", {
+                state: { results: response.data, keyword: searchKeyword },
+            });
         } catch (error) {
             console.error("검색 실패:", error);
         }
@@ -230,10 +243,12 @@ const TopBar = () => {
                                                 as={Link}
                                                 to="/mypage"
                                                 style={
-                                                    location.pathname === "/mypage"
+                                                    location.pathname ===
+                                                    "/mypage"
                                                         ? {
-                                                            backgroundColor: "#ffe7e7",
-                                                            color:"#333"
+                                                              backgroundColor:
+                                                                  "#ffe7e7",
+                                                              color: "#333",
                                                           }
                                                         : {}
                                                 }
@@ -245,10 +260,12 @@ const TopBar = () => {
                                                     as={Link}
                                                     to="/connect-couple"
                                                     style={
-                                                        location.pathname === "/connect-couple"
+                                                        location.pathname ===
+                                                        "/connect-couple"
                                                             ? {
-                                                                backgroundColor: "#ffe7e7",
-                                                                color:"#333"
+                                                                  backgroundColor:
+                                                                      "#ffe7e7",
+                                                                  color: "#333",
                                                               }
                                                             : {}
                                                     }
@@ -260,10 +277,12 @@ const TopBar = () => {
                                                     as={Link}
                                                     to="/calendar"
                                                     style={
-                                                        location.pathname === "/calendar"
+                                                        location.pathname ===
+                                                        "/calendar"
                                                             ? {
-                                                                backgroundColor: "#ffe7e7",
-                                                                color:"#333"
+                                                                  backgroundColor:
+                                                                      "#ffe7e7",
+                                                                  color: "#333",
                                                               }
                                                             : {}
                                                     }
@@ -276,10 +295,12 @@ const TopBar = () => {
                                                 as={Link}
                                                 to="/editpreference"
                                                 style={
-                                                    location.pathname === "/editpreference"
+                                                    location.pathname ===
+                                                    "/editpreference"
                                                         ? {
-                                                            backgroundColor: "#ffe7e7",
-                                                            color:"#333"
+                                                              backgroundColor:
+                                                                  "#ffe7e7",
+                                                              color: "#333",
                                                           }
                                                         : {}
                                                 }
@@ -290,10 +311,12 @@ const TopBar = () => {
                                                 as={Link}
                                                 to="/mypagelikes"
                                                 style={
-                                                    location.pathname === "/mypagelikes"
+                                                    location.pathname ===
+                                                    "/mypagelikes"
                                                         ? {
-                                                            backgroundColor: "#ffe7e7",
-                                                            color:"#333"
+                                                              backgroundColor:
+                                                                  "#ffe7e7",
+                                                              color: "#333",
                                                           }
                                                         : {}
                                                 }

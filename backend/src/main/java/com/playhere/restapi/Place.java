@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -62,6 +63,17 @@ public class Place {
 	        System.out.println("전체 검색 조건: " + parameterDTO);
 	        // DAO에 전체 결과를 반환하는 메서드를 호출합니다.
 	        // dao.listAll(parameterDTO) 메서드는 내부에서 페이징 계산을 하지 않고 조건에 맞는 모든 결과를 반환해야 합니다.
+	     // 한 페이지에 출력할 게시물의 수
+		    int pageSize = 10;
+		    // 페이지 번호
+		    System.out.println(parameterDTO);
+		    int pageNum = parameterDTO.getPageNum() == null ? 1 : Integer.parseInt(parameterDTO.getPageNum());
+		    // 게시물의 구간 계산
+		    int start = (pageNum - 1) * pageSize + 1;
+		    int end = pageNum * pageSize;
+
+		    parameterDTO.setStart(start);
+		    parameterDTO.setEnd(end);
 	        
 //		    검색 위치와 검색어 처리
 		    ArrayList<String> searchLocation = parameterDTO.getSearchLocation();
@@ -74,7 +86,7 @@ public class Place {
 		    System.out.println("start: " +parameterDTO.getStart());
 		    System.out.println("end: " + parameterDTO.getEnd());
 		    
-	        return dao.listAll(parameterDTO);
+	        return dao.listLikes(parameterDTO);
 	    }
 
 	@GetMapping("/placeView.do")
@@ -82,6 +94,16 @@ public class Place {
 		return dao.view(PlaceId);
 	}
 	
+	// 좋아요 여부 확인
+    @GetMapping("/likeStatus.do")
+    public boolean getLikeStatus(@RequestParam("userId") String userId,
+            @RequestParam("placeId") String placeId) {
+    	int check = dao.Interestcheck(userId, placeId);
+        if(check == 1) {
+        	return true;
+        }else return false;
+    }
+    
 	@PostMapping("/placeLike.do")
 	public void placeLike(@RequestBody Map<String, String> params) {
 		
@@ -95,8 +117,8 @@ public class Place {
 	            dao.InterestAdd(userId, placeId);
 	            dao.placeLikeAdd(placeId);
 	        } else {
-	            dao.InterestCancle(userId, placeId);
-	            dao.placeLikeCancle(placeId);
+	            dao.InterestCancel(userId, placeId);
+	            dao.placeLikeCancel(placeId);
 	        }
 
 	    } catch (Exception e) {
@@ -136,11 +158,11 @@ public class Place {
 	    dao.addCalendar(placeId, coupleId, visitDate);
 	}
 	
-	@PostMapping("interestCancle.do")
-	public void InterestCancle(@RequestBody Map<String, String> requestBody) {
+	@PostMapping("interestCancel.do")
+	public void InterestCancel(@RequestBody Map<String, String> requestBody) {
 		String userId = requestBody.get("userId");
 		String placeId = requestBody.get("placeId");
-		dao.InterestCancle(userId, placeId);
+		dao.InterestCancel(userId, placeId);
 		
 	}
 	
