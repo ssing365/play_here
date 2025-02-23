@@ -29,4 +29,5 @@ public interface ICoupleService {
          @Param("diaryDate") String diary_date,
          @Param("content") String content);
    public List<PlaceDTO> SearchPlace();
+   public List<CoupleDTO> Schedule(@Param("date") String date);
 }

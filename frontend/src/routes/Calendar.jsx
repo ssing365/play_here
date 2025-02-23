@@ -32,6 +32,8 @@ const Calendar = () => {
     const [noDiary, setNoDiary] = useState(false);
     const today = new Date();
     const location = useLocation();
+    const [schedule, setSchedule] = useState([]);
+    const [activeStartDate, setActiveStartDate] = useState(new Date());
 
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
@@ -143,6 +145,7 @@ const Calendar = () => {
         addPlace({ placeId: place.placeId, placeName: place.placeName });
     };
 
+    
     // 장소 추가 함수
     const addPlace = async (placeObj) => {
         const formattedDate = selectedDate
@@ -205,6 +208,9 @@ const Calendar = () => {
             diary(formattedDate);
         }
     }, [selectedDate, coupleInfo]);
+
+
+      
 
     // 일기 가져오기
     const diary = async (formattedDate) => {
@@ -312,22 +318,6 @@ const Calendar = () => {
         }
     };
 
-    /* 방문지 추가 */
-    // const placeInput = document.getElementById("placeInput");
-    // const addPlace = () => {
-    //     // 최대 7개
-    //     if (newPlace.trim() && (places[selectedDate]?.length || 0) < 7) {
-    //         const newPlaceObj = { id: uuidv4().toString(), name: newPlace };
-    //         setPlaces({
-    //             ...places,
-    //             [selectedDate]: [...(places[selectedDate] || []), newPlaceObj],
-    //         });
-    //         setNewPlace("");
-    //         setShowInput(false);
-    //         placeInput.focus();
-    //     }
-    // };
-
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
         console.log(placeId);
@@ -363,19 +353,53 @@ const Calendar = () => {
     const [editId, setEditId] = useState(null);
     const [editText, setEditText] = useState("");
 
+        //스케줄 있는 날짜 확인
+    // const Schedule = async () => {
+    //     const respone = await axios.post("http://localhost:8586/Schedule.do",{date : date})
+    //     console.log(respone.data);
+    // }
+
+     // 백엔드에서 schedule 데이터를 가져오는 함수
+  const fetchSchedule = async (date) => {
+    const year = date.getFullYear();
+    const month = (date.getMonth() + 1).toString().padStart(2, '0');
+    const yearMonth = `${year}-${month}`;
+    try {
+      const response = await axios.post("http://localhost:8586/Schedule.do", { date: yearMonth });
+      console.log(yearMonth, response.data);
+      setSchedule(response.data);
+    } catch (error) {
+      console.error("스케줄 데이터를 가져오는데 실패했습니다.", error);
+    }
+  };
+
+  // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
+  useEffect(() => {
+    fetchSchedule(activeStartDate);
+  }, [activeStartDate]);
+
+  // 달력의 월/년이 변경될 때 호출되는 핸들러
+  const handleActiveStartDateChange = async ({ activeStartDate }) => {
+    setActiveStartDate(activeStartDate);
+    fetchSchedule(activeStartDate);
+  };
+    
     /* 일기, 방문지 추가시 달력에 점 표시 */
     const tileContent = ({ date }) => {
-        const day = date.getDate();
-        const month = date.getMonth();
-        const year = date.getFullYear();
-        const currentMonth = new Date().getMonth();
-        const currentYear = new Date().getFullYear();
-
-        if (places[day] && month === currentMonth && year === currentYear) {
-            return <span className="calendar-dot"></span>;
-        }
-        return null;
-    };
+        const isVisitDate = schedule.some(dto => {
+          // dto 객체 내의 visitDate 속성 값을 사용합니다.
+          const visitDate = new Date(dto.visitDate);
+          return (
+            visitDate.getFullYear() === date.getFullYear() &&
+            visitDate.getMonth() === date.getMonth() &&
+            visitDate.getDate() === date.getDate()
+          );
+        });
+      
+        return isVisitDate ? <span className="calendar-dot"></span> : null;
+      };
+      
+    
 
     /** 일기 저장 */
     const saveDiary = async () => {
@@ -451,6 +475,7 @@ const Calendar = () => {
                             onClickDay={(value) => {
                                 setSelectedDate(value)
                             }}
+                            onActiveStartDateChange={handleActiveStartDateChange}
                             className="couple-calendar flex-grow-1"
                             tileContent={tileContent}
                         />
