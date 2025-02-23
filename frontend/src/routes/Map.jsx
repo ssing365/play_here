@@ -88,40 +88,30 @@ const Map = () => {
     const containerRef = useRef(null);
     const inputRef = useRef(null);
 
-    /** OFFCANAS 호출 -- 시작 */
+    // offcanvas 및 상세정보 관련 상태
+    const [placeDetail, setPlaceDetail] = useState(null);
     const [showOffcanvas, setShowOffcanvas] = useState(false);
-    const [selectedPlace, setSelectedPlace] = useState({});
-    // offcanvas 더미
-    const dummy = {
-        call: "064-757-0976",
-        descript: null,
-        editDate: "2025-02-19 00:00:00",
-        hashtag: ["#벚꽃명소"],
-        image: "https://t1.kakaocdn.net/thumb/T800x0.q50/?fname=http%3A%2F%2Ft1.kakaocdn.net%2Ffiy_reboot%2Fplace%2FE7A1430F241948CFA7589DA36133F881",
-        latitude: "33.511103",
-        likeStatus: null,
-        likes: "5",
-        link: "https://place.map.kakao.com/9937633",
-        location: "제주특별자치도 제주시 서문로 43  (우)63153",
-        location_short: "제주특별자치도 제주시",
-        longitude: "126.515612",
-        mainCate: null,
-        parking: "정보 없음",
-        placeId: "7442",
-        placeName: "제주향교",
-        placenameOnmap: "제주향교",
-        registDate: "2025-02-19 00:00:00",
-        time: null,
-    };
-
-    const handleShow = (dummy) => {
-        setSelectedPlace(dummy);
-        setShowOffcanvas(true);
-    };
-
     const handleClose = () => setShowOffcanvas(false);
 
-    /** OFFCANAS 호출 -- 끝 */
+    // 장소 정보 가져오기 함수 수정 (id 파라미터 추가)
+    const fetchPlace = async (id) => {
+        try {
+          const response = await axios.get(
+            `http://localhost:8586/placeView.do?id=${id}`
+          );
+          console.log(response.data);
+          setPlaceDetail(response.data[0]); // 받아온 데이터를 상태에 저장
+        } catch (error) {
+          console.error("Error fetching place:", error);
+        }
+      };
+    
+      // 상세보기 버튼 클릭 시 실행할 함수
+      const handleShowDetails = async (id) => {
+        await fetchPlace(id);
+        setShowOffcanvas(true);
+      };
+
 
     const container = useRef(null);
 
@@ -146,8 +136,8 @@ const Map = () => {
         function createMap() {
             if (container.current && window.kakao) {
                 const position = new window.kakao.maps.LatLng(
-                    dummy.latitude,
-                    dummy.longitude
+                    37.7,
+                    128.8
                 );
                 const options = { center: position, level: 3 };
                 new window.kakao.maps.Map(container.current, options);
@@ -206,7 +196,7 @@ const Map = () => {
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -374,7 +364,7 @@ const Map = () => {
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
         console.log(placeId);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -412,7 +402,7 @@ const Map = () => {
             <PlaceDetailOffcanvas
                 show={showOffcanvas}
                 handleClose={handleClose}
-                place={selectedPlace}
+                place={placeDetail}
             />
             {/** OFFCANVAS */}
 
@@ -526,14 +516,6 @@ const Map = () => {
                                                                     />
                                                                 ) : (
                                                                     <span
-                                                                        onClick={() => {
-                                                                            setEditId(
-                                                                                place.placeId
-                                                                            );
-                                                                            setEditText(
-                                                                                place.placeName
-                                                                            );
-                                                                        }}
                                                                         className="me-2 p-1"
                                                                     >
                                                                         {
@@ -542,6 +524,14 @@ const Map = () => {
                                                                         {/* ✅ 장소 이름 표시 */}
                                                                     </span>
                                                                 )}
+                                                                <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => handleShowDetails(place.placeId)}
+                        className="me-2"
+                      >
+                        상세보기
+                      </Button>
                                                                 <Button
                                                                     variant="outline-danger"
                                                                     size="sm"
@@ -563,10 +553,6 @@ const Map = () => {
                                         )}
                                     </Droppable>
                                 </DragDropContext>
-
-                                <Button onClick={() => handleShow(dummy)}>
-                                    상세 보기
-                                </Button>
                                 <br />
                                 {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
                                 {places?.length < 7 ? (

@@ -17,6 +17,7 @@ import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
+import PlaceDetailOffcanvas from "../components/PlaceDetailOffcanvas";
 
 const Calendar = () => {
     const [date, setDate] = useState(new Date());
@@ -37,6 +38,11 @@ const Calendar = () => {
     const { userInfo } = useContext(UserContext);
     const userId = userInfo?.userId;
     const coupleId = userInfo?.coupleId;
+
+    // offcanvas 및 상세정보 관련 상태
+  const [placeDetail, setPlaceDetail] = useState(null);
+  const [showOffcanvas, setShowOffcanvas] = useState(false);
+  const handleClose = () => setShowOffcanvas(false);
 
     // 다른 페이지에서 전달된 날짜를 읽어와 상태 업데이트
     useEffect(() => {
@@ -169,6 +175,25 @@ const Calendar = () => {
         }
     };
 
+    // 장소 정보 가져오기 함수 수정 (id 파라미터 추가)
+  const fetchPlace = async (id) => {
+    try {
+      const response = await axios.get(
+        `http://localhost:8586/placeView.do?id=${id}`
+      );
+      console.log(response.data);
+      setPlaceDetail(response.data[0]); // 받아온 데이터를 상태에 저장
+    } catch (error) {
+      console.error("Error fetching place:", error);
+    }
+  };
+
+  // 상세보기 버튼 클릭 시 실행할 함수
+  const handleShowDetails = async (id) => {
+    await fetchPlace(id);
+    setShowOffcanvas(true);
+  };
+
     useEffect(() => {
         const coupleInfo = async () => {
             if (coupleId) {
@@ -257,7 +282,7 @@ const Calendar = () => {
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -312,26 +337,10 @@ const Calendar = () => {
         }
     };
 
-    /* 방문지 추가 */
-    // const placeInput = document.getElementById("placeInput");
-    // const addPlace = () => {
-    //     // 최대 7개
-    //     if (newPlace.trim() && (places[selectedDate]?.length || 0) < 7) {
-    //         const newPlaceObj = { id: uuidv4().toString(), name: newPlace };
-    //         setPlaces({
-    //             ...places,
-    //             [selectedDate]: [...(places[selectedDate] || []), newPlaceObj],
-    //         });
-    //         setNewPlace("");
-    //         setShowInput(false);
-    //         placeInput.focus();
-    //     }
-    // };
-
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
         console.log(placeId);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -417,6 +426,13 @@ const Calendar = () => {
 
     return (
         <>
+        {/** OFFCANVAS */}
+        <PlaceDetailOffcanvas
+                show={showOffcanvas}
+                handleClose={handleClose}
+                place={placeDetail}
+            />
+            {/** OFFCANVAS */}
             <TopBar />
             <Container fluid className="back-container vh-100">
                 <Row className="couple-calendar-container">
@@ -585,14 +601,6 @@ const Calendar = () => {
                                                                                 />
                                                                             ) : (
                                                                                 <span
-                                                                                    onClick={() => {
-                                                                                        setEditId(
-                                                                                            place.placeId
-                                                                                        );
-                                                                                        setEditText(
-                                                                                            place.placeName
-                                                                                        );
-                                                                                    }}
                                                                                     className="me-2 p-1"
                                                                                 >
                                                                                     {
@@ -601,6 +609,15 @@ const Calendar = () => {
                                                                                     {/* ✅ 장소 이름 표시 */}
                                                                                 </span>
                                                                             )}
+                                                                            {/* 상세보기 버튼 추가 */}
+                      <Button
+                        variant="outline-secondary"
+                        size="sm"
+                        onClick={() => handleShowDetails(place.placeId)}
+                        className="me-2"
+                      >
+                        상세보기
+                      </Button>
                                                                             <Button
                                                                                 variant="outline-danger"
                                                                                 size="sm"
