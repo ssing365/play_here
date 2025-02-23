@@ -102,5 +102,12 @@ public class CoupleController {
 		return dao.SearchPlace();
 	}
 	
+	@PostMapping("/Schedule.do")
+	public List<CoupleDTO> getMethodName(@RequestBody Map<String, String> requestBody) {
+		String date = requestBody.get("date");
+		System.out.println(date);
+		return dao.Schedule(date);
+	}
+	
 
 }
