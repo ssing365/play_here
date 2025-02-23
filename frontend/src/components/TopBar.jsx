@@ -360,9 +360,21 @@ const TopBar = () => {
                                         outline: "none",
                                         boxShadow: "none",
                                     }}
+                                    onChange={(e) => {
+                                        setSearchKeyword(e.target.value);
+                                        console.log(searchKeyword);
+                                    }}
+                                    onKeyPress={(e) => {
+                                        if (e.key === "Enter") {
+                                            handleSubmit(e);
+                                        }
+                                    }}
                                 />
                                 <FaSearch
                                     className="position-absolute"
+                                    onClick={() =>
+                                        searchPlace(searchKeyword)
+                                    }
                                     style={{
                                         right: "10px",
                                         top: "50%",
@@ -405,6 +417,7 @@ const TopBar = () => {
                                               }
                                             : { fontSize: "17px" }
                                     }
+                                    onClick={handleCalendarClick}
                                 >
                                     캘린더
                                 </Nav.Link>
