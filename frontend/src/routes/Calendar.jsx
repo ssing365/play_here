@@ -5,14 +5,7 @@ import Cal from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../css/Calendar.css";
 import { FaSearch } from "react-icons/fa";
-import {
-    Button,
-    Form,
-    Row,
-    Col,
-    Card,
-    Container,
-} from "react-bootstrap";
+import { Button, Form, Row, Col, Card, Container } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
@@ -40,9 +33,9 @@ const Calendar = () => {
     const coupleId = userInfo?.coupleId;
 
     // offcanvas 및 상세정보 관련 상태
-  const [placeDetail, setPlaceDetail] = useState(null);
-  const [showOffcanvas, setShowOffcanvas] = useState(false);
-  const handleClose = () => setShowOffcanvas(false);
+    const [placeDetail, setPlaceDetail] = useState(null);
+    const [showOffcanvas, setShowOffcanvas] = useState(false);
+    const handleClose = () => setShowOffcanvas(false);
 
     // 다른 페이지에서 전달된 날짜를 읽어와 상태 업데이트
     useEffect(() => {
@@ -176,23 +169,23 @@ const Calendar = () => {
     };
 
     // 장소 정보 가져오기 함수 수정 (id 파라미터 추가)
-  const fetchPlace = async (id) => {
-    try {
-      const response = await axios.get(
-        `http://localhost:8586/placeView.do?id=${id}`
-      );
-      console.log(response.data);
-      setPlaceDetail(response.data[0]); // 받아온 데이터를 상태에 저장
-    } catch (error) {
-      console.error("Error fetching place:", error);
-    }
-  };
+    const fetchPlace = async (id) => {
+        try {
+            const response = await axios.get(
+                `http://localhost:8586/placeView.do?id=${id}`
+            );
+            console.log(response.data);
+            setPlaceDetail(response.data[0]); // 받아온 데이터를 상태에 저장
+        } catch (error) {
+            console.error("Error fetching place:", error);
+        }
+    };
 
-  // 상세보기 버튼 클릭 시 실행할 함수
-  const handleShowDetails = async (id) => {
-    await fetchPlace(id);
-    setShowOffcanvas(true);
-  };
+    // 상세보기 버튼 클릭 시 실행할 함수
+    const handleShowDetails = async (id) => {
+        await fetchPlace(id);
+        setShowOffcanvas(true);
+    };
 
     useEffect(() => {
         const coupleInfo = async () => {
@@ -426,8 +419,8 @@ const Calendar = () => {
 
     return (
         <>
-        {/** OFFCANVAS */}
-        <PlaceDetailOffcanvas
+            {/** OFFCANVAS */}
+            <PlaceDetailOffcanvas
                 show={showOffcanvas}
                 handleClose={handleClose}
                 place={placeDetail}
@@ -465,7 +458,7 @@ const Calendar = () => {
                             onChange={setDate}
                             value={selectedDate}
                             onClickDay={(value) => {
-                                setSelectedDate(value)
+                                setSelectedDate(value);
                             }}
                             className="couple-calendar flex-grow-1"
                             tileContent={tileContent}
@@ -600,9 +593,7 @@ const Calendar = () => {
                                                                                     autoFocus
                                                                                 />
                                                                             ) : (
-                                                                                <span
-                                                                                    className="me-2 p-1"
-                                                                                >
+                                                                                <span className="me-2 p-1">
                                                                                     {
                                                                                         place.placeName
                                                                                     }{" "}
@@ -610,14 +601,18 @@ const Calendar = () => {
                                                                                 </span>
                                                                             )}
                                                                             {/* 상세보기 버튼 추가 */}
-                      <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => handleShowDetails(place.placeId)}
-                        className="me-2"
-                      >
-                        상세보기
-                      </Button>
+                                                                            <Button
+                                                                                variant="outline-secondary"
+                                                                                size="sm"
+                                                                                onClick={() =>
+                                                                                    handleShowDetails(
+                                                                                        place.placeId
+                                                                                    )
+                                                                                }
+                                                                                className="me-2"
+                                                                            >
+                                                                                상세보기
+                                                                            </Button>
                                                                             <Button
                                                                                 variant="outline-danger"
                                                                                 size="sm"
@@ -756,16 +751,18 @@ const Calendar = () => {
 
                                         {selectedDate <= today ? (
                                             <>
-                                                <Diary 
-                                                diary={diary}
-                                                editDiary={editDiary}
-                                                setEditDiary={setEditDiary}
-                                                coupleInfo={coupleInfo}
-                                                diaryEntry={diaryEntry}
-                                                saveDiary={saveDiary}
-                                                diaryText={diaryText}
-                                                yourDiaryText={yourDiaryText}
-                                                setDiaryText={setDiaryText}
+                                                <Diary
+                                                    diary={diary}
+                                                    editDiary={editDiary}
+                                                    setEditDiary={setEditDiary}
+                                                    coupleInfo={coupleInfo}
+                                                    diaryEntry={diaryEntry}
+                                                    saveDiary={saveDiary}
+                                                    diaryText={diaryText}
+                                                    yourDiaryText={
+                                                        yourDiaryText
+                                                    }
+                                                    setDiaryText={setDiaryText}
                                                 />
                                             </>
                                         ) : (

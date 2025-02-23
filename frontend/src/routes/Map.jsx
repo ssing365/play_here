@@ -17,6 +17,7 @@ const Map = () => {
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [places, setPlaces] = useState([]);
     const [coupleInfo, setCoupleInfo] = useState(null);
+    const [totalDistance, setTotalDistance] = useState(0);
 
     const location = useLocation();
 
@@ -98,22 +99,21 @@ const Map = () => {
     // 장소 정보 가져오기 함수 수정 (id 파라미터 추가)
     const fetchPlace = async (id) => {
         try {
-          const response = await axios.get(
-            `http://localhost:8586/placeView.do?id=${id}`
-          );
-          console.log(response.data);
-          setPlaceDetail(response.data[0]); // 받아온 데이터를 상태에 저장
+            const response = await axios.get(
+                `http://localhost:8586/placeView.do?id=${id}`
+            );
+            console.log(response.data);
+            setPlaceDetail(response.data[0]); // 받아온 데이터를 상태에 저장
         } catch (error) {
-          console.error("Error fetching place:", error);
+            console.error("Error fetching place:", error);
         }
-      };
-    
-      // 상세보기 버튼 클릭 시 실행할 함수
-      const handleShowDetails = async (id) => {
+    };
+
+    // 상세보기 버튼 클릭 시 실행할 함수
+    const handleShowDetails = async (id) => {
         await fetchPlace(id);
         setShowOffcanvas(true);
-      };
-
+    };
 
     const container = useRef(null);
 
@@ -147,40 +147,121 @@ const Map = () => {
     //     }
     // }, []);
 
-
+    // 헬퍼 함수: 두 좌표 간 거리를 (km) 계산 (Haversine 공식)
+    function getDistance(point1, point2) {
+        const lat1 = point1.getLat();
+        const lon1 = point1.getLng();
+        const lat2 = point2.getLat();
+        const lon2 = point2.getLng();
+        const R = 6371; // 지구 반지름 (km)
+        const dLat = ((lat2 - lat1) * Math.PI) / 180;
+        const dLon = ((lon2 - lon1) * Math.PI) / 180;
+        const a =
+            Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+            Math.cos((lat1 * Math.PI) / 180) *
+                Math.cos((lat2 * Math.PI) / 180) *
+                Math.sin(dLon / 2) *
+                Math.sin(dLon / 2);
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        const distance = R * c;
+        console.log(distance);
+        return distance;
+    }
     useEffect(() => {
-        if (!places || places.length === 0) return; // 장소가 없으면 실행 X
-
-        const defaultPlace = places[0] || places[0]; // 기본 지도 위치를 index 1로, 없으면 index 0
-        if (!defaultPlace || !defaultPlace.latitude || !defaultPlace.longitude) return;
-
+        let centerLat, centerLng;
         const container = document.getElementById("map");
         if (!container) return;
 
-        const options = {
-            center: new window.kakao.maps.LatLng(defaultPlace.latitude, defaultPlace.longitude),
-            level: 3,
-        };
+        let map, options;
+        // 유효한 위도/경도 값을 가진 장소만 필터링
+        const validPlaces = places.filter(
+            (place) => place.latitude && place.longitude
+        );
 
-        const map = new window.kakao.maps.Map(container, options);
+        // 방문지가 없거나 유효한 장소가 없으면 기본 서울 좌표 사용
+        if (places.length === 0) {
+            centerLat = 37.5665;
+            centerLng = 126.978;
+            options = {
+                center: new window.kakao.maps.LatLng(centerLat, centerLng),
+                level: 7,
+            };
+            map = new window.kakao.maps.Map(container, options);
+        } else if (validPlaces.length === 1) {
+            // 방문지가 하나인 경우
+            centerLat = validPlaces[0].latitude;
+            centerLng = validPlaces[0].longitude;
+            options = {
+                center: new window.kakao.maps.LatLng(centerLat, centerLng),
+                level: 5,
+            };
+            map = new window.kakao.maps.Map(container, options);
+        } else {
+            // 방문지가 2개 이상인 경우 bounds로 중심 좌표 및 줌 레벨 자동 조절
+            const bounds = new window.kakao.maps.LatLngBounds();
+            validPlaces.forEach((place) => {
+                bounds.extend(
+                    new window.kakao.maps.LatLng(
+                        place.latitude,
+                        place.longitude
+                    )
+                );
+            });
+            options = {
+                center: new window.kakao.maps.LatLng(37.5, 126.9),
+                level: 7, // 초기 줌 레벨 (setBounds 호출 후 자동 조절)
+            };
+            map = new window.kakao.maps.Map(container, options);
+            map.setBounds(bounds);
+        }
 
-        // places 리스트를 순회하면서 마커 추가
+        // 마커 추가와 동시에 폴리라인 경로 배열 생성
+        const polylinePath = [];
         places.forEach((place, index) => {
             if (!place.latitude || !place.longitude) return;
 
-            const imageSrc = `../../images/marker(${index + 1}).svg`; // marker(1).svg, marker(2).svg ...
-            const imageSize = new kakao.maps.Size(64, 69);
-            const imageOption = { offset: new kakao.maps.Point(27, 69) };
-            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+            const latLng = new window.kakao.maps.LatLng(
+                place.latitude,
+                place.longitude
+            );
+            polylinePath.push(latLng);
 
-            const marker = new kakao.maps.Marker({
-                position: new kakao.maps.LatLng(place.latitude, place.longitude),
+            const imageSrc = `../../images/marker(${index + 1}).svg`;
+            const imageSize = new window.kakao.maps.Size(64, 69);
+            const imageOption = { offset: new window.kakao.maps.Point(27, 69) };
+            const markerImage = new window.kakao.maps.MarkerImage(
+                imageSrc,
+                imageSize,
+                imageOption
+            );
+            const marker = new window.kakao.maps.Marker({
+                position: latLng,
                 image: markerImage,
             });
-
             marker.setMap(map);
         });
 
+        // 요청사항 1: 마커 순서대로 선(폴리라인) 그리기
+        if (polylinePath.length >= 2) {
+            const polyline = new window.kakao.maps.Polyline({
+                path: polylinePath,
+                strokeWeight: 3,
+                strokeColor: "#e91e63",
+                strokeOpacity: 0.7,
+                strokeStyle: "solid",
+            });
+            polyline.setMap(map);
+
+            // 요청사항 2: 폴리라인 길이(총 거리) 계산
+            let totalDistance = 0;
+            for (let i = 0; i < polylinePath.length - 1; i++) {
+                totalDistance += getDistance(
+                    polylinePath[i],
+                    polylinePath[i + 1]
+                );
+            }
+            setTotalDistance(totalDistance.toFixed(2));
+        }
     }, [places]);
 
     useEffect(() => {
@@ -456,10 +537,10 @@ const Map = () => {
                             style={{ width: "100%", height: "100%" }}
                         ></div> */}
                         <div
-                                id="map"
-                                className="position-relative bg-secondary rounded-3"
-                                style={{ width: "100%", height: "100%" }}
-                            ></div>
+                            id="map"
+                            className="position-relative bg-secondary rounded-3"
+                            style={{ width: "100%", height: "100%" }}
+                        ></div>
                     </Col>
                     <Col md={6} className="places-column">
                         {selectedDate && (
@@ -470,7 +551,10 @@ const Map = () => {
                                 </h4>
                                 <div className="d-flex align-items-center mb-3">
                                     <b>방문지 리스트</b>
-                                    <Link to="/calendar" state={{ selectedDate }}>
+                                    <Link
+                                        to="/calendar"
+                                        state={{ selectedDate }}
+                                    >
                                         <Button
                                             variant="outline-success"
                                             className="ms-3 border-0"
@@ -558,9 +642,7 @@ const Map = () => {
                                                                         autoFocus
                                                                     />
                                                                 ) : (
-                                                                    <span
-                                                                        className="me-2 p-1"
-                                                                    >
+                                                                    <span className="me-2 p-1">
                                                                         {
                                                                             place.placeName
                                                                         }{" "}
@@ -568,13 +650,17 @@ const Map = () => {
                                                                     </span>
                                                                 )}
                                                                 <Button
-                        variant="outline-secondary"
-                        size="sm"
-                        onClick={() => handleShowDetails(place.placeId)}
-                        className="me-2"
-                      >
-                        상세보기
-                      </Button>
+                                                                    variant="outline-secondary"
+                                                                    size="sm"
+                                                                    onClick={() =>
+                                                                        handleShowDetails(
+                                                                            place.placeId
+                                                                        )
+                                                                    }
+                                                                    className="me-2"
+                                                                >
+                                                                    상세보기
+                                                                </Button>
                                                                 <Button
                                                                     variant="outline-danger"
                                                                     size="sm"
@@ -701,6 +787,13 @@ const Map = () => {
                                 )}
                                 <hr />
                                 <br />
+                                {places.length > 1 ? (
+                                    <h6>
+                                        <b>총 직선 거리</b> : {totalDistance}km
+                                    </h6>
+                                ) : (
+                                    ""
+                                )}
                             </>
                         )}
                     </Col>
