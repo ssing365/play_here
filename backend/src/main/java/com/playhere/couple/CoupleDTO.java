@@ -17,4 +17,6 @@ public class CoupleDTO {
     private String visitIndex;  
     
     private String placeName;
+    private String longitude;
+    private String latitude;
 }

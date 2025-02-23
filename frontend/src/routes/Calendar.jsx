@@ -257,7 +257,7 @@ const Calendar = () => {
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -331,7 +331,7 @@ const Calendar = () => {
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
         console.log(placeId);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",

@@ -10,6 +10,8 @@ import { UserContext } from "../contexts/UserContext";
 import PlaceDetailOffcanvas from "../components/PlaceDetailOffcanvas";
 import axios from "axios";
 
+const { kakao } = window;
+
 const Map = () => {
     const [date, setDate] = useState(new Date());
     const [selectedDate, setSelectedDate] = useState(new Date());
@@ -125,35 +127,74 @@ const Map = () => {
 
     const container = useRef(null);
 
+    // useEffect(() => {
+    //     // ✅ Kakao Maps API가 아직 로드되지 않았으면 동적으로 추가
+    //     if (!window.kakao || !window.kakao.maps) {
+    //         const script = document.createElement("script");
+    //         script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b5ba96e8bd64e3f89af591fdaa2a20d&autoload=false`;
+    //         script.async = true;
+    //         document.head.appendChild(script);
+
+    //         script.onload = () => {
+    //             console.log("✅ Kakao Maps API 로드 완료");
+    //             window.kakao.maps.load(() => {
+    //                 createMap();
+    //             });
+    //         };
+    //     } else {
+    //         createMap();
+    //     }
+
+    //     function createMap() {
+    //         if (container.current && window.kakao) {
+    //             const position = new window.kakao.maps.LatLng(
+    //                 dummy.latitude,
+    //                 dummy.longitude
+    //             );
+    //             const options = { center: position, level: 3 };
+    //             new window.kakao.maps.Map(container.current, options);
+    //         }
+    //     }
+    // }, []);
+
+
     useEffect(() => {
-        // ✅ Kakao Maps API가 아직 로드되지 않았으면 동적으로 추가
-        if (!window.kakao || !window.kakao.maps) {
-            const script = document.createElement("script");
-            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=9b5ba96e8bd64e3f89af591fdaa2a20d&autoload=false`;
-            script.async = true;
-            document.head.appendChild(script);
+        if (!places || places.length === 0) return; // 장소가 없으면 실행 X
 
-            script.onload = () => {
-                console.log("✅ Kakao Maps API 로드 완료");
-                window.kakao.maps.load(() => {
-                    createMap();
-                });
-            };
-        } else {
-            createMap();
-        }
+        const defaultPlace = places[0] || places[0]; // 기본 지도 위치를 index 1로, 없으면 index 0
+        if (!defaultPlace || !defaultPlace.latitude || !defaultPlace.longitude) return;
 
-        function createMap() {
-            if (container.current && window.kakao) {
-                const position = new window.kakao.maps.LatLng(
-                    dummy.latitude,
-                    dummy.longitude
-                );
-                const options = { center: position, level: 3 };
-                new window.kakao.maps.Map(container.current, options);
-            }
-        }
-    }, []);
+        const container = document.getElementById("map");
+        if (!container) return;
+
+        const options = {
+            center: new window.kakao.maps.LatLng(defaultPlace.latitude, defaultPlace.longitude),
+            level: 3,
+        };
+
+        const map = new window.kakao.maps.Map(container, options);
+
+        // places 리스트를 순회하면서 마커 추가
+        places.forEach((place, index) => {
+            if (!place.latitude || !place.longitude) return;
+
+            const imageSrc = `../../images/marker(${index + 1}).svg`; // marker(1).svg, marker(2).svg ...
+            const imageSize = new kakao.maps.Size(64, 69);
+            const imageOption = { offset: new kakao.maps.Point(27, 69) };
+            const markerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+            const marker = new kakao.maps.Marker({
+                position: new kakao.maps.LatLng(place.latitude, place.longitude),
+                image: markerImage,
+            });
+
+            marker.setMap(map);
+        });
+
+    }, [places]);
+
+
+
 
     useEffect(() => {
         const coupleInfo = async () => {
@@ -206,7 +247,7 @@ const Map = () => {
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -374,7 +415,7 @@ const Map = () => {
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
         console.log(placeId);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -423,10 +464,15 @@ const Map = () => {
                         md={6}
                         className="calendar-column d-flex flex-column justify-content-between"
                     >
-                        <div
+                        {/* <div
                             ref={container}
                             style={{ width: "100%", height: "100%" }}
-                        ></div>
+                        ></div> */}
+                        <div
+                                id="map"
+                                className="position-relative bg-secondary rounded-3"
+                                style={{ width: "100%", height: "100%" }}
+                            ></div>
                     </Col>
                     <Col md={6} className="places-column">
                         {selectedDate && (
