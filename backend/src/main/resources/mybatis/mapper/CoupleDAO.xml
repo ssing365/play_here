@@ -29,7 +29,7 @@
 	
 	<select id="visit" resultType="com.playhere.couple.CoupleDTO">
 		SELECT * from 
-		(select place_id, place_name from place) p 
+		(select place_id, place_name, longitude, latitude from place) p 
 		join couple_visit on p.place_id = couple_visit.place_id
 		where couple_id = #{coupleId} and visit_date = TO_DATE(#{visitDate},'YYYY-MM-DD')
 		order by visit_index 
