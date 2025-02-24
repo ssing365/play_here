@@ -86,7 +86,9 @@ const Top5 = () => {
                         <Col
                             md={8}
                             className="position-relative overflow-hidden"
-                            style={{ height: "500px" }}
+                            style={{ height: "500px",
+                                cursor:"pointer"
+                             }}
                         >
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.img

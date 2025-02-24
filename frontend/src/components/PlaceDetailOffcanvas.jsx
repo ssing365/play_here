@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useState, useEffect, useContext } from "react";
 import { UserContext } from "../contexts/UserContext";
 import { Offcanvas, Container, Row, Col, Button, Card } from "react-bootstrap";
 import { Link } from "react-router-dom";
@@ -12,6 +12,12 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
     const userId = userInfo?.userId;
 
     const [liked, setLiked] = useState(false);
+    const [likes, setLikes] = useState(0);
+useEffect(() => {
+    if (place?.likes) {
+        setLikes(Number(place.likes));
+    }
+}, [place]);
 
 
     let hashTag = [];
@@ -55,6 +61,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                         timer: 1500,
                         showConfirmButton: false,
                     });
+                    setLikes((prevLikes) => Number(prevLikes) + 1); // 좋아요 증가
                 }
             } else {
                 // 좋아요가 현재 false이면 좋아요 취소 호출 (interestCancel.do)
@@ -72,6 +79,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                         timer: 1500,
                         showConfirmButton: false,
                     });
+                    setLikes((prevLikes) => Number(prevLikes) - 1); // 좋아요 감소
                 }
             }
             // UI 업데이트: 좋아요 상태 토글
@@ -147,7 +155,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                         className="sm me-2"
                         onClick={(e) => handleLikeClick(placeId, e)}
                     >
-                        ❤ {place?.likes}
+                        ❤ {likes}
                     </Button>
                 ) : (
                     <Button
@@ -155,7 +163,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                         className="sm me-2"
                         onClick={(e) => handleLikeClick(placeId, e)}
                     >
-                        ❤ {place?.likes}
+                        ❤ {likes}
                     </Button>
                 )}
             </Offcanvas.Body>
