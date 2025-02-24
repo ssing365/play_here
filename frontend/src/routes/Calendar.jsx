@@ -30,6 +30,12 @@ const Calendar = () => {
     const [activeStartDate, setActiveStartDate] = useState(new Date());
     const [lastVisitPlace, setLastVisitPlace] = useState([]);
 
+    const [matchedDates, setMatchedDates] = useState([]);
+    const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+    const [searchSelectedDate, setSearchSelectedDate] = useState(null);
+
+
+
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
     const userId = userInfo?.userId;
@@ -404,7 +410,6 @@ const Calendar = () => {
     const yearMonth = `${year}-${month}`;
     try {
       const response = await axios.post("http://localhost:8586/Schedule.do", { date: yearMonth, coupleId : coupleId });
-      console.log(yearMonth, response.data);
       setSchedule(response.data);
     } catch (error) {
       console.error("스케줄 데이터를 가져오는데 실패했습니다.", error);
@@ -477,6 +482,85 @@ const Calendar = () => {
         diary(formattedDate);
     };
 
+
+    const handleSearch = async () => {
+        console.log("handleSearch 호출됨", searchTerm);
+        if (!searchTerm) {
+          setMatchedDates([]);
+          return;
+        }
+        try {
+          const response = await axios.post("http://localhost:8586/searchSchedule.do", {
+            searchWord: searchTerm,
+            coupleId: coupleInfo?.coupleId,
+          });
+          // 백엔드가 { visitDate: [...] }가 아니라 단순히 배열을 반환할 경우:
+          const dates = Array.isArray(response.data)
+            ? response.data
+            : [response.data];
+          
+          console.log("검색 응답:", response.data);
+          
+          // ISO 문자열에서 시간대 콜론 제거 후 Date 객체로 변환
+          const parsedDates = dates.filter(Boolean).map(dateStr => {
+            const fixedDateStr = dateStr.replace(/(\+\d{2}):(\d{2})$/, "$1$2");
+            const d = new Date(fixedDateStr);
+            if (isNaN(d.getTime())) {
+              console.error("Invalid date string:", dateStr, "=>", fixedDateStr);
+            }
+            return d;
+          });
+          
+          setMatchedDates(parsedDates);
+          setCurrentMatchIndex(0);
+          if (parsedDates.length > 0) {
+            setSearchSelectedDate(parsedDates[0]);
+            setSelectedDate(parsedDates[0]);
+          }
+        } catch (error) {
+          console.error("검색 결과 가져오기 오류:", error);
+        }
+      };
+      
+      
+      useEffect(() => {
+        console.log("matchedDates:", matchedDates);
+      }, [matchedDates]);
+      
+      
+      
+      const goToNextMatch = () => {
+        if (matchedDates.length === 0) return;
+        const nextIndex = (currentMatchIndex + 1) % matchedDates.length;
+        setCurrentMatchIndex(nextIndex);
+        setSelectedDate(new Date(matchedDates[nextIndex]));
+      };
+      
+      const goToPrevMatch = () => {
+        if (matchedDates.length === 0) return;
+        const prevIndex = (currentMatchIndex - 1 + matchedDates.length) % matchedDates.length;
+        setCurrentMatchIndex(prevIndex);
+        setSelectedDate(new Date(matchedDates[prevIndex]));
+      };
+
+      const highlightText = (text, keyword) => {
+        if (!keyword) return text;
+        const parts = text.split(new RegExp(`(${keyword})`, "gi"));
+        return parts.map((part, index) =>
+          part.toLowerCase() === keyword.toLowerCase() ? (
+            <span key={index} style={{ backgroundColor: "yellow", fontWeight: "bold" }}>
+              {part}
+            </span>
+          ) : (
+            part
+          )
+        );
+      };
+            
+      const handleDateChange = (date) => {
+        setSelectedDate(date);
+        // 방문지 리스트 갱신 등을 위한 추가 작업 실행
+      };
     return (
         <>
             {/** OFFCANVAS */}
@@ -493,6 +577,7 @@ const Calendar = () => {
                     <Col
                         md={6}
                         className="calendar-column d-flex flex-column justify-content-between"
+                        style={{ position: "relative" }}
                     >
                         <h4 className="mb-3">
                             {userInfo ? userInfo.nickname : "Loading..."} ❤{" "}
@@ -510,20 +595,35 @@ const Calendar = () => {
                             />
                             <FaSearch
                                 className="search-icon"
-                                onClick={() => setShowSearch(!showSearch)}
+                                onClick={handleSearch}
+                                // onClick={() => setShowSearch(!showSearch)}
                             />
                         </div>
-
+                        {matchedDates.length > 0 && (
+                        <div className="search-navigation d-flex align-items-center mb-3">
+                        <Button variant="outline-primary" onClick={goToPrevMatch}>⬆️</Button>
+                        <span className="mx-2">
+                            {currentMatchIndex + 1}/{matchedDates.length}
+                        </span>
+                        <Button variant="outline-primary" onClick={goToNextMatch}>⬇️</Button>
+                        </div>
+                    )}
                         <Cal
-                            onChange={setDate}
+                            onChange={(value) => {
+                                setSelectedDate(value);
+                                // 사용자가 직접 날짜 선택 시 searchSelectedDate 초기화
+                                setSearchSelectedDate(null);
+                            }}
                             value={selectedDate}
                             onClickDay={(value) => {
                                 setSelectedDate(value);
+                                setSearchSelectedDate(null);
                             }}
                             onActiveStartDateChange={handleActiveStartDateChange}
                             className="couple-calendar flex-grow-1"
                             tileContent={tileContent}
-                        />
+                            />
+
                     </Col>
 
                     {/* 오른쪽 방문지 리스트 */}
@@ -655,11 +755,9 @@ const Calendar = () => {
                                                                                 />
                                                                             ) : (
                                                                                 <span className="me-2 p-1">
-                                                                                    {
-                                                                                        place.placeName
-                                                                                    }{" "}
-                                                                                    {/* ✅ 장소 이름 표시 */}
+                                                                                {highlightText(place.placeName, searchTerm)}
                                                                                 </span>
+
                                                                             )}
                                                                             {/* 상세보기 버튼 추가 */}
                                                                             <Button

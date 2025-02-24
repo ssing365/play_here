@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.playhere.couple.CoupleDTO;
@@ -111,6 +112,13 @@ public class CoupleController {
 		String coupleId = requestBody.get("coupleId");
 		String today = requestBody.get("today");
 		return dao.LastVisit(coupleId,today);
+	}
+	
+	@PostMapping("/searchSchedule.do")
+	public List<CoupleDTO> searchSchedule(@RequestBody Map<String, String> requestBody) {
+		String coupleId = requestBody.get("coupleId");
+		String searchWord = requestBody.get("searchWord");
+		return dao.searchSchedule(coupleId,searchWord);
 	}
 	
 }

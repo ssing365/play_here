@@ -181,3 +181,17 @@
     background-color: #ffeff0;
     box-shadow: 0 4px 10px #ffc7c7;
 }
+
+/* 검색 */
+.search-navigation-overlay {
+    position: absolute;
+    top: 10px;       /* 캘린더 영역 내 원하는 위치로 조정 */
+    right: 10px;     /* 캘린더 영역 내 원하는 위치로 조정 */
+    background-color: #fff;
+    padding: 8px 12px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    z-index: 10;
+  }
+  

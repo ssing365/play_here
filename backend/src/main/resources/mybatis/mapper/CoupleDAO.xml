@@ -91,5 +91,14 @@
     )
     ]]>
 	</select>
+	
+	<select id="searchSchedule" resultType="java.util.Date">
+		select visit_date from (
+	    select place.place_name as place_name, couple_visit.visit_date as visit_date from couple_visit
+	    join place on couple_visit.place_id = place.place_id
+	    WHERE couple_id = #{coupleId})
+	    where place_name like '%' || #{searchWord} || '%'
+	    group by visit_date
+	</select>
 
 </mapper>
