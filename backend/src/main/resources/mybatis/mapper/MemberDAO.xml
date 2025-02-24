@@ -128,4 +128,10 @@
 	    WHERE couple_id = #{coupleId} AND user_id != #{userId}
 	</select>
 	
+	<!-- 아이디 찾기 -->
+	<select id="findUserId" parameterType="map" resultType="string">
+	    SELECT user_id FROM member WHERE name = #{name} AND email = #{email}
+	</select>
+	
+	
 </mapper>
