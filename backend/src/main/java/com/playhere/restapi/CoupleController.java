@@ -110,5 +110,12 @@ public class CoupleController {
 		return dao.Schedule(date,coupleId);
 	}
 	
-
+	@PostMapping("/LastVisit.do")
+	public List<CoupleDTO> LastVisit(@RequestBody Map<String, String> requestBody) {
+		String coupleId = requestBody.get("coupleId");
+		String today = requestBody.get("today");
+		
+		return dao.LastVisit(coupleId,today);
+	}
+	
 }

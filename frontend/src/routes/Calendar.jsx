@@ -28,6 +28,7 @@ const Calendar = () => {
     const location = useLocation();
     const [schedule, setSchedule] = useState([]);
     const [activeStartDate, setActiveStartDate] = useState(new Date());
+    const [lastVisitPlace, setLastVisitPlace] = useState([]);
 
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
@@ -221,6 +222,7 @@ const Calendar = () => {
             .replace(/\. /g, "-")
             .replace(".", "");
         setPlaces([]);
+        lastVisit(today);
         visitList(formattedDate);
         if (coupleInfo) {
             diary(formattedDate);
@@ -276,6 +278,29 @@ const Calendar = () => {
         } catch (error) {
             console.error("Error visit list :", error);
         }
+    };
+
+    //지난 방문지
+    const lastVisit = async(today) => {
+        const formattedDate = today
+            .toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .replace(/\. /g, "-")
+            .replace(".", "");
+        try {
+        const response = await axios.post(
+            "http://localhost:8586/lastVisit.do",
+            { today: formattedDate, coupleId: coupleId }
+        );
+        console.log(response.data);
+        setLastVisitPlace(response.data);
+        }catch (error) {
+            console.error("Error lastvisit list :", error);
+        }
+        
     };
 
     /* 방문지 리스트 드래그 */
@@ -370,12 +395,6 @@ const Calendar = () => {
     // 수정 입력창 관리
     const [editId, setEditId] = useState(null);
     const [editText, setEditText] = useState("");
-
-        //스케줄 있는 날짜 확인
-    // const Schedule = async () => {
-    //     const respone = await axios.post("http://localhost:8586/Schedule.do",{date : date})
-    //     console.log(respone.data);
-    // }
 
      // 백엔드에서 schedule 데이터를 가져오는 함수
   const fetchSchedule = async (date) => {
@@ -816,8 +835,8 @@ const Calendar = () => {
                                                                 방문지
                                                             </b>
                                                         </h6>
-                                                        {/* <ul className="list-group mb-3">
-                                                        {pastPlaces.map(
+                                                        <ul className="list-group mb-3">
+                                                        {lastVisitPlace.map(
                                                             (place, index) => (
                                                                 <li
                                                                     key={index}
@@ -827,7 +846,7 @@ const Calendar = () => {
                                                                 </li>
                                                             )
                                                         )}
-                                                    </ul> */}
+                                                    </ul>
                                                     </Col>
                                                     <Col>
                                                         <h6>

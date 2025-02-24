@@ -73,4 +73,17 @@
 		GROUP by visit_date
 	]]>
 	</select>
+	
+	<select id="LastVisit" resultType="com.playhere.couple.CoupleDTO">
+	<![CDATA[
+		SELECT * 
+		FROM couple_visit
+		WHERE couple_id = #{coupleId}
+		AND visit_date = (
+		    SELECT MAX(visit_date) 
+		    FROM couple_visit 
+		    WHERE visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD')
+		);
+		]]>
+	</select>
 </mapper>
