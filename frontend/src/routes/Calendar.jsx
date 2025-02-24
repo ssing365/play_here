@@ -383,7 +383,7 @@ const Calendar = () => {
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const yearMonth = `${year}-${month}`;
     try {
-      const response = await axios.post("http://localhost:8586/Schedule.do", { date: yearMonth });
+      const response = await axios.post("http://localhost:8586/Schedule.do", { date: yearMonth, coupleId : coupleId });
       console.log(yearMonth, response.data);
       setSchedule(response.data);
     } catch (error) {
@@ -394,7 +394,7 @@ const Calendar = () => {
   // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
   useEffect(() => {
     fetchSchedule(activeStartDate);
-  }, [activeStartDate]);
+  }, [selectedDate]);
 
   // 달력의 월/년이 변경될 때 호출되는 핸들러
   const handleActiveStartDateChange = async ({ activeStartDate }) => {
