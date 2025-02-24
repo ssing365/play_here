@@ -241,9 +241,12 @@ const Map = () => {
             const marker = new window.kakao.maps.Marker({
                 position: latLng,
                 image: markerImage,
-                onclick:
             });
             marker.setMap(map);
+            // 마커 클릭 시, 상세보기 버튼을 누른 것과 동일하게 offcanvas가 뜨도록 처리
+            window.kakao.maps.event.addListener(marker, "click", function () {
+                handleShowDetails(place.placeId);
+            });
         });
 
         // 마커 순서대로 선(폴리라인) 그리기
@@ -825,9 +828,13 @@ const Map = () => {
                                                 placement="right"
                                                 overlay={
                                                     <Tooltip id="tooltip-info">
-                                                        도로상황을 고려하지 않은 예상 시간으로,
-                                                        직선거리를 평균 속도(도보:5km/h, 차량:50km/h)로 나누어
-                                                        계산한 정보임을 참고하시기 바랍니다.
+                                                        도로상황을 고려하지 않은
+                                                        예상 시간으로,
+                                                        직선거리를 평균
+                                                        속도(도보:5km/h,
+                                                        차량:50km/h)로 나누어
+                                                        계산한 정보임을
+                                                        참고하시기 바랍니다.
                                                     </Tooltip>
                                                 }
                                             >
