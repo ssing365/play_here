@@ -74,13 +74,14 @@ function Place() {
         }
     };
 
+    // 근처 장소
     const closePlace = async (longitude,latitude) =>{
         try{
             const response = await axios.get(
                 `http://localhost:8586/closePlace.do`,{
                     params : {longitude, latitude}
                 });
-                console.log(response.data);
+                console.log("hohoh",response.data);
                 setClosePlaceList(response.data);
         }catch (error) {
             console.error("Error fetching close place:", error);
@@ -466,11 +467,17 @@ function Place() {
                                         backgroundImage: `url(${place.image})`,
                                         backgroundSize: "cover",
                                         backgroundPosition: "center",
+                                        cursor:"pointer"
                                     }}
+                                    onClick={() =>
+                                        (window.location.href = `/place?id=${place.placeId}`)
+                                    }
                                 ></div>
-
                                     <Card.Body>
-                                        <p className="fw-bold">{place.placeName}</p>
+                                        <p className="fw-bold"
+                                        style={{
+                                            cursor:"pointer"
+                                        }}>{place.placeName}</p>
                                         <p className="text-muted">
                                             {place.location_short}
                                         </p>
