@@ -6,31 +6,62 @@
 	
 <mapper namespace="com.playhere.place.IPlaceService">
 	<select id="list" resultType="com.playhere.place.PlaceDTO">
-		SELECT p.*, 
-       LISTAGG(pr.sub_cate, ',') AS categories
-		FROM place p
-		LEFT JOIN place_preference pp ON p.place_id = pp.place_id
-		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
-		GROUP BY p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
-		         p.call, p.Link, p.image, p.longitude, p.latitude, 
-		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
-		         p.hashtag
-
-		 
+		SELECT * FROM place order by place_id desc
 	</select>
 	
 	<select id="view" resultType="com.playhere.place.PlaceDTO">
-		SELECT p.*, 
-       LISTAGG(pr.sub_cate, ',') AS categories
-		FROM place p
-		LEFT JOIN place_preference pp ON p.place_id = pp.place_id
-		LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
-		WHERE p.place_id = #{PlaceId}
-		GROUP BY p.place_id, p.place_name, p.location, p.descript, p.time, p.parking, 
-		         p.call, p.Link, p.image, p.longitude, p.latitude, 
-		         p.placename_onmap, p.regist_date, p.edit_date, p.likes,
-		         p.hashtag
+		SELECT * FROM place WHERE place_id = #{placeId}
 	</select>
 	
+
 	<select id=""></select>
+
+	<update id="placeLikeAdd" parameterType="java.lang.String">
+	    update place set likes = likes + 1 where place_id = #{placeId}
+	</update>
+	
+	<update id="placeLikeCancle" parameterType="java.lang.String">
+	    update place set likes = likes - 1 where place_id = #{placeId}
+	</update>
+
+	
+	<insert id="InterestAdd">
+	    insert into interests values(INTEREST_SEQ.nextval, #{userId}, #{placeId})
+	</insert>
+	
+	<delete id="InterestCancle">
+	    delete from interests where user_id = #{userId} and place_id = #{placeId}
+	</delete>
+
+	
+	<select id="Interestcheck" resultType="int">
+	    select count(*) from interests where user_id = #{userId} and place_id = #{placeId}
+	</select>
+
+	<select id="top5" resultType="com.playhere.place.PlaceDTO">
+  	<![CDATA[
+    	SELECT * FROM (
+        SELECT * FROM place ORDER BY likes DESC
+	    ) 
+	    WHERE ROWNUM <= 5
+ 	 ]]>
+	</select>
+	
+	<select id="interests" resultType="com.playhere.place.PlaceDTO">
+		SELECT * FROM interests i
+		INNER JOIN place p ON i.place_id = p.place_id
+		WHERE user_id = #{userId}
+	</select>
+	
+	<insert id="addCalendar">
+    INSERT INTO couple_visit
+	    VALUES (
+	        VISIT_SEQ.nextval, 
+	        #{placeId}, 
+	        #{coupleId}, 
+	        #{visitDate}, 
+	        (SELECT COUNT(*) FROM couple_visit WHERE couple_id = #{coupleId} AND visit_date = #{visitDate}) + 1
+	    )
+	</insert>
+
 </mapper>

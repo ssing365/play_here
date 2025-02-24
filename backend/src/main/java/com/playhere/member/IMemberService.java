@@ -27,10 +27,19 @@ public interface IMemberService {
 	// 정보 수정
 	public void updateUser(MemberDTO updatedUser);
 
+	// 커플 끊기(상태 변경)
 	public void disconnectCouple(String userId);
 	
 	// 회원 탈퇴
 	public void withdrawUser(String userId);
 
+	// 선호도 수정
+	public void updateUserPreferences(String userId, List<Integer> preferenceIds);
+
+	// 현재 선호도 조회
+	public List<Integer> getUserPreferences(String userId);
+
+	// 기존 선호도 삭제
+	public void deleteUserPreferences(String userId);
 
 }

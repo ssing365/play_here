@@ -3,15 +3,17 @@ package com.playhere.restapi;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.sql.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +25,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.playhere.member.IMemberService;
 import com.playhere.member.MemberDTO;
+import com.playhere.member.UserPreferenceDTO;
 import com.playhere.util.JwtUtil;
 
 import io.jsonwebtoken.Claims;
@@ -52,11 +55,9 @@ public class UserController {
                 // DB에서 사용자 정보 조회
                 MemberDTO member = memberService.findByUserId(userId);
                 if (member != null) {
-                	/* 이미지 불러오기 시도 실패
-                	 * if (member.getProfilePicture() != null && !member.getProfilePicture().startsWith("http")) {
-                        member.setProfilePicture("http://localhost:8586/images/" + member.getProfilePicture());
-                    }*/
-                	
+                	if (member.getProfilePicture() != null && !member.getProfilePicture().startsWith("http")) {
+                        member.setProfilePicture(member.getProfilePicture());
+                    }
                     // 필요한 정보만 Map에 담아서 반환 (보안에 주의)
                 	System.out.println(member);
                     Map<String, Object> result = new HashMap<>();
@@ -192,6 +193,31 @@ public class UserController {
         }
     }
     
-    
+    // 선호도 수정
+    @Transactional
+    @PutMapping("/user/{userId}/preferences")
+    public ResponseEntity<Map<String, Integer>> updatePreferences(
+    		 @PathVariable String userId,
+    	     @RequestBody List<UserPreferenceDTO> preferences) {
+    	Map<String, Integer> response = new HashMap<>();
+        try {
+        	// 기존 선호도 삭제
+            memberService.deleteUserPreferences(userId);
+            // 새 선호도 입력 (회원가입 시 사용한 방식과 동일)
+            memberService.insertUserPreferences(preferences);
+            response.put("result", 1);
+            return ResponseEntity.ok(response);
+        } catch(Exception e) {
+        	e.printStackTrace();
+            response.put("result", 0);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
+        }
+    }
 
+    // 현재 선호도 조회 API
+    @GetMapping("/user/{userId}/preferences")
+    public ResponseEntity<List<Integer>> getUserPreferences(@PathVariable String userId) {
+        List<Integer> prefList = memberService.getUserPreferences(userId);
+        return ResponseEntity.ok(prefList);
+    }
 }

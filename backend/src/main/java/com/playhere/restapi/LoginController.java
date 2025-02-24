@@ -56,7 +56,7 @@ public class LoginController {
             cookie.setPath("/");
             cookie.setMaxAge(60 * 60); // 1시간
             cookie.setSecure(false); // 🚨 로컬 개발 환경에서는 false
-            cookie.setDomain("localhost"); // 필요 시 추가
+            //cookie.setDomain("localhost"); // 필요 시 추가
             response.addCookie(cookie);
 
             return ResponseEntity.ok("success");

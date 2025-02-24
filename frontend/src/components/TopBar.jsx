@@ -1,21 +1,35 @@
 import { useState, useEffect } from "react";
 import { FaUserCircle, FaSearch } from "react-icons/fa";
 import { Link, useNavigate, useLocation } from "react-router-dom";
-import { Container, Row,  Col, Form, FormControl, Navbar, Nav, Dropdown, Button, Modal} from "react-bootstrap";
-import "../css/Bar.css"
+import {
+    Container,
+    Row,
+    Col,
+    Form,
+    FormControl,
+    Navbar,
+    Nav,
+    Dropdown,
+    Button,
+} from "react-bootstrap";
+import "../css/Bar.css";
 import { useContext } from "react";
-import { UserContext } from '../contexts/UserContext';
-import axios from 'axios';
+import { UserContext } from "../contexts/UserContext";
+import Swal from "sweetalert2";
+import axios from "axios";
 
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
-
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const navigate = useNavigate();
 
+    // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
+    const profilePictureUrl =
+        userInfo && userInfo.profilePicture
+            ? `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
+            : null;
 
     // 로그아웃 함수
     const handleLoginToggle = async () => {
@@ -29,9 +43,7 @@ const TopBar = () => {
             if (response.data === "logout success") {
                 // 로그인 상태 토글 및 UI 업데이트
                 setIsLoggedIn(false);
-                setShowModal(false);
-                navigate("/login");
-                alert("로그아웃 되었습니다.");
+                navigate("/search");
             }
         } catch (error) {
             console.error("로그아웃 오류:", error);
@@ -43,7 +55,21 @@ const TopBar = () => {
     const handleCalendarClick = (e) => {
         if (!isLoggedIn) {
             e.preventDefault(); // 기본 페이지 이동 막기
-            setShowModal(true); // 모달 표시
+            Swal.fire({
+                icon: "warning",
+                title: "로그인을 해주세요",
+                text: "캘린더를 이용하려면 로그인이 필요합니다.",
+
+                showCancelButton: true,
+                confirmButtonText: "로그인 하기",
+                confirmButtonColor: '#e91e63',
+                cancelButtonText: "닫기",
+                cancelButtonColor: '#666666',
+            }).then(result => {
+                if(result.isConfirmed){
+                    navigate("/login")
+                }
+            });
         }
     };
 
@@ -66,7 +92,7 @@ const TopBar = () => {
                                     alt="로고"
                                     className="h-8"
                                     style={{
-                                        width:"200px"
+                                        width: "200px",
                                     }}
                                 />
                             </Link>
@@ -84,24 +110,26 @@ const TopBar = () => {
                                     className="text-gray-700 mx-5"
                                     style={
                                         location.pathname === "/search"
-                                            ? {fontSize: "1.1rem",
+                                            ? {
+                                                  fontSize: "1.1rem",
                                                   color: "#e91e63",
                                               }
-                                            : {fontSize:"17px"}
+                                            : { fontSize: "17px" }
                                     }
                                 >
                                     탐색
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 mx-5"
                                     style={
-                                        location.pathname === "/calender"
-                                            ? {fontSize: "1.1rem",
+                                        location.pathname === "/calendar"
+                                            ? {
+                                                  fontSize: "1.1rem",
                                                   color: "#e91e63",
                                               }
-                                            : {fontSize:"17px"}
+                                            : { fontSize: "17px" }
                                     }
                                     onClick={handleCalendarClick}
                                 >
@@ -122,7 +150,9 @@ const TopBar = () => {
                                         placeholder="어떤 데이트를 하고 싶으신가요?"
                                         className="custom-input w-100"
                                     />
-                                    <FaSearch className="search-icon"
+                                    <FaSearch
+                                        className="search-icon"
+                                        onClick={() => navigate("/searchlist")}
                                     />
                                 </Form>
 
@@ -138,14 +168,18 @@ const TopBar = () => {
                                             {userInfo &&
                                             userInfo.profilePicture ? (
                                                 <img
-                                                    src={
-                                                        `http://${remoteIp}:${port}/image/${userInfo.profilePicture}`
-                                                    }
+                                                    src={profilePictureUrl}
                                                     alt="프로필"
                                                     style={{
                                                         width: "40px",
                                                         height: "40px",
                                                         borderRadius: "50%",
+                                                    }}
+                                                    //이미지 불러오는 도중 에러가 나면 기본이미지(마커이미지)
+                                                    onError={(e) => {
+                                                        e.target.onError = null;
+                                                        e.target.src =
+                                                            "/images/marker.svg";
                                                     }}
                                                 />
                                             ) : (
@@ -163,12 +197,22 @@ const TopBar = () => {
                                             >
                                                 마이페이지
                                             </Dropdown.Item>
-                                            <Dropdown.Item
-                                                as={Link}
-                                                to="/connect-couple"
-                                            >
-                                                커플 연결하기
-                                            </Dropdown.Item>
+                                            {userInfo?.coupleStatus === 0 ? (
+                                                <Dropdown.Item
+                                                    as={Link}
+                                                    to="/connect-couple"
+                                                >
+                                                    커플 연결하기
+                                                </Dropdown.Item>
+                                            ) : (
+                                                <Dropdown.Item
+                                                    as={Link}
+                                                    to="/calendar"
+                                                >
+                                                    커플 캘린더
+                                                </Dropdown.Item>
+                                            )}
+
                                             <Dropdown.Item
                                                 as={Link}
                                                 to="/editpreference"
@@ -245,7 +289,7 @@ const TopBar = () => {
                                 </Nav.Link>
                                 <Nav.Link
                                     as={Link}
-                                    to="/calender"
+                                    to="/calendar"
                                     className="text-gray-700 my-1"
                                 >
                                     캘린더
@@ -255,25 +299,6 @@ const TopBar = () => {
                     </Row>
                 </Container>
             </Navbar>
-
-            {/* 로그인 요청 모달 */}
-            <Modal show={showModal} onHide={() => setShowModal(false)} centered>
-                <Modal.Body>캘린더를 이용하려면 로그인해야 합니다.</Modal.Body>
-                <Modal.Footer>
-                    <Button
-                        variant="secondary"
-                        onClick={() => setShowModal(false)}
-                    >
-                        닫기
-                    </Button>
-                    <Button
-                        variant="primary"
-                        onClick={() => navigate("/login")}
-                    >
-                        로그인하기
-                    </Button>
-                </Modal.Footer>
-            </Modal>
         </>
     );
 };

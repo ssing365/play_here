@@ -2,17 +2,12 @@ import { Button, Row, Col, Carousel } from "react-bootstrap";
 import { ChevronLeft, ChevronRight } from "react-bootstrap-icons";
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const Top5 = () => {
-
-    {/** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 시작*/}
-    const images = [
-        { src: "/images/main1.png", alt: "제주 감귤농장" },
-        { src: "/images/main2.png", alt: "제주 해변" }
-    ];
-
     const [index, setIndex] = useState(0);
     const [direction, setDirection] = useState(1);
+    const [top5, setTop5] = useState([]);
 
     // 👉 일정 시간(4초)마다 자동으로 다음 이미지로 전환
     useEffect(() => {
@@ -20,19 +15,44 @@ const Top5 = () => {
             handleNext();
         }, 4000);
 
-        return () => clearInterval(interval); // 컴포넌트가 언마운트되면 인터벌 제거
-        }, [index]); // index가 변경될 때마다 인터벌 재설정
+        return () => clearInterval(interval); // 컴포넌트가 언마운트되면 인터벌 제거2
+    }, [index]); // index가 변경될 때마다 인터벌 재설정
 
     const handleNext = () => {
+        if (!top5 || top5.length === 0) return;
         setDirection(1);
-        setIndex((prevIndex) => (prevIndex + 1) % images.length);
+        setIndex((prevIndex) => (prevIndex + 1) % top5.length);
     };
 
     const handlePrev = () => {
+        if (!top5 || top5.length === 0) return;
         setDirection(-1);
-        setIndex((prevIndex) => (prevIndex - 1 + images.length) % images.length);
+        setIndex((prevIndex) => (prevIndex - 1 + top5.length) % top5.length);
     };
-    {/** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 끝 */}
+
+    {
+        /** 중간 섹션 : 사진만 슬라이드 되게 수정 -- 끝 */
+    }
+
+    useEffect(() => {
+        if (top5 && top5.length > 0) {
+            setIndex(0); // 새로운 데이터가 들어오면 index 초기화
+        }
+    }, [top5]);
+
+    
+    useEffect(()=>{
+        const fetchTop5 = async () => {
+            try {
+                const response = await axios.get("http://localhost:8586/top5.do");
+                console.log(response.data);
+                setTop5(response.data);
+            } catch (error) {
+                console.error("장소 리스트 불러오기 실패:", error);
+            }
+        };
+        fetchTop5();
+    },[])
 
 
     return (
@@ -69,9 +89,12 @@ const Top5 = () => {
                         >
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.img
-                                    key={index} // key 값이 바뀌어야 애니메이션이 작동함
-                                    src={images[index].src}
-                                    alt={images[index].alt}
+                                    key={index}
+                                    src={
+                                        top5.length > 0
+                                            ? top5[index].image
+                                            : "/images/placeholder.png"
+                                    }
                                     className="d-block w-100 position-absolute"
                                     style={{
                                         objectFit: "cover",

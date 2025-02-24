@@ -11,7 +11,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/api")
-public class CoupleController {
+public class CoupleDeleteController {
 	
 	@Autowired
     private JwtUtil jwtUtil;
