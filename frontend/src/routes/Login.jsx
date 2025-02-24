@@ -69,6 +69,12 @@ const Login = () => {
                     timer: 1000,
                     showConfirmButton: false,
                 });
+            }else if (error.response && error.response.status === 403) {
+                Swal.fire({
+                    icon: "error",
+                    text: "이 계정은 탈퇴한 회원입니다. 로그인할 수 없습니다.",
+                    showConfirmButton: true,
+                });
             } else {
                 console.error("로그인 오류:", error);
                 alert("서버 오류가 발생했습니다.");

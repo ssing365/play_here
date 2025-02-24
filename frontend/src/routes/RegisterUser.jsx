@@ -139,11 +139,20 @@ const RegisterUser = () => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData({ ...formData, [name]: value });
-        setIsUserIdChecked(false); // 아이디가 변경되면 중복확인 상태를 초기화
 
         //id 형식 실시간 검증하기
         //바뀐 부분
         if (name === "user_id") {
+
+            // 아이디가 변경되면 중복확인 상태를 초기화
+            setIsUserIdChecked(false);
+
+            // 아이디 길이가 6자 미만이면 중복 확인 메시지 초기화
+            if (value.length < 6) {
+                setUserIdMessage("");
+            }
+
+            //아이디 유효성 검사하기
             if (!/^[a-zA-Z0-9]{6,20}$/.test(value)) {
                 setErrors((prevErrors) => ({
                     ...prevErrors,
@@ -200,40 +209,55 @@ const RegisterUser = () => {
 
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
+        e.preventDefault();
   
-    // 필수 입력 필드 검증
-    const requiredFields = ['user_id', 'password', 'confirmPassword', 'name', 'nickname', 'email'];
-    for (const field of requiredFields) {
-      if (!formData[field].trim()) {
-        alert(`"${field}" 항목을 입력해 주세요.`);
+        // 필수 입력 필드 검증 (기존 필드 + 새로운 필드)
+        const requiredFields = [
+            'user_id', 'password', 'confirmPassword', 'name', 
+            'nickname', 'email', 'birth_date', 'postcode', 
+            'address', 'detailAddress'
+        ];
+
+        for (const field of requiredFields) {
+        if (!formData[field].trim()) {
+            alert(`${field === 'birth_date' ? '생년월일' : 
+                field === 'postcode' ? '우편번호' :
+                field === 'detailAddress' ? '상세주소' :
+                field} 항목을 입력해 주세요.`);
+            return;
+        }
+        }
+
+        // 생년월일 연도 4자리 검증
+        const birthYear = new Date(formData.birth_date).getFullYear();
+        if (birthYear.toString().length !== 4) {
+            alert("생년월일의 연도는 4자리여야 합니다.");
+            return;
+        }
+        
+        // 아이디 중복 확인 체크
+        if (!isUserIdChecked) {
+        alert("아이디 중복 확인을 해주세요.");
         return;
-      }
-    }
+        }
     
-    // 아이디 중복 확인 체크
-    if (!isUserIdChecked) {
-      alert("아이디 중복 확인을 해주세요.");
-      return;
-    }
-  
-    // 기존 검증 로직
-    
-    // 아이디 형식 재검증
-    if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
-      alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
-      return;
-    }
-    // 비밀번호 형식 재검증
-    if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(formData.password)) {
-      alert("비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다.");
-      return;
-    }
-    //비밀번호와 비밀번호 확인 일치 여부 검증
-    if (formData.password !== formData.confirmPassword) {
-      alert("비밀번호가 일치하지 않습니다.");
-      return;
-    }
+        // 기존 검증 로직
+        
+        // 아이디 형식 재검증
+        if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
+        alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
+        return;
+        }
+        // 비밀번호 형식 재검증
+        if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(formData.password)) {
+        alert("비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다.");
+        return;
+        }
+        //비밀번호와 비밀번호 확인 일치 여부 검증
+        if (formData.password !== formData.confirmPassword) {
+        alert("비밀번호가 일치하지 않습니다.");
+        return;
+        }
 
 
         // JSON으로 변환할 데이터에서 profile_picture 제거
@@ -337,8 +361,7 @@ const RegisterUser = () => {
                                     className="mb-3"
                                 >
                                     <Form.Label>
-                                        아이디{" "}
-                                        <span className="text-danger">*</span>
+                                        아이디 <span className="text-danger">*</span>
                                     </Form.Label>
                                     <div className="d-flex">
                                         <Form.Control
@@ -366,29 +389,17 @@ const RegisterUser = () => {
                                             중복확인
                                         </Button>
                                     </div>
-                                    {/* 아이디 실시간 검증 */}
-                                    {/*{errors.user_id && (
-                    <Form.Text className="text-danger">
-                      {errors.user_id}
-                    </Form.Text>
-                  )}*/}
-
-                                    {userIdMessage && (
-                                        <Form.Text
-                                            className={
-                                                userIdMessage ===
-                                                "사용가능한 아이디 입니다."
-                                                    ? "text-success"
-                                                    : "text-danger"
-                                            }
-                                        >
-                                            {userIdMessage}
-                                        </Form.Text>
-                                    )}
-                                    {errors.user_id && (
-                                        <Form.Text className="text-danger">
-                                            {errors.user_id}
-                                        </Form.Text>
+                                    {/* 오류 메세지 또는 중복 확인 메세지 출력 */}
+                                    {errors.user_id ? (
+                                        <Form.Text className="text-danger">{errors.user_id}</Form.Text>
+                                    ) : (
+                                        userIdMessage && (
+                                            <Form.Text
+                                                className={userIdMessage === "사용가능한 아이디 입니다." ? "text-success" : "text-danger"}
+                                            >
+                                                {userIdMessage}
+                                            </Form.Text>
+                                        )
                                     )}
                                 </Form.Group>
 
@@ -530,18 +541,24 @@ const RegisterUser = () => {
 
                         {/* 생년월일 */}
                         <Form.Group controlId="formBirthDate" className="mb-3">
-                            <Form.Label>생년월일</Form.Label>
+                            <Form.Label>
+                                생년월일 <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
                                 type="date"
                                 name="birth_date"
                                 value={formData.birth_date}
                                 onChange={handleChange}
+                                max="9999-12-31"
+                                required
                             />
                         </Form.Group>
 
                         {/* 우편번호 입력 */}
                         <Form.Group controlId="formPostcode" className="mb-3">
-                            <Form.Label>우편번호</Form.Label>
+                            <Form.Label>
+                                우편번호 <span className="text-danger">*</span>
+                            </Form.Label>
                             <div className="d-flex">
                                 <Form.Control
                                     type="text"
@@ -550,8 +567,10 @@ const RegisterUser = () => {
                                     value={formData.postcode}
                                     readOnly
                                     style={{ flex: "1 1 auto" }}
+                                    required
+                                    onClick={execDaumPostcode}
                                 />
-                                {/* 아이디 중복확인 버튼*/}
+                                {/* 다음 우편번호*/}
                                 <Button
                                     variant="outline-secondary"
                                     className="ms-2"
@@ -565,13 +584,16 @@ const RegisterUser = () => {
 
                         {/* 주소입력 */}
                         <Form.Group controlId="formAddress" className="mb-3">
-                            <Form.Label>주소</Form.Label>
+                            <Form.Label>
+                                주소 <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="주소"
                                 name="address"
                                 value={formData.address}
                                 readOnly
+                                required
                             />
                         </Form.Group>
 
@@ -580,7 +602,9 @@ const RegisterUser = () => {
                             controlId="formDetailAddress"
                             className="mb-3"
                         >
-                            <Form.Label>상세주소</Form.Label>
+                            <Form.Label>
+                                상세주소 <span className="text-danger">*</span>
+                            </Form.Label>
                             <Form.Control
                                 type="text"
                                 placeholder="상세주소"
@@ -588,6 +612,7 @@ const RegisterUser = () => {
                                 value={formData.detailAddress}
                                 onChange={handleChange}
                                 ref={detailAddressRef}
+                                required
                             />
                         </Form.Group>
                         <Button variant="primary" type="submit">

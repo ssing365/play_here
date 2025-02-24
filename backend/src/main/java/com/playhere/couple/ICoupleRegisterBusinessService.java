@@ -10,4 +10,7 @@ public interface ICoupleRegisterBusinessService {
 	
 	//초대 코드 정보 조회 메서드 추가
 	CoupleCodeDTO getCoupleCodeByCode(String code);
+	
+	// 커플 끊기 기능 추가
+    void disconnectCouple(String userId);
 }
