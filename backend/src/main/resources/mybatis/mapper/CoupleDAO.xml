@@ -75,16 +75,20 @@
 	</select>
 	
 	<select id="LastVisit" resultType="com.playhere.couple.CoupleDTO">
-	<![CDATA[
-		SELECT * from 
-		(select place_id, place_name, longitude, latitude from place) p 
-		join couple_visit on p.place_id = couple_visit.place_id
-		WHERE couple_id = #{coupleId}
-		AND visit_date = (
-		    SELECT MAX(visit_date) 
-		    FROM couple_visit 
-		    WHERE visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD')
-		)
-		]]>
-	</select>
+    <![CDATA[
+    SELECT * 
+    FROM (
+        SELECT p.place_id, p.place_name, p.longitude, p.latitude
+        FROM place p
+        JOIN couple_visit cv ON p.place_id = cv.place_id
+        WHERE cv.couple_id = #{coupleId}
+        AND cv.visit_date = (
+            SELECT MAX(visit_date)
+            FROM couple_visit
+            WHERE couple_id = #{coupleId} 
+            AND visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD') 
+        )
+    )
+    ]]>
+</select>
 </mapper>

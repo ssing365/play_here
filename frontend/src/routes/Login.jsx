@@ -36,11 +36,11 @@ const Login = () => {
 
         try {
             const response = await axios.post(
-                '/api/login',
+                "/api/login",
                 { userId, password },
                 { withCredentials: true }
             );
-            console.log(response)
+            console.log(response);
             console.log(response.data);
 
             if (response.status === 200) {
@@ -52,7 +52,9 @@ const Login = () => {
                 }
 
                 // 리디렉트 처리 수정
-                const redirectPath = new URLSearchParams(location.search).get("redirect");
+                const redirectPath = new URLSearchParams(location.search).get(
+                    "redirect"
+                );
                 if (redirectPath) {
                     window.location.href = redirectPath;
                 } else {
@@ -153,10 +155,16 @@ const Login = () => {
                 </div>
 
                 <div className="kakao__btn">
-                    <KakaoLoginButton />
+                    <KakaoLoginButton
+                        
+                    />
                 </div>
                 <div className="naver__btn">
-                    <NaverLoginButton />
+                    <NaverLoginButton 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        alert("구현중입니다.")
+                    }}/>
                 </div>
             </div>
         </>

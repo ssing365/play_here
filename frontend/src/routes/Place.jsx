@@ -74,7 +74,6 @@ function Place() {
     // 좋아요 상태 확인
     if (!userInfo?.userId) {
         console.log("userInfo가 아직 로드되지 않음");
-        return;
     }
     axios
         .get(`http://localhost:8586/likeStatus.do`, {
