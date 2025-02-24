@@ -114,7 +114,8 @@ public class CoupleController {
 	public List<CoupleDTO> LastVisit(@RequestBody Map<String, String> requestBody) {
 		String coupleId = requestBody.get("coupleId");
 		String today = requestBody.get("today");
-		
+		System.out.println("today:"+today);
+		System.out.println("coupleId:"+coupleId);
 		return dao.LastVisit(coupleId,today);
 	}
 	

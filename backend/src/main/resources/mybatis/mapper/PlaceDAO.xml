@@ -100,9 +100,6 @@
 		SELECT * FROM place WHERE place_id = #{placeId}
 	</select>
 	
-	<select id="placeLikeCount" resultType="com.playhere.place.PlaceDTO">
-		SELECT likes FROM place WHERE place_id = #{placeId}
-	</select>
 	
 	<update id="placeLikeAdd" parameterType="java.lang.String">
 	    update place set likes = likes + 1 where place_id = #{placeId}

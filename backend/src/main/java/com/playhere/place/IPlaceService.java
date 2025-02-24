@@ -24,5 +24,4 @@ public interface IPlaceService {
 	
 	public List<PlaceDTO> listAll(ParameterDTO parameterDTO);
 	public List<PlaceDTO> listLikes(ParameterDTO parameterDTO);
-	public List<PlaceDTO> placeLikeCount(@Param("placeId") String placeId);
 }

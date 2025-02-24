@@ -222,6 +222,7 @@ const Calendar = () => {
             .replace(/\. /g, "-")
             .replace(".", "");
         setPlaces([]);
+        const today = new Date();
         lastVisit(today);
         visitList(formattedDate);
         if (coupleInfo) {
@@ -292,10 +293,10 @@ const Calendar = () => {
             .replace(".", "");
         try {
         const response = await axios.post(
-            "http://localhost:8586/lastVisit.do",
+            "http://localhost:8586/LastVisit.do",
             { today: formattedDate, coupleId: coupleId }
         );
-        console.log(response.data);
+        console.log("lastVisit:",response.data);
         setLastVisitPlace(response.data);
         }catch (error) {
             console.error("Error lastvisit list :", error);
@@ -842,7 +843,7 @@ const Calendar = () => {
                                                                     key={index}
                                                                     className="list-group-item"
                                                                 >
-                                                                    {place}
+                                                                    {place.placeName}
                                                                 </li>
                                                             )
                                                         )}

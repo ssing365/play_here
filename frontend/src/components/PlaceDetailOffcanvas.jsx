@@ -33,16 +33,19 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
         console.log("userInfo가 아직 로드되지 않음");
         return;
     }
-    axios
-        .get(`http://localhost:8586/likeStatus.do`, {
-            params: { userId, placeId },
-        })
-        .then((response) => {
-            setLiked(response.data);
-        })
-        .catch((error) => {
-            console.error("Error fetching like status:", error);
-        });
+    if(place){
+
+        axios
+            .get(`http://localhost:8586/likeStatus.do`, {
+                params: { userId, placeId },
+            })
+            .then((response) => {
+                setLiked(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching like status:", error);
+            });
+    }
 
     // 좋아요 클릭 시 처리
     const handleLikeClick = async (PlaceId) => {

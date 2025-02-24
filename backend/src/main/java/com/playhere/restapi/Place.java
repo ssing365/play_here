@@ -104,13 +104,7 @@ public class Place {
         	return true;
         }else return false;
     }
-    
-    @GetMapping("placeLikeCount.do")
-    public List<PlaceDTO> placeLikeCount(@RequestParam("placeId") String placeId) {
-        return dao.placeLikeCount(placeId);
-    }
-
-    
+   
     
 	@PostMapping("/placeLike.do")
 	public void placeLike(@RequestBody Map<String, String> params) {
