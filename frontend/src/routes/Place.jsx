@@ -17,7 +17,7 @@ function Place() {
     const [tempDate, setTempDate] = useState(null); // 임시 날짜 저장
     //const [selectedDates, setSelectedDates] = useState({}); // 최종 선택된 날짜
     const [liked, setLiked] = useState(false);
-    const [closePlaceList,setClosePlaceList] = useState([]);
+    const [closePlaceList, setClosePlaceList] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
     const { userInfo, isLoggedIn } = useContext(UserContext);
@@ -68,41 +68,43 @@ function Place() {
             );
             console.log(response.data);
             setPlace(response.data[0]); // 받아온 데이터를 상태에 저장
-            closePlace(response.data[0].longitude,response.data[0].latitude)
+            closePlace(response.data[0].longitude, response.data[0].latitude);
         } catch (error) {
             console.error("Error fetching place:", error);
         }
     };
 
     // 근처 장소
-    const closePlace = async (longitude,latitude) =>{
-        try{
+    const closePlace = async (longitude, latitude) => {
+        try {
             const response = await axios.get(
-                `http://localhost:8586/closePlace.do`,{
-                    params : {longitude, latitude}
-                });
-                console.log("hohoh",response.data);
-                setClosePlaceList(response.data);
-        }catch (error) {
+                `http://localhost:8586/closePlace.do`,
+                {
+                    params: { longitude, latitude },
+                }
+            );
+            console.log("hohoh", response.data);
+            setClosePlaceList(response.data);
+        } catch (error) {
             console.error("Error fetching close place:", error);
         }
-    }
+    };
 
     // 좋아요 상태 확인
     if (!userInfo?.userId) {
         console.log("userInfo가 아직 로드되지 않음");
     }
 
-        axios
-            .get(`http://localhost:8586/likeStatus.do`, {
-                params: { userId, placeId },
-            })
-            .then((response) => {
-                setLiked(response.data);
-            })
-            .catch((error) => {
-                console.error("Error fetching like status:", error);
-            });
+    axios
+        .get(`http://localhost:8586/likeStatus.do`, {
+            params: { userId, placeId },
+        })
+        .then((response) => {
+            setLiked(response.data);
+        })
+        .catch((error) => {
+            console.error("Error fetching like status:", error);
+        });
     useEffect(() => {
         fetchPlace();
     }, [userInfo, placeId]);
@@ -455,37 +457,55 @@ function Place() {
                     </Card>
 
                     {/* 근처 다른 장소 */}
-                    <h3 className="mt-4">근처 다른 장소</h3>
-                    <Row className="g-3 flex-nowrap overflow-auto">
-                        {closePlaceList.map((place, index) => (
-                            <Col key={index} xs={6} md={3}>
-                                <Card>
-                                <div
-                                    className="bg-secondary rounded-top"
-                                    style={{
-                                        height: "150px",
-                                        backgroundImage: `url(${place.image})`,
-                                        backgroundSize: "cover",
-                                        backgroundPosition: "center",
-                                        cursor:"pointer"
-                                    }}
-                                    onClick={() =>
-                                        (window.location.href = `/place?id=${place.placeId}`)
-                                    }
-                                ></div>
-                                    <Card.Body>
-                                        <p className="fw-bold"
-                                        style={{
-                                            cursor:"pointer"
-                                        }}>{place.placeName}</p>
-                                        <p className="text-muted">
-                                            {place.location_short}
-                                        </p>
-                                    </Card.Body>
-                                </Card>
-                            </Col>
-                        ))}
-                    </Row>
+                    {console.log(place?.latitude)}
+                    {place?.latitude == null || place?.longitude == null ? (
+                        <></>
+                    ) : (
+                        <>
+                            <h3 className="mt-4">근처 다른 장소</h3>
+                            <Row className="g-3 flex-nowrap overflow-auto">
+                                {closePlaceList.map((place, index) => (
+                                    <Col key={index} xs={6} md={3}>
+                                        <Card>
+                                            <div
+                                                className="bg-secondary rounded-top"
+                                                style={{
+                                                    height: "150px",
+                                                    backgroundImage: `url(${
+                                                        place?.image &&
+                                                        place.image !==
+                                                            "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                                            ? place.image
+                                                            : defaultImage
+                                                    })`,
+                                                    backgroundSize: "cover",
+                                                    backgroundPosition:
+                                                        "center",
+                                                    cursor: "pointer",
+                                                }}
+                                                onClick={() =>
+                                                    (window.location.href = `/place?id=${place.placeId}`)
+                                                }
+                                            ></div>
+                                            <Card.Body>
+                                                <p
+                                                    className="fw-bold"
+                                                    style={{
+                                                        cursor: "pointer",
+                                                    }}
+                                                >
+                                                    {place.placeName}
+                                                </p>
+                                                <p className="text-muted">
+                                                    {place.location_short}
+                                                </p>
+                                            </Card.Body>
+                                        </Card>
+                                    </Col>
+                                ))}
+                            </Row>
+                        </>
+                    )}
                 </Container>
             </Container>
         </>

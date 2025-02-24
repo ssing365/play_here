@@ -7,10 +7,12 @@ import "../css/Calendar.css";
 import { FaSearch } from "react-icons/fa";
 import { Button, Form, Row, Col, Card, Container } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 import PlaceDetailOffcanvas from "../components/PlaceDetailOffcanvas";
+import Swal from "sweetalert2";
 
 const Calendar = () => {
     const [date, setDate] = useState(new Date());
@@ -33,8 +35,6 @@ const Calendar = () => {
     const [matchedDates, setMatchedDates] = useState([]);
     const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
     const [searchSelectedDate, setSearchSelectedDate] = useState(null);
-
-
 
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
@@ -151,7 +151,6 @@ const Calendar = () => {
         addPlace({ placeId: place.placeId, placeName: place.placeName });
     };
 
-    
     // 장소 추가 함수
     const addPlace = async (placeObj) => {
         const formattedDate = selectedDate
@@ -227,16 +226,13 @@ const Calendar = () => {
             })
             .replace(/\. /g, "-")
             .replace(".", "");
-        setPlaces([]); 
+        setPlaces([]);
         lastVisit();
         visitList(formattedDate);
         if (coupleInfo) {
             diary(formattedDate);
         }
     }, [selectedDate, coupleInfo]);
-
-
-      
 
     // 일기 가져오기
     const diary = async (formattedDate) => {
@@ -287,7 +283,7 @@ const Calendar = () => {
     };
 
     //지난 방문지
-    const lastVisit = async() => {
+    const lastVisit = async () => {
         const today = new Date();
         const formattedDate = today
             .toLocaleDateString("ko-KR", {
@@ -298,16 +294,15 @@ const Calendar = () => {
             .replace(/\. /g, "-")
             .replace(".", "");
         try {
-        const response = await axios.post(
-            "http://localhost:8586/LastVisit.do",
-            { today: formattedDate, coupleId: coupleId }
-        );
-        console.log("lastVisit:",response.data);
-        setLastVisitPlace(response.data);
-        }catch (error) {
+            const response = await axios.post(
+                "http://localhost:8586/LastVisit.do",
+                { today: formattedDate, coupleId: coupleId }
+            );
+            console.log("lastVisit:", response.data);
+            setLastVisitPlace(response.data);
+        } catch (error) {
             console.error("Error lastvisit list :", error);
         }
-        
     };
 
     /* 방문지 리스트 드래그 */
@@ -403,46 +398,47 @@ const Calendar = () => {
     const [editId, setEditId] = useState(null);
     const [editText, setEditText] = useState("");
 
-     // 백엔드에서 schedule 데이터를 가져오는 함수
-  const fetchSchedule = async (date) => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const yearMonth = `${year}-${month}`;
-    try {
-      const response = await axios.post("http://localhost:8586/Schedule.do", { date: yearMonth, coupleId : coupleId });
-      setSchedule(response.data);
-    } catch (error) {
-      console.error("스케줄 데이터를 가져오는데 실패했습니다.", error);
-    }
-  };
+    // 백엔드에서 schedule 데이터를 가져오는 함수
+    const fetchSchedule = async (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const yearMonth = `${year}-${month}`;
+        try {
+            const response = await axios.post(
+                "http://localhost:8586/Schedule.do",
+                { date: yearMonth, coupleId: coupleId }
+            );
+            setSchedule(response.data);
+        } catch (error) {
+            console.error("스케줄 데이터를 가져오는데 실패했습니다.", error);
+        }
+    };
 
-  // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
-  useEffect(() => {
-    fetchSchedule(activeStartDate);
-  }, [selectedDate]);
+    // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
+    useEffect(() => {
+        fetchSchedule(activeStartDate);
+    }, [selectedDate]);
 
-  // 달력의 월/년이 변경될 때 호출되는 핸들러
-  const handleActiveStartDateChange = async ({ activeStartDate }) => {
-    setActiveStartDate(activeStartDate);
-    fetchSchedule(activeStartDate);
-  };
-    
+    // 달력의 월/년이 변경될 때 호출되는 핸들러
+    const handleActiveStartDateChange = async ({ activeStartDate }) => {
+        setActiveStartDate(activeStartDate);
+        fetchSchedule(activeStartDate);
+    };
+
     /* 일기, 방문지 추가시 달력에 점 표시 */
     const tileContent = ({ date }) => {
-        const isVisitDate = schedule.some(dto => {
-          // dto 객체 내의 visitDate 속성 값을 사용합니다.
-          const visitDate = new Date(dto.visitDate);
-          return (
-            visitDate.getFullYear() === date.getFullYear() &&
-            visitDate.getMonth() === date.getMonth() &&
-            visitDate.getDate() === date.getDate()
-          );
+        const isVisitDate = schedule.some((dto) => {
+            // dto 객체 내의 visitDate 속성 값을 사용합니다.
+            const visitDate = new Date(dto.visitDate);
+            return (
+                visitDate.getFullYear() === date.getFullYear() &&
+                visitDate.getMonth() === date.getMonth() &&
+                visitDate.getDate() === date.getDate()
+            );
         });
-      
+
         return isVisitDate ? <span className="calendar-dot"></span> : null;
-      };
-      
-    
+    };
 
     /** 일기 저장 */
     const saveDiary = async () => {
@@ -482,85 +478,114 @@ const Calendar = () => {
         diary(formattedDate);
     };
 
-
     const handleSearch = async () => {
         console.log("handleSearch 호출됨", searchTerm);
         if (!searchTerm) {
-          setMatchedDates([]);
-          return;
+            setMatchedDates([]);
+            Swal.fire({
+                icon: "info",
+                text: "검색어를 입력해주세요.",
+                timer: 1200,
+                showConfirmButton: false,
+            });
+            return;
         }
+
         try {
-          const response = await axios.post("http://localhost:8586/searchSchedule.do", {
-            searchWord: searchTerm,
-            coupleId: coupleInfo?.coupleId,
-          });
-          // 백엔드가 { visitDate: [...] }가 아니라 단순히 배열을 반환할 경우:
-          const dates = Array.isArray(response.data)
-            ? response.data
-            : [response.data];
-          
-          console.log("검색 응답:", response.data);
-          
-          // ISO 문자열에서 시간대 콜론 제거 후 Date 객체로 변환
-          const parsedDates = dates.filter(Boolean).map(dateStr => {
-            const fixedDateStr = dateStr.replace(/(\+\d{2}):(\d{2})$/, "$1$2");
-            const d = new Date(fixedDateStr);
-            if (isNaN(d.getTime())) {
-              console.error("Invalid date string:", dateStr, "=>", fixedDateStr);
+            const response = await axios.post(
+                "http://localhost:8586/searchSchedule.do",
+                {
+                    searchWord: searchTerm,
+                    coupleId: coupleInfo?.coupleId,
+                }
+            );
+            // 백엔드가 { visitDate: [...] }가 아니라 단순히 배열을 반환할 경우:
+            const dates = Array.isArray(response.data)
+                ? response.data
+                : [response.data];
+
+            console.log("검색 응답:", response.data);
+
+            // ISO 문자열에서 시간대 콜론 제거 후 Date 객체로 변환
+            const parsedDates = dates.filter(Boolean).map((dateStr) => {
+                const fixedDateStr = dateStr.replace(
+                    /(\+\d{2}):(\d{2})$/,
+                    "$1$2"
+                );
+                const d = new Date(fixedDateStr);
+                if (isNaN(d.getTime())) {
+                    console.error(
+                        "Invalid date string:",
+                        dateStr,
+                        "=>",
+                        fixedDateStr
+                    );
+                }
+                return d;
+            });
+
+            setMatchedDates(parsedDates);
+            setCurrentMatchIndex(0);
+            if (parsedDates.length === 0) {
+                Swal.fire({
+                    icon: "info",
+                    text: `'${searchTerm}'와 일치하는 장소가 없습니다.`,
+                    timer: 1000,
+                    showConfirmButton: false,
+                });
+                return;
             }
-            return d;
-          });
-          
-          setMatchedDates(parsedDates);
-          setCurrentMatchIndex(0);
-          if (parsedDates.length > 0) {
-            setSearchSelectedDate(parsedDates[0]);
-            setSelectedDate(parsedDates[0]);
-          }
+            if (parsedDates.length > 0) {
+                setSearchSelectedDate(parsedDates[0]);
+                setSelectedDate(parsedDates[0]);
+            }
         } catch (error) {
-          console.error("검색 결과 가져오기 오류:", error);
+            console.error("검색 결과 가져오기 오류:", error);
         }
-      };
-      
-      
-      useEffect(() => {
+        // 검색결과가 하나 이상이면 엔터를 누를 때마다 다음 결과로 이동
+        goToNextMatch();
+    };
+
+    useEffect(() => {
         console.log("matchedDates:", matchedDates);
-      }, [matchedDates]);
-      
-      
-      
-      const goToNextMatch = () => {
+    }, [matchedDates]);
+
+    const goToNextMatch = () => {
         if (matchedDates.length === 0) return;
         const nextIndex = (currentMatchIndex + 1) % matchedDates.length;
         setCurrentMatchIndex(nextIndex);
         setSelectedDate(new Date(matchedDates[nextIndex]));
-      };
-      
-      const goToPrevMatch = () => {
+    };
+
+    const goToPrevMatch = () => {
         if (matchedDates.length === 0) return;
-        const prevIndex = (currentMatchIndex - 1 + matchedDates.length) % matchedDates.length;
+        const prevIndex =
+            (currentMatchIndex - 1 + matchedDates.length) % matchedDates.length;
         setCurrentMatchIndex(prevIndex);
         setSelectedDate(new Date(matchedDates[prevIndex]));
-      };
+    };
 
-      const highlightText = (text, keyword) => {
+    const highlightText = (text, keyword) => {
         if (!keyword) return text;
         const parts = text.split(new RegExp(`(${keyword})`, "gi"));
         return parts.map((part, index) =>
-          part.toLowerCase() === keyword.toLowerCase() ? (
-            <span key={index} style={{ backgroundColor: "yellow", fontWeight: "bold" }}>
-              {part}
-            </span>
-          ) : (
-            part
-          )
+            part.toLowerCase() === keyword.toLowerCase() ? (
+                <span
+                    key={index}
+                    style={{ backgroundColor: "#FFE0E0", fontWeight: "bold" }}
+                >
+                    {part}
+                </span>
+            ) : (
+                part
+            )
         );
-      };
-            
-      const handleDateChange = (date) => {
+    };
+
+    const handleDateChange = (date) => {
         setSelectedDate(date);
         // 방문지 리스트 갱신 등을 위한 추가 작업 실행
-      };
+    };
     return (
         <>
             {/** OFFCANVAS */}
@@ -592,6 +617,12 @@ const Calendar = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="calendar__search-input me-2"
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") {
+                                        console.log(e.key);
+                                        handleSearch();
+                                    }
+                                }}
                             />
                             <FaSearch
                                 className="search-icon"
@@ -599,15 +630,21 @@ const Calendar = () => {
                                 // onClick={() => setShowSearch(!showSearch)}
                             />
                         </div>
-                        {matchedDates.length > 0 && (
-                        <div className="search-navigation d-flex align-items-center mb-3">
-                        <Button variant="outline-primary" onClick={goToPrevMatch}>⬆️</Button>
-                        <span className="mx-2">
-                            {currentMatchIndex + 1}/{matchedDates.length}
-                        </span>
-                        <Button variant="outline-primary" onClick={goToNextMatch}>⬇️</Button>
+                        <div>
+                            {matchedDates.length > 0 && (
+                                <div className="search-navigation d-flex justify-content-end mb-3 me-4">
+                                    <ArrowLeft onClick={goToPrevMatch} />
+
+                                    <span className="mx-2">
+                                        검색된 날짜 {" "}
+                                        {currentMatchIndex + 1}/
+                                        {matchedDates.length}
+                                    </span>
+                                    <ArrowRight onClick={goToNextMatch} />
+                                </div>
+                            )}
                         </div>
-                    )}
+
                         <Cal
                             onChange={(value) => {
                                 setSelectedDate(value);
@@ -619,11 +656,12 @@ const Calendar = () => {
                                 setSelectedDate(value);
                                 setSearchSelectedDate(null);
                             }}
-                            onActiveStartDateChange={handleActiveStartDateChange}
+                            onActiveStartDateChange={
+                                handleActiveStartDateChange
+                            }
                             className="couple-calendar flex-grow-1"
                             tileContent={tileContent}
-                            />
-
+                        />
                     </Col>
 
                     {/* 오른쪽 방문지 리스트 */}
@@ -755,9 +793,11 @@ const Calendar = () => {
                                                                                 />
                                                                             ) : (
                                                                                 <span className="me-2 p-1">
-                                                                                {highlightText(place.placeName, searchTerm)}
+                                                                                    {highlightText(
+                                                                                        place.placeName,
+                                                                                        searchTerm
+                                                                                    )}
                                                                                 </span>
-
                                                                             )}
                                                                             {/* 상세보기 버튼 추가 */}
                                                                             <Button
@@ -935,17 +975,24 @@ const Calendar = () => {
                                                             </b>
                                                         </h6>
                                                         <ul className="list-group mb-3">
-                                                        {lastVisitPlace.map(
-                                                            (place, index) => (
-                                                                <li
-                                                                    key={index}
-                                                                    className="list-group-item"
-                                                                >
-                                                                    {place.placeName}
-                                                                </li>
-                                                            )
-                                                        )}
-                                                    </ul>
+                                                            {lastVisitPlace.map(
+                                                                (
+                                                                    place,
+                                                                    index
+                                                                ) => (
+                                                                    <li
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="list-group-item"
+                                                                    >
+                                                                        {
+                                                                            place.placeName
+                                                                        }
+                                                                    </li>
+                                                                )
+                                                            )}
+                                                        </ul>
                                                     </Col>
                                                     <Col>
                                                         <h6>
