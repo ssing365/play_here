@@ -29,6 +29,7 @@ const SearchList = () => {
     const userId = userInfo?.userId;
 
     const results = location.state;
+    const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
 
     // 상단바에서 입력한 키워드로 렌더링 후 키워드 필터 검색창에 옮겨놓고 삭제.(필요)
     useEffect(() => {
@@ -137,7 +138,12 @@ const SearchList = () => {
                     <Col md={4}>
                         <div className="position-relative">
                             <img
-                                src={places[i].image}
+                                src={
+                                    places[i].image ===
+                                    "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                        ? defaultImage
+                                        : places[i].image
+                                }
                                 onClick={() => {
                                     window.location.href = `/place?id=${places[i].placeId}`;
                                 }}
@@ -147,6 +153,12 @@ const SearchList = () => {
                                     height: "300px",
                                     objectFit: "cover",
                                     width: "100%",
+                                    opacity:
+                                        places[i]?.image ===
+                                        "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                            ? 0.6
+                                            : 1, // 기본 이미지일 때만 흐리게
+                                    transition: "opacity 0.3s ease-in-out", // 부드럽게 전환
                                 }}
                             />
                         </div>

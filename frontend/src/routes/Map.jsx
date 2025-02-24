@@ -7,6 +7,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../css/Calendar.css";
 import { useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
+import OverlayTrigger from "react-bootstrap/OverlayTrigger";
+import Tooltip from "react-bootstrap/Tooltip";
 import PlaceDetailOffcanvas from "../components/PlaceDetailOffcanvas";
 import axios from "axios";
 
@@ -18,6 +20,8 @@ const Map = () => {
     const [places, setPlaces] = useState([]);
     const [coupleInfo, setCoupleInfo] = useState(null);
     const [totalDistance, setTotalDistance] = useState(0);
+    const [walkingTimeFormatted, setWalkingTimeFormatted] = useState("");
+    const [drivingTimeFormatted, setDrivingTimeFormatted] = useState("");
 
     const location = useLocation();
 
@@ -261,6 +265,28 @@ const Map = () => {
                 );
             }
             setTotalDistance(totalDistance.toFixed(2));
+
+            // 도보 소요시간 (평균 5km/h): 분 단위 계산
+            const walkingMinutes = (totalDistance / 5) * 60;
+            const walkingMinutesInt = Math.round(walkingMinutes);
+            const walkingHours = Math.floor(walkingMinutesInt / 60);
+            const walkingRemain = walkingMinutesInt % 60;
+            setWalkingTimeFormatted(
+                `${
+                    walkingHours > 0 ? walkingHours + "시간 " : ""
+                }${walkingRemain}분`
+            );
+
+            // 차량 소요시간 (평균 50km/h): 분 단위 계산
+            const drivingMinutes = (totalDistance / 50) * 60;
+            const drivingMinutesInt = Math.round(drivingMinutes);
+            const drivingHours = Math.floor(drivingMinutesInt / 60);
+            const drivingRemain = drivingMinutesInt % 60;
+            setDrivingTimeFormatted(
+                `${
+                    drivingHours > 0 ? drivingHours + "시간 " : ""
+                }${drivingRemain}분`
+            );
         }
     }, [places]);
 
@@ -682,7 +708,6 @@ const Map = () => {
                                         )}
                                     </Droppable>
                                 </DragDropContext>
-                                <br />
                                 {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
                                 {places?.length < 7 ? (
                                     showInput ? (
@@ -788,9 +813,41 @@ const Map = () => {
                                 <hr />
                                 <br />
                                 {places.length > 1 ? (
-                                    <h6>
-                                        <b>총 직선 거리</b> : {totalDistance}km
-                                    </h6>
+                                    <>
+                                        <h6>
+                                            📏 총 직선 거리 : {totalDistance}km
+                                        </h6>
+                                        <br />
+                                        <h6>
+                                            이동 예상 시간{" "}
+                                            <OverlayTrigger
+                                                placement="right"
+                                                overlay={
+                                                    <Tooltip id="tooltip-info">
+                                                        도로상황을 고려하지 않은 예상 시간으로,
+                                                        직선거리를 평균 속도(도보:5km/h, 차량:50km/h)로 나누어
+                                                        계산한 정보임을 참고하시기 바랍니다.
+                                                    </Tooltip>
+                                                }
+                                            >
+                                                <span
+                                                    style={{
+                                                        color: "gray",
+                                                        cursor: "pointer",
+                                                        fontSize: "0.9em",
+                                                    }}
+                                                >
+                                                    ⓘ
+                                                </span>
+                                            </OverlayTrigger>{" "}
+                                        </h6>
+                                        <h6>
+                                            🚶‍♂️🚶‍♀️ 도보: {walkingTimeFormatted}{" "}
+                                        </h6>
+                                        <h6>
+                                            🚗 차량: {drivingTimeFormatted}{" "}
+                                        </h6>
+                                    </>
                                 ) : (
                                     ""
                                 )}
