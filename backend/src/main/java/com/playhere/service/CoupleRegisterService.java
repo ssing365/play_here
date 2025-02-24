@@ -147,7 +147,7 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
         }
     }
     
-    //커플끊기
+  //커플끊기
     @Transactional
     public void disconnectCouple(String userId) {
         System.out.println("💡 [백엔드] disconnectCouple() 실행 - userId: " + userId);
@@ -174,6 +174,8 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
             throw new RuntimeException("파트너 정보를 찾을 수 없습니다.");
         }
         
+        String parterId = partner.getUserId();
+        
         System.out.println("🔍 [백엔드] 파트너 userId 확인: " + partner.getUserId());
 
         // ✅ 수정된 SQL 호출
@@ -182,7 +184,7 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
         System.out.println("✅ [백엔드] 사용자 커플 상태 업데이트 완료!");
 
         System.out.println("🔄 [백엔드] 파트너 커플 상태 업데이트...");
-        coupleRegisterMapper.updatePartnerAfterDisconnect(userId);
+        coupleRegisterMapper.updatePartnerAfterDisconnect(parterId);
         System.out.println("✅ [백엔드] 파트너 커플 상태 업데이트 완료!");
 
         // couple 테이블에서 삭제
@@ -193,6 +195,7 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
         // couple_code 테이블에서 코드 삭제
         System.out.println("🔄 [백엔드] 커플 코드 삭제...");
         coupleRegisterMapper.deleteCoupleCodeByUser(userId);
+        coupleRegisterMapper.deleteCoupleCodeByUser(parterId);
         System.out.println("✅ [백엔드] 커플 코드 삭제 완료!");
     }
 

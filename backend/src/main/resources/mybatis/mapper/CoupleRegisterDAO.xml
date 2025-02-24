@@ -28,7 +28,6 @@
     </delete>
 
     <!-- ✅ 각 SQL 문을 개별적인 태그로 분리 -->
-    
     <!-- 1️⃣ 커플을 끊은 사람 (couple1) → couple_id 제거 & 상태 0 (커플 아님) -->
     <update id="updateMemberAfterDisconnect">
         UPDATE member
@@ -38,15 +37,9 @@
 
     <!-- 2️⃣ 커플이 끊긴 상대방 (couple2) → couple_status = 2 (일방적 해제) -->
     <update id="updatePartnerAfterDisconnect">
-        UPDATE member
-        SET couple_id = NULL, couple_status = 2
-        WHERE user_id = (
-            SELECT CASE 
-                WHEN user_id_1 = #{userId} THEN user_id_2
-                ELSE user_id_1
-            END 
-            FROM couple WHERE user_id_1 = #{userId} OR user_id_2 = #{userId}
-        )
+      UPDATE member
+	    SET couple_id = NULL, couple_status = 2
+        WHERE user_id = #{userId}
     </update>
 
     <!-- 3️⃣ couple 테이블에서 커플 관계 삭제 -->
