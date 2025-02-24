@@ -221,9 +221,8 @@ const Calendar = () => {
             })
             .replace(/\. /g, "-")
             .replace(".", "");
-        setPlaces([]);
-        const today = new Date();
-        lastVisit(today);
+        setPlaces([]); 
+        lastVisit();
         visitList(formattedDate);
         if (coupleInfo) {
             diary(formattedDate);
@@ -282,7 +281,8 @@ const Calendar = () => {
     };
 
     //지난 방문지
-    const lastVisit = async(today) => {
+    const lastVisit = async() => {
+        const today = new Date();
         const formattedDate = today
             .toLocaleDateString("ko-KR", {
                 year: "numeric",

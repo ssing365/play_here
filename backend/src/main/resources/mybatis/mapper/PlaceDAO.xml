@@ -100,6 +100,15 @@
 		SELECT * FROM place WHERE place_id = #{placeId}
 	</select>
 	
+	<select id="closePlace" resultType="com.playhere.place.PlaceDTO">
+	<![CDATA[
+		select * from
+		(select * from place where longitude between #{longitude1} and #{longitude2}
+		and latitude between #{latitude1} and #{latitude2}
+		ORDER BY DBMS_RANDOM.VALUE)
+		WHERE ROWNUM <= 4
+	]]>
+	</select>
 	
 	<update id="placeLikeAdd" parameterType="java.lang.String">
 	    update place set likes = likes + 1 where place_id = #{placeId}

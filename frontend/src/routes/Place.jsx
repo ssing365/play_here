@@ -17,6 +17,7 @@ function Place() {
     const [tempDate, setTempDate] = useState(null); // 임시 날짜 저장
     //const [selectedDates, setSelectedDates] = useState({}); // 최종 선택된 날짜
     const [liked, setLiked] = useState(false);
+    const [closePlaceList,setClosePlaceList] = useState([]);
     const location = useLocation();
     const navigate = useNavigate();
     const { userInfo, isLoggedIn } = useContext(UserContext);
@@ -67,25 +68,40 @@ function Place() {
             );
             console.log(response.data);
             setPlace(response.data[0]); // 받아온 데이터를 상태에 저장
+            closePlace(response.data[0].longitude,response.data[0].latitude)
         } catch (error) {
             console.error("Error fetching place:", error);
         }
     };
+
+    const closePlace = async (longitude,latitude) =>{
+        try{
+            const response = await axios.get(
+                `http://localhost:8586/closePlace.do`,{
+                    params : {longitude, latitude}
+                });
+                console.log(response.data);
+                setClosePlaceList(response.data);
+        }catch (error) {
+            console.error("Error fetching close place:", error);
+        }
+    }
+
     // 좋아요 상태 확인
     if (!userInfo?.userId) {
         console.log("userInfo가 아직 로드되지 않음");
-        return;
     }
-    axios
-        .get(`http://localhost:8586/likeStatus.do`, {
-            params: { userId, placeId },
-        })
-        .then((response) => {
-            setLiked(response.data);
-        })
-        .catch((error) => {
-            console.error("Error fetching like status:", error);
-        });
+
+        axios
+            .get(`http://localhost:8586/likeStatus.do`, {
+                params: { userId, placeId },
+            })
+            .then((response) => {
+                setLiked(response.data);
+            })
+            .catch((error) => {
+                console.error("Error fetching like status:", error);
+            });
     useEffect(() => {
         fetchPlace();
     }, [userInfo, placeId]);
@@ -440,20 +456,23 @@ function Place() {
                     {/* 근처 다른 장소 */}
                     <h3 className="mt-4">근처 다른 장소</h3>
                     <Row className="g-3 flex-nowrap overflow-auto">
-                        {[1, 2, 3, 4].map((i) => (
-                            <Col key={i} xs={6} md={3}>
+                        {closePlaceList.map((place, index) => (
+                            <Col key={index} xs={6} md={3}>
                                 <Card>
-                                    <div
-                                        className="bg-secondary rounded-top"
-                                        style={{ height: "150px" }}
-                                    ></div>
+                                <div
+                                    className="bg-secondary rounded-top"
+                                    style={{
+                                        height: "150px",
+                                        backgroundImage: `url(${place.image})`,
+                                        backgroundSize: "cover",
+                                        backgroundPosition: "center",
+                                    }}
+                                ></div>
+
                                     <Card.Body>
-                                        <p className="fw-bold">구현중입니다.</p>
+                                        <p className="fw-bold">{place.placeName}</p>
                                         <p className="text-muted">
-                                            조금만 기다려 주세요.
-                                        </p>
-                                        <p className="text-secondary">
-                                            - 여기놀자 -
+                                            {place.location_short}
                                         </p>
                                     </Card.Body>
                                 </Card>

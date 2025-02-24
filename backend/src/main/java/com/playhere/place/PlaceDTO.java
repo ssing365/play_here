@@ -32,7 +32,6 @@ public class PlaceDTO {
 			this.hashtag = Arrays.asList(hashtagStr.split(","));
 		}
 	}
-	
 	public void setLocation_short(String locationStr) {
         if (locationStr != null) {
             String[] parts = locationStr.split(" ");
@@ -43,7 +42,6 @@ public class PlaceDTO {
             }
         }
     }
-	
 	public void setLocation(String locationStr) {
 	    this.location = locationStr;
 	    setLocation_short(locationStr); // location이 설정될 때 자동으로 location_short 설정
