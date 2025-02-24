@@ -23,6 +23,7 @@ const MyPageLikes = () => {
     const [tempDate, setTempDate] = useState(null); // 임시 날짜 저장
     const [selectedDates, setSelectedDates] = useState({}); // 최종 선택된 날짜
     const datepickerRef = useRef(null);
+    const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
 
     // 검색어와 현재 페이지 상태 관리
     const [searchTerm, setSearchTerm] = useState("");
@@ -255,7 +256,10 @@ const MyPageLikes = () => {
                                     className="position-relative mb-5 d-flex align-items-center"
                                 >
                                     <img
-                                        src={interest.image}
+                                        src={interest.image ===
+                                            "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                                ? defaultImage
+                                                :interest.image}
                                         alt={interest.placeName}
                                         className="rounded"
                                         style={{
@@ -263,6 +267,12 @@ const MyPageLikes = () => {
                                             height: "200px",
                                             objectFit: "cover",
                                             cursor: "pointer",
+                                            opacity:
+                                interest?.image ===
+                                "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                    ? 0.6
+                                    : 1, // 기본 이미지일 때만 흐리게
+                            transition: "opacity 0.3s ease-in-out", // 부드럽게 전환
                                         }}
                                         onClick={() =>
                                             (window.location.href = `/place?id=${interest.placeId}`)

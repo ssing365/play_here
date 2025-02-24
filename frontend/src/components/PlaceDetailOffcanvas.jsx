@@ -13,12 +13,13 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
 
     const [liked, setLiked] = useState(false);
     const [likes, setLikes] = useState(0);
-useEffect(() => {
-    if (place?.likes) {
-        setLikes(Number(place.likes));
-    }
-}, [place]);
+    const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
 
+    useEffect(() => {
+        if (place?.likes) {
+            setLikes(Number(place.likes));
+        }
+    }, [place]);
 
     let hashTag = [];
     if (place?.hashtag) {
@@ -101,10 +102,23 @@ useEffect(() => {
             <Offcanvas.Body>
                 <Container>
                     <img
-                        src={place?.image}
+                        src={
+                            place?.image ===
+                            "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                ? defaultImage
+                                : place?.image
+                        }
                         alt={place?.placeName}
                         className="w-100 rounded-3 mb-4"
-                        style={{ height: "250px", objectFit: "cover" }}
+                        style={{
+                            height: "250px",
+                            objectFit: "cover",
+                            opacity:
+                                place?.image ===
+                                "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                    ? 0.6
+                                    : 1, // 기본 이미지일 때만 흐리게
+                        }}
                     />
                     <Row>
                         <h3 className="fw-bold">{place?.placeName}</h3>
@@ -133,17 +147,25 @@ useEffect(() => {
                     </Row>
                     <Card className="mt-3">
                         <Card.Body>
-                            <p>
-                                <strong>시간 :</strong> {place?.time}
+                        <p>
+                                <strong>시간 : </strong>
+                                {place?.time ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                             <p>
-                                <strong>휴무 :</strong> {place?.dayoff}
+                                <strong>휴무 : </strong>
+                                {place?.dayoff ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                             <p>
-                                <strong>주차 :</strong> {place?.parking}
+                                <strong>주차 : </strong>
+                                {place?.parking ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                             <p>
-                                <strong>연락처 :</strong> {place?.call}
+                                <strong>연락처 : </strong>
+                                {place?.call ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                         </Card.Body>
                     </Card>

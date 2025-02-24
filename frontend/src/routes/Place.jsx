@@ -9,7 +9,6 @@ import TopBar from "../components/TopBar";
 import Swal from "sweetalert2";
 import "../css/Place.css";
 
-
 const { kakao } = window;
 
 function Place() {
@@ -26,6 +25,7 @@ function Place() {
     const queryParams = new URLSearchParams(location.search);
     const placeId = queryParams.get("id");
     const datepickerRef = useRef(null);
+    const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
 
     useEffect(() => {
         if (!place || !place.latitude || !place.longitude) return; // place가 없으면 실행 X
@@ -87,7 +87,6 @@ function Place() {
             console.error("Error fetching like status:", error);
         });
     useEffect(() => {
-        
         fetchPlace();
     }, [userInfo, placeId]);
 
@@ -168,7 +167,6 @@ function Place() {
                 alert("좋아요에 실패했습니다. 잠시후 다시 시도해주세요.");
                 console.error("좋아요 요청 중 오류 발생:", error);
             }
-            
         }
         fetchPlace();
     };
@@ -253,31 +251,43 @@ function Place() {
                 {/* 본문 */}
                 <Container className="content-container">
                     <img
-                        src={place?.image}
-                        alt={place?.placeName}
+                        src={
+                            place?.image ===
+                            "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                ? defaultImage
+                                : place?.image
+                        }
+                        alt={place?.placeName || "업체 이미지"}
                         className="w-100 rounded-3 mb-4"
                         style={{
                             height: "500px",
                             objectFit: "cover",
                             width: "100%",
+                            opacity:
+                                place?.image ===
+                                "https://via.placeholder.com/300x200?text=No+Place+Image"
+                                    ? 0.6
+                                    : 1, // 기본 이미지일 때만 흐리게
+                            transition: "opacity 0.3s ease-in-out", // 부드럽게 전환
                         }}
                     />
 
                     <Row className="g-4">
                         {/* 기본 정보 */}
                         <Col md={6}>
-                            <h2 className="fw-bold">{place?.placeName}</h2>
+                            <h2 className="fw-bold">
+                                {place?.placeName ||
+                                    "업체에서 제공한 정보가 없습니다."}
+                            </h2>
                             <p className="text-muted">
                                 {place?.location_short}
                             </p>
                             <div className="hashtags">
-                                {hashTag.map((tag, index) => {
-                                    return (
-                                        <span key={index} className="hashtag">
-                                            {tag.props.children}
-                                        </span>
-                                    );
-                                })}
+                                {hashTag.map((tag, index) => (
+                                    <span key={index} className="hashtag">
+                                        {tag.props.children}
+                                    </span>
+                                ))}
                             </div>
                         </Col>
                         <Col md={6} className="text-end">
@@ -293,21 +303,23 @@ function Place() {
                                     className="sm me-2"
                                     onClick={(e) => handleLikeClick(placeId, e)}
                                 >
-                                    ❤ {place.likes}
+                                    ❤{" "}
+                                    {place?.likes ||
+                                        "업체에서 제공한 정보가 없습니다."}
                                 </Button>
-                                
                             ) : (
                                 <Button
                                     variant="outline-danger"
                                     className="sm me-2"
                                     onClick={(e) => handleLikeClick(placeId, e)}
                                 >
-                                    ❤ {place.likes}
+                                    ❤{" "}
+                                    {place?.likes ||
+                                        "업체에서 제공한 정보가 없습니다."}
                                 </Button>
-                                
                             )}
 
-                            {/* ✅ 캘린더 버튼만 감싸서 위치 기준 조정 */}
+                            {/* 캘린더 버튼 */}
                             <div className="calendar-container position-relative d-inline-block">
                                 <Button
                                     variant="success"
@@ -332,9 +344,8 @@ function Place() {
                                             }
                                         />
 
-                                        {/* ✅ 날짜 표시 & 추가 버튼 */}
+                                        {/* 날짜 표시 & 추가 버튼 */}
                                         <div className="d-flex justify-content-end gap-1 mt-2">
-                                            {/* ✅ 선택한 날짜 표시 */}
                                             <p className="text-center fw-bold m-1">
                                                 {tempDate
                                                     ? tempDate.toLocaleDateString()
@@ -363,17 +374,24 @@ function Place() {
                     <Card className="mt-4">
                         <Card.Body>
                             <p>
-                                <strong>시간 : </strong> {place?.time}
+                                <strong>시간 : </strong>
+                                {place?.time ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                             <p>
-                                <strong>휴무 : </strong> {place?.dayoff}
+                                <strong>휴무 : </strong>
+                                {place?.dayoff ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                             <p>
-                                <strong>주차 : </strong> {place?.parking}
+                                <strong>주차 : </strong>
+                                {place?.parking ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                             <p>
                                 <strong>연락처 : </strong>
-                                {place?.call}
+                                {place?.call ||
+                                    "업체에서 제공한 정보가 없습니다."}
                             </p>
                         </Card.Body>
                     </Card>
@@ -383,21 +401,39 @@ function Place() {
                         <Card.Body>
                             <p>
                                 <strong>주소 : </strong>
-                                {place?.location} <Link to={place.link} target="_blank">카카오맵 바로가기</Link>
+                                {place?.location ||
+                                    "업체에서 제공한 정보가 없습니다."}{" "}
+                                {place?.link && (
+                                    <Link to={place.link} target="_blank">
+                                        카카오맵 바로가기
+                                    </Link>
+                                )}
                             </p>
-                            
-                            <div
-                                id="map"
-                                className="position-relative bg-secondary rounded-3"
-                                style={{ height: "350px" }}
-                            >
-                                <Button
-                                    variant="outline-light"
-                                    className="position-absolute top-2 end-2"
+
+                            {place?.latitude && place?.longitude ? (
+                                <div
+                                    id="map"
+                                    className="position-relative bg-secondary rounded-3"
+                                    style={{ height: "350px" }}
                                 >
-                                    <MapPin size={20} /> 길찾기
-                                </Button>
-                            </div>
+                                    <Button
+                                        variant="outline-light"
+                                        className="position-absolute top-2 end-2"
+                                    >
+                                        <MapPin size={20} /> 길찾기
+                                    </Button>
+                                    {/* 지도 렌더링 컴포넌트 또는 로직 */}
+                                </div>
+                            ) : (
+                                <div
+                                    className="d-flex align-items-center justify-content-center bg-secondary rounded-3"
+                                    style={{ height: "350px" }}
+                                >
+                                    <p className="text-white m-0">
+                                        업체에서 제공한 위치 정보가 없습니다.
+                                    </p>
+                                </div>
+                            )}
                         </Card.Body>
                     </Card>
 
