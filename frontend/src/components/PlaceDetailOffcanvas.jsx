@@ -6,7 +6,7 @@ import axios from "axios";
 import Swal from "sweetalert2";
 
 const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
-    const placeId = place.placeId;
+    const placeId = place?.placeId;
 
     const { userInfo } = useContext(UserContext);
     const userId = userInfo?.userId;
@@ -26,7 +26,6 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
         console.log("userInfo가 아직 로드되지 않음");
         return;
     }
-    /*
     axios
         .get(`http://localhost:8586/likeStatus.do`, {
             params: { userId, placeId },
@@ -36,7 +35,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
         })
         .catch((error) => {
             console.error("Error fetching like status:", error);
-        });*/
+        });
 
     // 좋아요 클릭 시 처리
     const handleLikeClick = async (PlaceId) => {
@@ -90,14 +89,12 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
             placement="start"
             className="custom-offcanvas"
         >
-            <Offcanvas.Header closeButton>
-                <Offcanvas.Title>{place.place_name}</Offcanvas.Title>
-            </Offcanvas.Header>
+            <Offcanvas.Header closeButton />
             <Offcanvas.Body>
                 <Container>
                     <img
-                        src={place.image}
-                        alt={place.placeName}
+                        src={place?.image}
+                        alt={place?.placeName}
                         className="w-100 rounded-3 mb-4"
                         style={{ height: "250px", objectFit: "cover" }}
                     />
@@ -106,9 +103,9 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
 
                         <Col>
                             <p className="text-muted">
-                                {place.location} <br />
+                                {place?.location} <br />
                                 <Link
-                                    to={place.link}
+                                    to={place?.link}
                                     target="_blank"
                                     style={{ fontSize: "14px" }}
                                 >
@@ -129,16 +126,16 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                     <Card className="mt-3">
                         <Card.Body>
                             <p>
-                                <strong>시간 :</strong> {place.time}
+                                <strong>시간 :</strong> {place?.time}
                             </p>
                             <p>
-                                <strong>휴무 :</strong> {place.dayoff}
+                                <strong>휴무 :</strong> {place?.dayoff}
                             </p>
                             <p>
-                                <strong>주차 :</strong> {place.parking}
+                                <strong>주차 :</strong> {place?.parking}
                             </p>
                             <p>
-                                <strong>연락처 :</strong> {place.call}
+                                <strong>연락처 :</strong> {place?.call}
                             </p>
                         </Card.Body>
                     </Card>
@@ -150,7 +147,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                         className="sm me-2"
                         onClick={(e) => handleLikeClick(placeId, e)}
                     >
-                        ❤ {place.likes}
+                        ❤ {place?.likes}
                     </Button>
                 ) : (
                     <Button
@@ -158,7 +155,7 @@ const PlaceDetailOffcanvas = ({ show, handleClose, place }) => {
                         className="sm me-2"
                         onClick={(e) => handleLikeClick(placeId, e)}
                     >
-                        ❤ {place.likes}
+                        ❤ {place?.likes}
                     </Button>
                 )}
             </Offcanvas.Body>

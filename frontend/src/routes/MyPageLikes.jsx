@@ -34,12 +34,26 @@ const MyPageLikes = () => {
         setSearchTerm(e.target.value);
         setCurrentPage(1);
     };
-    // 검색어 필터링: 검색어를 소문자로 비교
+
+    // 검색
     const filteredInterests = useMemo(() => {
-        return interests.filter((place) =>
-            place.placeName.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-    }, [interests, searchTerm]);
+        const lowerSearchTerm = searchTerm.toLowerCase();
+        return interests.filter((place) => {
+          // placeName 비교 (소문자 변환 후 포함 여부)
+          const placeNameMatch = place.placeName?.toLowerCase().includes(lowerSearchTerm);
+          
+          // location 및 location_short 비교
+          const locationMatch = place.location?.toLowerCase().includes(lowerSearchTerm) ||
+                                  place.location_short?.toLowerCase().includes(lowerSearchTerm);
+          
+          // hashtag는 배열이므로, 각 항목을 소문자로 변환 후 검색어 포함 여부 체크
+          const hashtagMatch = Array.isArray(place.hashtag) 
+            ? place.hashtag.some((tag) => tag.toLowerCase().includes(lowerSearchTerm))
+            : false;
+          
+          return placeNameMatch || locationMatch || hashtagMatch;
+        });
+      }, [interests, searchTerm]);
 
     // 페이징 처리
     const totalPages = Math.ceil(filteredInterests.length / itemsPerPage);
