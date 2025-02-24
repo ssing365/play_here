@@ -97,18 +97,13 @@
     </update>
     
     <!-- member 테이블의 couple_id, couple_status 업데이트 -->
-	<update id="updateCoupleStatus" parameterType="map">
+	<update id="updateCoupleStatus">
 	    UPDATE member
-	    SET couple_id = #{coupleId}, couple_status = 1
+	    SET couple_status = #{coupleStatus}, couple_id = #{coupleId,jdbcType=INTEGER}
 	    WHERE user_id = #{userId}
 	</update>
 	
-	<!-- couple_status 가 2인 회원(일방적으로 커플 끊긴 사람) 0으로 다시 바꾸기 -->
-	<update id="updateCoupleStatus2to0" parameterType="map">
-	    UPDATE member
-		Set couple_status = 0
-	    WHERE user_id = #{userId}
-	</update>
+	
 
     <!-- 선호도 수정  -->
     <update id="updateUserPreferences">
@@ -125,4 +120,12 @@
 	<delete id="deleteUserPreferences" parameterType="String">
 	    DELETE FROM user_preference WHERE user_id = #{userId}
 	</delete>
+	
+	
+	<!-- 커플 아이디로 파트너 찾기  -->
+	<select id="findPartnerByCoupleId" parameterType="map" resultType="com.playhere.member.MemberDTO">
+	    SELECT * FROM member
+	    WHERE couple_id = #{coupleId} AND user_id != #{userId}
+	</select>
+	
 </mapper>
