@@ -31,4 +31,6 @@ public interface ICoupleService {
    public List<PlaceDTO> SearchPlace();
    public List<CoupleDTO> Schedule(@Param("date") String date,@Param("coupleId") String coupleId);
    public List<CoupleDTO> LastVisit(@Param("coupleId") String coupleId, @Param("today") String today);
+   public List<CoupleDTO> searchSchedule(@Param("coupleId") String coupleId, @Param("searchWord") String searchWord);
+   
 }

@@ -95,6 +95,9 @@ public class Place {
 		return dao.view(PlaceId);
 	}
 	
+	
+	
+	
 	@GetMapping("/closePlace.do")
 	public List<PlaceDTO> closePlace(@RequestParam("longitude") double longitude, @RequestParam("latitude") double latitude) {
 		double longitude1 = longitude - 0.01;
