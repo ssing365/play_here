@@ -24,4 +24,8 @@ public interface IPlaceService {
 	
 	public List<PlaceDTO> listAll(ParameterDTO parameterDTO);
 	public List<PlaceDTO> listLikes(ParameterDTO parameterDTO);
+	public List<PlaceDTO> closePlace(@Param("longitude1") double longitude1,
+		    @Param("longitude2") double longitude2,
+		    @Param("latitude1") double latitude1,
+		    @Param("latitude2") double latitude2);
 }

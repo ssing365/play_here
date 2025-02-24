@@ -245,7 +245,7 @@ const Map = () => {
             marker.setMap(map);
         });
 
-        // 요청사항 1: 마커 순서대로 선(폴리라인) 그리기
+        // 마커 순서대로 선(폴리라인) 그리기
         if (polylinePath.length >= 2) {
             const polyline = new window.kakao.maps.Polyline({
                 path: polylinePath,
@@ -256,7 +256,7 @@ const Map = () => {
             });
             polyline.setMap(map);
 
-            // 요청사항 2: 폴리라인 길이(총 거리) 계산
+            // 폴리라인 길이(총 거리) 계산
             let totalDistance = 0;
             for (let i = 0; i < polylinePath.length - 1; i++) {
                 totalDistance += getDistance(

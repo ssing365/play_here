@@ -49,10 +49,6 @@ public class CoupleController {
 	    String visitDate = (String) requestBody.get("visitDate");
 
 	    try {
-	        System.out.println("Received placeIds: " + placeIds);
-	        System.out.println("Received coupleId: " + coupleId);
-	        System.out.println("Received visitDate: " + visitDate);
-
 	        // placeIds 순서대로 couple_visit 테이블의 index를 업데이트
 	        for (int index = 0; index < placeIds.size(); index++) {
 	            String placeId = placeIds.get(index);
@@ -103,7 +99,7 @@ public class CoupleController {
 	}
 	
 	@PostMapping("/Schedule.do")
-	public List<CoupleDTO> getMethodName(@RequestBody Map<String, String> requestBody) {
+	public List<CoupleDTO> Schedule(@RequestBody Map<String, String> requestBody) {
 		String date = requestBody.get("date");
 		String coupleId = requestBody.get("coupleId");
 		System.out.println(date);
@@ -114,8 +110,6 @@ public class CoupleController {
 	public List<CoupleDTO> LastVisit(@RequestBody Map<String, String> requestBody) {
 		String coupleId = requestBody.get("coupleId");
 		String today = requestBody.get("today");
-		System.out.println("today:"+today);
-		System.out.println("coupleId:"+coupleId);
 		return dao.LastVisit(coupleId,today);
 	}
 	

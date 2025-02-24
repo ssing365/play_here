@@ -86,9 +86,20 @@ public class Place {
 		return dao.view(PlaceId);
 	}
 	
+	@GetMapping("/closePlace.do")
+	public List<PlaceDTO> closePlace(@RequestParam("longitude") double longitude, @RequestParam("latitude") double latitude) {
+		double longitude1 = longitude - 0.01;
+		double longitude2 = longitude + 0.01;
+		double latitude1 = latitude - 0.01;
+		double latitude2 = latitude + 0.01;
+		
+		return dao.closePlace(longitude1,longitude2,latitude1,latitude2);
+	}
+	
+	
 	// 좋아요 여부 확인
     @GetMapping("/likeStatus.do")
-    public boolean getLikeStatus(@RequestParam("userId") String userId,
+    public boolean likeStatus(@RequestParam("userId") String userId,
             @RequestParam("placeId") String placeId) {
     	int check = dao.Interestcheck(userId, placeId);
         if(check == 1) {
