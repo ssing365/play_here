@@ -50,6 +50,10 @@ public interface IMemberService {
 	
 	//커플 삭제하는 사람의  파트너 조회
 	public MemberDTO findPartnerByCoupleId(@Param("coupleId") int coupleId, @Param("userId") String userId);
+	
+	// 아이디 찾기
+	public String findUserId(@Param("name") String name, @Param("email") String email);
+
 
 
 	

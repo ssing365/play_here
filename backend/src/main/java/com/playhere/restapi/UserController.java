@@ -14,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -220,4 +221,24 @@ public class UserController {
         List<Integer> prefList = memberService.getUserPreferences(userId);
         return ResponseEntity.ok(prefList);
     }
+    
+    
+    @PostMapping("/find-id")
+    public ResponseEntity<?> findUserId(@RequestBody Map<String, String> request) {
+        String name = request.get("name");
+        String email = request.get("email");
+
+        // ✅ 입력값 검증 추가
+        if (name == null || name.trim().isEmpty() || email == null || email.trim().isEmpty()) {
+            return ResponseEntity.badRequest().body(Map.of("success", false, "message", "이름과 이메일을 모두 입력해주세요."));
+        }
+
+        String userId = memberService.findUserId(name, email);
+        if (userId != null) {
+            return ResponseEntity.ok(Map.of("success", true, "userId", userId));
+        } else {
+            return ResponseEntity.ok(Map.of("success", false, "message", "일치하는 아이디가 없습니다."));
+        }
+    }
+
 }
