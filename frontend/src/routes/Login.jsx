@@ -48,21 +48,29 @@ const Login = () => {
             console.log(response.data);
 
             if (response.status === 200) {
-                // ✅ 3. 아이디 저장 또는 삭제
-                if (rememberMe) {
-                    localStorage.setItem("savedUserId", userId); // 아이디 저장
+                // ✅ 1. `couple_status == 2`이면 알림 띄우고 확인 후 이동!
+                if (response.data.message && response.data.message.trim() !== "") {
+                    Swal.fire({
+                        icon: "warning",
+                        title: response.data.message, 
+                        text: "커플 캘린더와 커플 일기가 모두 삭제되어 접근하실 수 없습니다.",
+                        confirmButtonText: "확인",
+                    }).then(() => {
+                        // ✅ 확인 버튼을 누른 후에만 이동하도록 변경!
+                        const redirectPath = new URLSearchParams(location.search).get("redirect");
+                        window.location.href = redirectPath ? redirectPath : "/";
+                    });
                 } else {
-                    localStorage.removeItem("savedUserId"); // 저장된 아이디 삭제
+                    // ✅ 메시지가 없으면 바로 이동
+                    const redirectPath = new URLSearchParams(location.search).get("redirect");
+                    window.location.href = redirectPath ? redirectPath : "/";
                 }
-
-                // 리디렉트 처리 수정
-                const redirectPath = new URLSearchParams(location.search).get(
-                    "redirect"
-                );
-                if (redirectPath) {
-                    window.location.href = redirectPath;
+    
+                // ✅ 2. 아이디 저장 또는 삭제
+                if (rememberMe) {
+                    localStorage.setItem("savedUserId", userId);
                 } else {
-                    window.location.href = "/";
+                    localStorage.removeItem("savedUserId");
                 }
             }
         } catch (error) {

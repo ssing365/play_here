@@ -217,7 +217,7 @@ public class UserController {
 
     // 현재 선호도 조회 API
     @GetMapping("/user/{userId}/preferences")
-    public ResponseEntity<List<Integer>> getUserPreferences(@PathVariable String userId) {
+    public ResponseEntity<List<Integer>> getUserPreferences(@PathVariable("userId")  String userId) {
         List<Integer> prefList = memberService.getUserPreferences(userId);
         return ResponseEntity.ok(prefList);
     }

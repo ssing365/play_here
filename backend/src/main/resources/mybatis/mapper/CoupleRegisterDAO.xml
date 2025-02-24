@@ -26,12 +26,44 @@
     <delete id="deleteCoupleCode">
         DELETE FROM couple_code WHERE user_id = #{userId}
     </delete>
+
+    <!-- ✅ 각 SQL 문을 개별적인 태그로 분리 -->
     
-    
-    <!--  couple 테이블에서 해당 couple_id 삭제 -->
-    <delete id="disconnectCouple">
-    DELETE FROM couple WHERE couple_id = (SELECT couple_id FROM member WHERE user_id = #{userId})
-	</delete>
+    <!-- 1️⃣ 커플을 끊은 사람 (couple1) → couple_id 제거 & 상태 0 (커플 아님) -->
+    <update id="updateMemberAfterDisconnect">
+        UPDATE member
+        SET couple_id = NULL, couple_status = 0
+        WHERE user_id = #{userId}
+    </update>
+
+    <!-- 2️⃣ 커플이 끊긴 상대방 (couple2) → couple_status = 2 (일방적 해제) -->
+    <update id="updatePartnerAfterDisconnect">
+        UPDATE member
+        SET couple_id = NULL, couple_status = 2
+        WHERE user_id = (
+            SELECT CASE 
+                WHEN user_id_1 = #{userId} THEN user_id_2
+                ELSE user_id_1
+            END 
+            FROM couple WHERE user_id_1 = #{userId} OR user_id_2 = #{userId}
+        )
+    </update>
+
+    <!-- 3️⃣ couple 테이블에서 커플 관계 삭제 -->
+    <delete id="deleteCoupleByUser">
+        DELETE FROM couple 
+        WHERE (user_id_1 = #{userId} OR user_id_2 = #{userId})
+    </delete>
+
+    <!-- 4️⃣ couple_code 테이블에서 초대자 & 수락자의 코드 삭제 -->
+    <delete id="deleteCoupleCodeByUser">
+        DELETE FROM couple_code 
+        WHERE user_id IN (
+            #{userId}, 
+            (SELECT user_id_2 FROM couple WHERE user_id_1 = #{userId}),
+            (SELECT user_id_1 FROM couple WHERE user_id_2 = #{userId})
+        )
+    </delete>
     
 
 </mapper>
