@@ -241,6 +241,7 @@ const Map = () => {
             const marker = new window.kakao.maps.Marker({
                 position: latLng,
                 image: markerImage,
+                onclick:
             });
             marker.setMap(map);
         });

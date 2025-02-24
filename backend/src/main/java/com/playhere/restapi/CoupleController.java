@@ -1,6 +1,7 @@
 package com.playhere.restapi;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -115,10 +116,13 @@ public class CoupleController {
 	}
 	
 	@PostMapping("/searchSchedule.do")
-	public List<CoupleDTO> searchSchedule(@RequestBody Map<String, String> requestBody) {
-		String coupleId = requestBody.get("coupleId");
-		String searchWord = requestBody.get("searchWord");
-		return dao.searchSchedule(coupleId,searchWord);
+	public List<CoupleDTO> searchSchedule(@RequestBody Map<String, Object> requestBody) {
+	    String coupleId = String.valueOf(requestBody.get("coupleId"));
+	    List<String> searchWord = (List<String>) requestBody.get("searchWord");
+	    return dao.searchSchedule(coupleId, searchWord);
 	}
+
+
+
 	
 }

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import TopBar from "../components/TopBar";
 import Diary from "../components/Calendar/Diary";
 import Cal from "react-calendar";
@@ -478,8 +478,24 @@ const Calendar = () => {
         diary(formattedDate);
     };
 
+    const goToNextMatch = () => {
+        if (matchedDates.length === 0) return;
+        const nextIndex = (currentMatchIndex + 1) % matchedDates.length;
+        setCurrentMatchIndex(nextIndex);
+        setSelectedDate(new Date(matchedDates[nextIndex]));
+    };
+
+    const goToPrevMatch = () => {
+        if (matchedDates.length === 0) return;
+        const prevIndex =
+            (currentMatchIndex - 1 + matchedDates.length) % matchedDates.length;
+        setCurrentMatchIndex(prevIndex);
+        setSelectedDate(new Date(matchedDates[prevIndex]));
+    };
+
     const handleSearch = async () => {
-        console.log("handleSearch 호출됨", searchTerm);
+        const searchWord = searchTerm ? searchTerm.split(" ") : [];
+        console.log("handleSearch 호출됨", searchWord);
         if (!searchTerm) {
             setMatchedDates([]);
             Swal.fire({
@@ -495,7 +511,7 @@ const Calendar = () => {
             const response = await axios.post(
                 "http://localhost:8586/searchSchedule.do",
                 {
-                    searchWord: searchTerm,
+                    searchWord: searchWord,
                     coupleId: coupleInfo?.coupleId,
                 }
             );
@@ -542,34 +558,27 @@ const Calendar = () => {
         } catch (error) {
             console.error("검색 결과 가져오기 오류:", error);
         }
-        // 검색결과가 하나 이상이면 엔터를 누를 때마다 다음 결과로 이동
         goToNextMatch();
     };
 
-    useEffect(() => {
-        console.log("matchedDates:", matchedDates);
-    }, [matchedDates]);
+    const searchWord = React.useMemo(() => {
+        return searchTerm
+            ? searchTerm.split(" ").filter((word) => word.trim() !== "")
+            : [];
+    }, [searchTerm]);
 
-    const goToNextMatch = () => {
-        if (matchedDates.length === 0) return;
-        const nextIndex = (currentMatchIndex + 1) % matchedDates.length;
-        setCurrentMatchIndex(nextIndex);
-        setSelectedDate(new Date(matchedDates[nextIndex]));
-    };
+    const highlightText = (text, keywords) => {
+        if (!keywords || keywords.length === 0) return text;
 
-    const goToPrevMatch = () => {
-        if (matchedDates.length === 0) return;
-        const prevIndex =
-            (currentMatchIndex - 1 + matchedDates.length) % matchedDates.length;
-        setCurrentMatchIndex(prevIndex);
-        setSelectedDate(new Date(matchedDates[prevIndex]));
-    };
+        // 정규식에서 특별한 의미를 갖는 문자를 이스케이프합니다.
+        const escapedKeywords = keywords.map((keyword) =>
+            keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        );
 
-    const highlightText = (text, keyword) => {
-        if (!keyword) return text;
-        const parts = text.split(new RegExp(`(${keyword})`, "gi"));
+        const regex = new RegExp(`(${escapedKeywords.join("|")})`, "gi");
+        const parts = text.split(regex);
         return parts.map((part, index) =>
-            part.toLowerCase() === keyword.toLowerCase() ? (
+            regex.test(part) ? (
                 <span
                     key={index}
                     style={{ backgroundColor: "#FFE0E0", fontWeight: "bold" }}
@@ -636,8 +645,7 @@ const Calendar = () => {
                                     <ArrowLeft onClick={goToPrevMatch} />
 
                                     <span className="mx-2">
-                                        검색된 날짜 {" "}
-                                        {currentMatchIndex + 1}/
+                                        검색된 날짜 {currentMatchIndex + 1}/
                                         {matchedDates.length}
                                     </span>
                                     <ArrowRight onClick={goToNextMatch} />
@@ -795,7 +803,7 @@ const Calendar = () => {
                                                                                 <span className="me-2 p-1">
                                                                                     {highlightText(
                                                                                         place.placeName,
-                                                                                        searchTerm
+                                                                                        searchWord
                                                                                     )}
                                                                                 </span>
                                                                             )}
@@ -984,8 +992,8 @@ const Calendar = () => {
                                                                         key={
                                                                             index
                                                                         }
-                                                                        className="list-group-item"
-                                                                    >
+                                                                        className="prev-list-group-item"
+                                                                    >• {" "}
                                                                         {
                                                                             place.placeName
                                                                         }

@@ -136,6 +136,17 @@
 .list-group-item:hover {
     background-color: #f8f9fa;
 }
+.prev-list-group-item {
+    padding: 15px !important;
+    margin-bottom: 10px;
+    user-select: none;
+    transition: background 0.2s ease-in-out;
+    border-bottom: 1px solid #ccc;
+}
+
+.prev-list-group-item:hover {
+    background-color: #f8f9fa;
+}
 
 /* 방문지 추가 버튼 */
 .add-btn {
