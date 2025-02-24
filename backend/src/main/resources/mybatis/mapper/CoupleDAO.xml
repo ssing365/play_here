@@ -92,13 +92,25 @@
     ]]>
 	</select>
 	
-	<select id="searchSchedule" resultType="java.util.Date">
-		select visit_date from (
-	    select place.place_name as place_name, couple_visit.visit_date as visit_date from couple_visit
-	    join place on couple_visit.place_id = place.place_id
-	    WHERE couple_id = #{coupleId})
-	    where place_name like '%' || #{searchWord} || '%'
-	    group by visit_date
-	</select>
+<select id="searchSchedule" resultType="java.util.Date">
+    SELECT visit_date 
+    FROM (
+      SELECT place.place_name AS place_name, couple_visit.visit_date AS visit_date 
+      FROM couple_visit 
+      JOIN place ON couple_visit.place_id = place.place_id
+      WHERE couple_id = #{coupleId}
+      <if test="searchWord != null and searchWord.size() > 0">
+        AND (
+          <foreach collection="searchWord" item="str" separator=" OR ">
+            place.place_name LIKE '%' || TO_CHAR(#{str}) || '%'
+          </foreach>
+        )
+      </if>
+    )
+    GROUP BY visit_date
+
+</select>
+
+
 
 </mapper>

@@ -1,4 +1,4 @@
-import { useState, useContext, useEffect, useRef } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import TopBar from "../components/TopBar";
 import Diary from "../components/Calendar/Diary";
 import Cal from "react-calendar";
@@ -484,14 +484,15 @@ const Calendar = () => {
 
 
     const handleSearch = async () => {
-        console.log("handleSearch 호출됨", searchTerm);
+        const searchWord = searchTerm ? searchTerm.split(" ") : [];
+        console.log("handleSearch 호출됨", searchWord);
         if (!searchTerm) {
           setMatchedDates([]);
           return;
         }
         try {
           const response = await axios.post("http://localhost:8586/searchSchedule.do", {
-            searchWord: searchTerm,
+            searchWord: searchWord,
             coupleId: coupleInfo?.coupleId,
           });
           // 백엔드가 { visitDate: [...] }가 아니라 단순히 배열을 반환할 경우:
@@ -522,6 +523,11 @@ const Calendar = () => {
         }
       };
       
+      const searchWord = React.useMemo(() => {
+        return searchTerm ? searchTerm.split(" ").filter(word => word.trim() !== "") : [];
+      }, [searchTerm]);
+      
+      
       
       useEffect(() => {
         console.log("matchedDates:", matchedDates);
@@ -543,11 +549,18 @@ const Calendar = () => {
         setSelectedDate(new Date(matchedDates[prevIndex]));
       };
 
-      const highlightText = (text, keyword) => {
-        if (!keyword) return text;
-        const parts = text.split(new RegExp(`(${keyword})`, "gi"));
+      const highlightText = (text, keywords) => {
+        if (!keywords || keywords.length === 0) return text;
+      
+        // 정규식에서 특별한 의미를 갖는 문자를 이스케이프합니다.
+        const escapedKeywords = keywords.map(keyword =>
+          keyword.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        );
+        
+        const regex = new RegExp(`(${escapedKeywords.join('|')})`, "gi");
+        const parts = text.split(regex);
         return parts.map((part, index) =>
-          part.toLowerCase() === keyword.toLowerCase() ? (
+          regex.test(part) ? (
             <span key={index} style={{ backgroundColor: "yellow", fontWeight: "bold" }}>
               {part}
             </span>
@@ -556,6 +569,7 @@ const Calendar = () => {
           )
         );
       };
+      
             
       const handleDateChange = (date) => {
         setSelectedDate(date);
@@ -755,7 +769,7 @@ const Calendar = () => {
                                                                                 />
                                                                             ) : (
                                                                                 <span className="me-2 p-1">
-                                                                                {highlightText(place.placeName, searchTerm)}
+                                                                                {highlightText(place.placeName, searchWord)}
                                                                                 </span>
 
                                                                             )}
