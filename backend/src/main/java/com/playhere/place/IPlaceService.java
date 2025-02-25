@@ -27,5 +27,7 @@ public interface IPlaceService {
 	public List<PlaceDTO> closePlace(@Param("longitude1") double longitude1,
 		    @Param("longitude2") double longitude2,
 		    @Param("latitude1") double latitude1,
-		    @Param("latitude2") double latitude2);
+		    @Param("latitude2") double latitude2,
+		    @Param("placeId") String placeId);
+	public int CountCalendar(@Param("coupleId") String coupleId, @Param("visitDate") Date visitDate);
 }

@@ -105,6 +105,7 @@
 		and latitude between #{latitude1} and #{latitude2}
 		ORDER BY DBMS_RANDOM.VALUE)
 		WHERE ROWNUM <= 4
+		AND place_id <> #{placeId}
 	]]>
 	</select>
 
@@ -155,6 +156,11 @@
 	        (SELECT COUNT(*) FROM couple_visit WHERE couple_id = #{coupleId} AND visit_date = #{visitDate}) + 1
 	    )
 	</insert>
+	
+	<select id="CountCalendar">
+		select count(*) from couple_visit
+		where couple_id = #{coupleId} and visit_date = #{visitDate}
+	</select>
 	
 	<select id="CheckCalendar" resultType="int">
 		select count(*) from couple_visit
