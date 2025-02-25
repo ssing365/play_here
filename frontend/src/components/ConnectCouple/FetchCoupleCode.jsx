@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react';
 import { Button } from 'react-bootstrap';
 import { CiShare2 } from "react-icons/ci";
+import { FaShareFromSquare } from "react-icons/fa6";
 import { UserContext } from "../../contexts/UserContext";
 
 const FetchCoupleCode = ({ setCoupleCode }) => {
@@ -77,13 +78,43 @@ const FetchCoupleCode = ({ setCoupleCode }) => {
     }
   };
 
+  const handleWebShare = async () => {
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "여기놀자 커플 초대",
+          text: "내 커플 코드로 연결해 보세요!",
+          url: `${window.location.origin}/connect-couple?code=${coupleCode}`,
+        });
+        console.log("공유 성공!");
+      } catch (error) {
+        console.error("공유 실패:", error);
+      }
+    } else {
+      alert("이 브라우저에서는 공유 기능을 사용할 수 없습니다.");
+    }
+  };
+  
+
   return (<>
     <div className="text-center">
-      <h6>내 커플코드</h6>
-      <h3 onClick={copyToClipboard}>{coupleCode || '불러오는 중...'}</h3>
+      <h4 style={{ marginBottom: '8px' }}>내 커플코드 </h4>
+      <span className="text-danger"
+        style={{ display: 'block', fontSize: '13px', marginBottom: '8px', lineHeight: '1.5' }}>
+        * 커플코드 클릭시 클립보드에 복사됩니다 *
+      </span>
+      <h3 onClick={copyToClipboard} style={{ marginBottom: '12px' }}>{coupleCode || '불러오는 중...'}</h3>
       {coupleCode && <p>남은 커플코드 유효시간: {timeRemaining}</p>}
-      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <Button variant="secondary" onClick={handleCopyLink}>초대링크 복사하기 <CiShare2 style={{ display: 'inline' }} /> </Button>
+
+      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+      <Button 
+          variant="secondary" 
+          onClick={handleCopyLink} 
+          style={{ display: 'inline-flex', alignItems: 'center' }}
+        >
+          초대링크 복사하기 
+          <CiShare2 style={{ fontSize: '16px', marginLeft: '5px', cursor: 'pointer' }} onClick={handleWebShare}/>
+        </Button>
       </div>
     </div>
   </>);
