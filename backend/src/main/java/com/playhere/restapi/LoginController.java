@@ -89,6 +89,8 @@ public class LoginController {
         responseData.put("userId", user.getUserId());
         responseData.put("coupleStatus", user.getCoupleStatus());
 
+        System.out.println("[백엔드] 응답 데이터 확인: " + responseData);
+        
         return ResponseEntity.ok(responseData);
 		
 	}

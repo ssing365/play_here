@@ -103,6 +103,12 @@
 	    WHERE user_id = #{userId}
 	</update>
 	
+	<update id="updateCoupleStatus2to0">
+	    UPDATE member 
+	    SET couple_status = 0 
+	    WHERE couple_status = 2
+	</update>
+
 	
 
     <!-- 선호도 수정  -->
@@ -127,5 +133,17 @@
 	    SELECT * FROM member
 	    WHERE couple_id = #{coupleId} AND user_id != #{userId}
 	</select>
+	
+	<!-- 아이디 찾기 -->
+	<select id="findUserId" parameterType="map" resultType="string">
+	    SELECT user_id FROM member WHERE name = #{name} AND email = #{email}
+	</select>
+	
+	<select id="getCoupleId" resultType="Integer">
+	    SELECT couple_id 
+	    FROM member 
+	    WHERE user_id = #{userId}
+	</select>
+	
 	
 </mapper>

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 // import Container_ from 'postcss/lib/container';
 import TopBar from "../components/TopBar";
 import "../css/LogForm.scss";
@@ -7,6 +7,8 @@ import NaverLoginButton from "../components/Login/NaverLogin.jsx";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import axios from "axios";
 import Swal from "sweetalert2";
+import { Modal } from "bootstrap";
+import FindIdModal from "../components/Login/FindIdModal.jsx";
 
 const Login = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
@@ -17,6 +19,8 @@ const Login = () => {
     const rememberMeRef = useRef(null);
     const navigate = useNavigate();
     const location = useLocation();
+    const modalRef = useRef(null); // 모달 참조 추가
+
 
     // ✅ 1. 페이지 로드 시 localStorage에서 아이디 불러오기
     useEffect(() => {
@@ -44,21 +48,29 @@ const Login = () => {
             console.log(response.data);
 
             if (response.status === 200) {
-                // ✅ 3. 아이디 저장 또는 삭제
-                if (rememberMe) {
-                    localStorage.setItem("savedUserId", userId); // 아이디 저장
+                // ✅ 1. `couple_status == 2`이면 알림 띄우고 확인 후 이동!
+                if (response.data.message && response.data.message.trim() !== "") {
+                    Swal.fire({
+                        icon: "warning",
+                        title: response.data.message, 
+                        text: "커플 캘린더와 커플 일기가 모두 삭제되어 접근하실 수 없습니다.",
+                        confirmButtonText: "확인",
+                    }).then(() => {
+                        // ✅ 확인 버튼을 누른 후에만 이동하도록 변경!
+                        const redirectPath = new URLSearchParams(location.search).get("redirect");
+                        window.location.href = redirectPath ? redirectPath : "/";
+                    });
                 } else {
-                    localStorage.removeItem("savedUserId"); // 저장된 아이디 삭제
+                    // ✅ 메시지가 없으면 바로 이동
+                    const redirectPath = new URLSearchParams(location.search).get("redirect");
+                    window.location.href = redirectPath ? redirectPath : "/";
                 }
-
-                // 리디렉트 처리 수정
-                const redirectPath = new URLSearchParams(location.search).get(
-                    "redirect"
-                );
-                if (redirectPath) {
-                    window.location.href = redirectPath;
+    
+                // ✅ 2. 아이디 저장 또는 삭제
+                if (rememberMe) {
+                    localStorage.setItem("savedUserId", userId);
                 } else {
-                    window.location.href = "/";
+                    localStorage.removeItem("savedUserId");
                 }
             }
         } catch (error) {
@@ -79,6 +91,14 @@ const Login = () => {
                 console.error("로그인 오류:", error);
                 alert("서버 오류가 발생했습니다.");
             }
+        }
+    };
+
+    // ✅ 모달 트리거 함수
+    const handleShowModal = () => {
+        if (modalRef.current) {
+            const modalInstance = new Modal(modalRef.current);
+            modalInstance.show();
         }
     };
 
@@ -137,10 +157,7 @@ const Login = () => {
                 </form>
 
                 <div className="find-me">
-                    <span
-                        className="find-id"
-                        onClick={() => navigate("/find-id")}
-                    >
+                    <span className="find-id" onClick={handleShowModal}>
                         아이디 찾기
                     </span>
                     /
@@ -152,6 +169,9 @@ const Login = () => {
                     </span>
                 </div>
 
+                {/* 아이디 찾기 모달 */}
+                <FindIdModal modalRef={modalRef} />
+
                 <Link to={"/register-terms"}>
                     <span className="regist">회원가입</span>
                 </Link>
@@ -161,16 +181,13 @@ const Login = () => {
                 </div>
 
                 <div className="kakao__btn">
-                    <KakaoLoginButton
-                        
-                    />
+                    <KakaoLoginButton />
                 </div>
                 <div className="naver__btn">
-                    <NaverLoginButton 
-                    onClick={(e) => {
+                    <NaverLoginButton onClick={(e) => {
                         e.preventDefault();
-                        alert("구현중입니다.")
-                    }}/>
+                        alert("구현중입니다.");
+                    }} />
                 </div>
             </div>
         </>

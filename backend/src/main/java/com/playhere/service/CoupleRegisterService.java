@@ -147,52 +147,58 @@ public class CoupleRegisterService implements ICoupleRegisterBusinessService {
         }
     }
     
-    //커플끊기
+  //커플끊기
     @Transactional
     public void disconnectCouple(String userId) {
-    	 System.out.println("💡 [백엔드] disconnectCouple() 실행 - userId: " + userId);
+        System.out.println("💡 [백엔드] disconnectCouple() 실행 - userId: " + userId);
+        
+        // 현재 사용자 정보 조회
         MemberDTO user = memberMapper.findByUserId(userId);
         if (user == null) {
-        	System.out.println("❌ [백엔드] 사용자를 찾을 수 없음!");
+            System.out.println("❌ [백엔드] 사용자를 찾을 수 없음!");
             throw new RuntimeException("해당 유저는 존재하지 않습니다.");
         }
 
-        Integer coupleId = user.getCoupleId(); // 기존 int → Integer 변경
+        Integer coupleId = user.getCoupleId();
         if (coupleId == null) {
-        	System.out.println("❌ [백엔드] 커플 ID 없음!");
+            System.out.println("❌ [백엔드] 커플 ID 없음!");
             throw new RuntimeException("커플 ID가 존재하지 않습니다.");
         }
         
         System.out.println("🔍 [백엔드] coupleId 확인: " + coupleId);
 
+        // 커플 상대방 조회
         MemberDTO partner = memberMapper.findPartnerByCoupleId(coupleId, userId);
         if (partner == null) {
-        	System.out.println("❌ [백엔드] 파트너 정보 없음!");
+            System.out.println("❌ [백엔드] 파트너 정보 없음!");
             throw new RuntimeException("파트너 정보를 찾을 수 없습니다.");
         }
         
+        String parterId = partner.getUserId();
+        
         System.out.println("🔍 [백엔드] 파트너 userId 확인: " + partner.getUserId());
 
-        // 사용자와 상대방의 커플 상태 변경
+        // ✅ 수정된 SQL 호출
         System.out.println("🔄 [백엔드] 사용자 커플 상태 업데이트...");
-        memberMapper.updateCoupleStatus(userId, 0, null);
+        coupleRegisterMapper.updateMemberAfterDisconnect(userId);
         System.out.println("✅ [백엔드] 사용자 커플 상태 업데이트 완료!");
-        
-        System.out.println("🔄 [백엔드] 파트너 커플 상태 업데이트...");
-        memberMapper.updateCoupleStatus2to0(partner.getUserId());
-        System.out.println("✅ [백엔드] 파트너 커플 상태 업데이트 완료!");
-        
-        // 커플 테이블에서 삭제
-        System.out.println("🔄 [백엔드] 커플 테이블 삭제...");
-        coupleRegisterMapper.deleteCouple(coupleId);
-        System.out.println("✅ [백엔드] 커플 테이블 삭제 완료!");
 
-        // 커플 코드 삭제
+        System.out.println("🔄 [백엔드] 파트너 커플 상태 업데이트...");
+        coupleRegisterMapper.updatePartnerAfterDisconnect(parterId);
+        System.out.println("✅ [백엔드] 파트너 커플 상태 업데이트 완료!");
+
+        // couple 테이블에서 삭제
+        System.out.println("🔄 [백엔드] 커플 관계 삭제...");
+        coupleRegisterMapper.deleteCoupleByUser(userId);
+        System.out.println("✅ [백엔드] 커플 관계 삭제 완료!");
+
+        // couple_code 테이블에서 코드 삭제
         System.out.println("🔄 [백엔드] 커플 코드 삭제...");
-        coupleRegisterMapper.deleteCoupleCode(userId);
-        coupleRegisterMapper.deleteCoupleCode(partner.getUserId());
+        coupleRegisterMapper.deleteCoupleCodeByUser(userId);
+        coupleRegisterMapper.deleteCoupleCodeByUser(parterId);
         System.out.println("✅ [백엔드] 커플 코드 삭제 완료!");
     }
+
 
 
 }

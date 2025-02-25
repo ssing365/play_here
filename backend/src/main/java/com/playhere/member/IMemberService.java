@@ -49,7 +49,14 @@ public interface IMemberService {
 	public void deleteUserPreferences(String userId);
 	
 	//커플 삭제하는 사람의  파트너 조회
-	public MemberDTO findPartnerByCoupleId(@Param("coupleId") int coupleId, @Param("userId") String userId);
+	public MemberDTO findPartnerByCoupleId(@Param("coupleId") Integer coupleId, @Param("userId") String userId);
+	
+	// 아이디 찾기
+	public String findUserId(@Param("name") String name, @Param("email") String email);
+	
+	// 현재 사용자의 커플 ID 조회
+    public Integer getCoupleId(@Param("userId") String userId);
+
 
 
 	

@@ -50,13 +50,24 @@ const CoupleDisconnect = () => {
                     { withCredentials: true }
                 );
                 console.log("✅ [프론트] 응답 받음: ", response.data); // 응답 확인
-                alert(response.data);
-                // API 호출 후 mypage로 이동 및 새로고침
-                window.location.href = "/mypage";
+                Swal.fire({
+                    icon: "success",
+                    title: "커플 해제 완료!",
+                    text: response.data.message,  // 🔥 응답 메시지 출력!
+                    confirmButtonText: "확인",
+                }).then(() => {
+                    // ✅ 확인 버튼 클릭 후 마이페이지로 이동
+                    window.location.href = "/mypage";
+                });
             } catch (error) {
                 console.error("커플 끊기 실패:", error);
                 console.error("❌ [프론트] 커플 끊기 실패:", error.response ? error.response.data : error.message);
-                alert("커플 끊기에 실패했습니다.");
+                Swal.fire({
+                    icon: "error",
+                    title: "커플 끊기 실패!",
+                    text: "커플 끊기에 실패했습니다. 다시 시도해주세요.",
+                    confirmButtonText: "확인",
+                });
             }
         }
     };
