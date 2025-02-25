@@ -41,6 +41,7 @@
 }
 
 .react-calendar__tile {
+    position: relative; /* 절대 위치 요소의 기준이 됩니다. */
     padding: 25px 10px;
     font-size: 15px;
     text-align: center;
@@ -67,15 +68,34 @@
     border-radius: 10px;
 }
 
+/* 달력 타일은 이미 relative 포지셔닝이 적용되어 있다고 가정 */
+.tile-dot-wrapper {
+    position: absolute;
+    bottom: 15px;       /* 타일 하단에서 15px 위 */
+    left: 50%;         /* 수평 중앙 */
+    transform: translateX(-50%);
+    display: flex;
+    gap: 2px;
+}
+  
+
 /* 방문지, 일기 추가 시 표시 */
 .calendar-dot {
-    display: block;
+    display: inline-block;
     width: 5px;
     height: 5px;
-    background-color: #d32f2f;
     border-radius: 50%;
-    margin: auto;
 }
+
+/* 방문지 점, 일기 점 */
+.calendar-visit-dot {
+    background-color: #d32f2f;
+  }
+  
+  .calendar-diary-dot {
+    background-color: #2ab3dd;
+  }
+
 
 /* 우측 패널 : 방문지 리스트 */
 .places-column {
@@ -134,6 +154,17 @@
 }
 
 .list-group-item:hover {
+    background-color: #f8f9fa;
+}
+.prev-list-group-item {
+    padding: 15px !important;
+    margin-bottom: 10px;
+    user-select: none;
+    transition: background 0.2s ease-in-out;
+    border-bottom: 1px solid #ccc;
+}
+
+.prev-list-group-item:hover {
     background-color: #f8f9fa;
 }
 

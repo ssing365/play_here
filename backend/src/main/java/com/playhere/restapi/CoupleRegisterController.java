@@ -22,6 +22,12 @@ import com.playhere.couple.ICoupleCodeBusinessService;
 import com.playhere.couple.ICoupleRegisterBusinessService;
 import com.playhere.member.MemberDTO;
 
+import jakarta.servlet.http.HttpSession;
+
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+
+
 @RestController
 @RequestMapping("/api/couple")
 public class CoupleRegisterController {
@@ -98,5 +104,6 @@ public class CoupleRegisterController {
             return ResponseEntity.internalServerError().body(response);
         }
     }
+    
 
 }

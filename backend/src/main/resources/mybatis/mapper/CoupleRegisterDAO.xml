@@ -15,8 +15,23 @@
     <!-- member 테이블에 couple_id, couple_status 업데이트 -->
     <update id="updateCoupleStatus" parameterType="map">
         UPDATE member
-        SET couple_id = #{coupleId}, couple_status = 1
+        SET couple_id = #{coupleId}, couple_status = #{coupleStatus}
         WHERE user_id = #{userId}
     </update>
+    
+    <delete id="deleteCouple">
+        DELETE FROM couple WHERE couple_id = #{coupleId}
+    </delete>
+
+    <delete id="deleteCoupleCode">
+        DELETE FROM couple_code WHERE user_id = #{userId}
+    </delete>
+    
+    
+    <!--  couple 테이블에서 해당 couple_id 삭제 -->
+    <delete id="disconnectCouple">
+    DELETE FROM couple WHERE couple_id = (SELECT couple_id FROM member WHERE user_id = #{userId})
+	</delete>
+    
 
 </mapper>

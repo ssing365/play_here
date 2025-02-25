@@ -46,15 +46,6 @@ public class Place {
 	    ArrayList<String> searchLocation = parameterDTO.getSearchLocation();
 	    ArrayList<String> searchWord = parameterDTO.getSearchWord();
 	    ArrayList<String> searchCategory = parameterDTO.getSearchCategory();
-	    System.out.println("searchWord:"+searchWord);
-	    System.out.println("searchloca:"+searchLocation);
-	    System.out.println("searchCate:"+searchCategory);
-	    // 예시로 검색 조건을 출력
-	    System.out.println("start: " +parameterDTO.getStart());
-	    System.out.println("end: " + parameterDTO.getEnd());
-
-	    // DAO 메서드 호출하여 필터링된 장소 리스트 반환
-	    System.out.println(dao.list(parameterDTO));
 	    return dao.list(parameterDTO);
 	}
 	
@@ -124,7 +115,7 @@ public class Place {
 	public void placeLike(@RequestBody Map<String, String> params) {
 		
 		String userId = params.get("userId");
-	    String placeId = params.get("placeId");
+	    String placeId = params.get("PlaceId");
 	    
 		try {
 

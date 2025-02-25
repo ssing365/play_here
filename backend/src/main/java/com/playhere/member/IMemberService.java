@@ -33,9 +33,11 @@ public interface IMemberService {
 	// 회원 탈퇴
 	public void withdrawUser(String userId);
 	
-	//커플 상태 업데이트 추가 
-	public void updateCoupleStatus(@Param("userId") String userId, @Param("coupleId") int coupleId);
+	//커플 상태 업데이트 추가 (커플 맺기, 끊기)
+	public void updateCoupleStatus(@Param("userId") String userId, @Param("coupleStatus") int coupleStatus, @Param("coupleId") Integer coupleId);
 	
+	//커플 상태 2인 사람 0으로 고치기 
+	public void updateCoupleStatus2to0(@Param("userId") String userId);
 
 	// 선호도 수정
 	public void updateUserPreferences(String userId, List<Integer> preferenceIds);
@@ -45,5 +47,13 @@ public interface IMemberService {
 
 	// 기존 선호도 삭제
 	public void deleteUserPreferences(String userId);
+	
+	//커플 삭제하는 사람의  파트너 조회
+	public MemberDTO findPartnerByCoupleId(@Param("coupleId") int coupleId, @Param("userId") String userId);
+
+
+	
+	
+	
 
 }

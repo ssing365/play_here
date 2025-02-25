@@ -36,11 +36,11 @@ const Login = () => {
 
         try {
             const response = await axios.post(
-                '/api/login',
+                "/api/login",
                 { userId, password },
                 { withCredentials: true }
             );
-            console.log(response)
+            console.log(response);
             console.log(response.data);
 
             if (response.status === 200) {
@@ -52,7 +52,9 @@ const Login = () => {
                 }
 
                 // 리디렉트 처리 수정
-                const redirectPath = new URLSearchParams(location.search).get("redirect");
+                const redirectPath = new URLSearchParams(location.search).get(
+                    "redirect"
+                );
                 if (redirectPath) {
                     window.location.href = redirectPath;
                 } else {
@@ -66,6 +68,12 @@ const Login = () => {
                     text: "아이디 또는 비밀번호가 올바르지 않습니다.",
                     timer: 1000,
                     showConfirmButton: false,
+                });
+            }else if (error.response && error.response.status === 403) {
+                Swal.fire({
+                    icon: "error",
+                    text: "이 계정은 탈퇴한 회원입니다. 로그인할 수 없습니다.",
+                    showConfirmButton: true,
                 });
             } else {
                 console.error("로그인 오류:", error);
@@ -153,10 +161,16 @@ const Login = () => {
                 </div>
 
                 <div className="kakao__btn">
-                    <KakaoLoginButton />
+                    <KakaoLoginButton
+                        
+                    />
                 </div>
                 <div className="naver__btn">
-                    <NaverLoginButton />
+                    <NaverLoginButton 
+                    onClick={(e) => {
+                        e.preventDefault();
+                        alert("구현중입니다.")
+                    }}/>
                 </div>
             </div>
         </>

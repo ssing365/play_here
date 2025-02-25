@@ -68,9 +68,20 @@
 		SELECT visit_date
 		FROM couple_visit
 		WHERE couple_id = #{coupleId}
-		  AND visit_date >= TO_DATE('2025-02-01','YYYY-MM-DD')
-		  AND visit_date < ADD_MONTHS(TO_DATE('2025-02-01','YYYY-MM-DD'), 1)
+		  AND visit_date >= TO_DATE(#{date},'YYYY-MM')
+		  AND visit_date < ADD_MONTHS(TO_DATE(#{date},'YYYY-MM'), 1)
 		GROUP by visit_date
+	]]>
+	</select>
+	
+	<select id="DiaryWrited" resultType="com.playhere.couple.CoupleDTO">
+	<![CDATA[
+		SELECT diary_date
+		FROM couple_diary
+		WHERE couple_id = #{coupleId}
+		  AND diary_date >= TO_DATE(#{date},'YYYY-MM')
+		  AND diary_date < ADD_MONTHS(TO_DATE(#{date},'YYYY-MM'), 1)
+		GROUP by diary_date
 	]]>
 	</select>
 	

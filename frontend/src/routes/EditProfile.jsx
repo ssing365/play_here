@@ -320,9 +320,6 @@ const EditProfile = () => {
                             </div>
 
                             <div className="button-container">
-                                <Button variant="outline-secondary">
-                                    비밀번호 변경
-                                </Button>
                                 <div className="spacer"></div>
                                 <button
                                     type="button"

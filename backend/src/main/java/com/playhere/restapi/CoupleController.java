@@ -104,8 +104,16 @@ public class CoupleController {
 	public List<CoupleDTO> Schedule(@RequestBody Map<String, String> requestBody) {
 		String date = requestBody.get("date");
 		String coupleId = requestBody.get("coupleId");
-		System.out.println(date);
+		System.out.println("date:"+date);
 		return dao.Schedule(date,coupleId);
+	}
+	
+	@PostMapping("/DiaryWrited.do")
+	public List<CoupleDTO> DiaryWrited(@RequestBody Map<String, String> requestBody) {
+		String date = requestBody.get("date");
+		String coupleId = requestBody.get("coupleId");
+		System.out.println(date);
+		return dao.DiaryWrited(date,coupleId);
 	}
 	
 	@PostMapping("/LastVisit.do")
