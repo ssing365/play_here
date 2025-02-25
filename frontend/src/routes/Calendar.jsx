@@ -14,7 +14,6 @@ import PlaceDetailOffcanvas from "../components/PlaceDetailOffcanvas";
 
 const Calendar = () => {
     const [date, setDate] = useState(new Date());
-    const [showSearch, setShowSearch] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [places, setPlaces] = useState([]);
@@ -74,8 +73,6 @@ const Calendar = () => {
                 const response = await axios.get(
                     "http://localhost:8586/SearchPlace.do"
                 );
-                console.log("Fetched places:", response.data);
-                // API 응답이 배열이라고 가정
                 setPlaceList(response.data);
             } catch (error) {
                 console.error("Error fetching places:", error);
@@ -227,8 +224,10 @@ const Calendar = () => {
             })
             .replace(/\. /g, "-")
             .replace(".", "");
+            setShowInput(false);
         setPlaces([]); 
         lastVisit();
+        setNewPlace("");
         visitList(formattedDate);
         if (coupleInfo) {
             diary(formattedDate);
@@ -286,6 +285,23 @@ const Calendar = () => {
         }
     };
 
+    useEffect(() => {
+        if (newPlace.trim() === "") {
+          setFilteredPlaces([]);
+          setShowDropdown(false);
+        } else {
+          const filtered = placeList.filter((p) =>
+            // 검색어(newPlace)가 포함된 곳만 남기고
+            p.placeName.toLowerCase().includes(newPlace.toLowerCase()) &&
+            // 이미 추가된 장소(places)에 같은 placeId가 없는 것만 필터링
+            !places.some((added) => String(added.placeId) === String(p.placeId))
+          );
+          setFilteredPlaces(filtered);
+          setShowDropdown(filtered.length > 0);
+        }
+      }, [newPlace, placeList, places]);
+      
+    
     //지난 방문지
     const lastVisit = async() => {
         const today = new Date();
