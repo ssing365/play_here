@@ -2,6 +2,7 @@ import TopBar from "../components/TopBar";
 import Footer from "../components/Footer";
 import Top5 from "../components/Main/Top5"
 import WeatherCard from "../components/Main/WeatherCard"; // WeatherCard 추가
+import RecomandPlaces from "../components/Main/RecomandPlaces";
 import '../index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row, Col, Card } from "react-bootstrap";
@@ -15,7 +16,6 @@ const Search = () => {
 
     // 주간 날짜 뽑기
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
-    console.log("날짜:", selectedDate);
     const [weekDates, setWeekDates] = useState([]);
     
     // context에서 로그인 상태, 유저 정보 가져오기
@@ -43,49 +43,16 @@ const Search = () => {
         [selectedDate+6] : [{ name: '행사 H', img: '/images/main2.png' }, { name: '행사 M', img: '/images/main3.png' }, { name: '행사 R', img: '/images/main5.png' }],
     }
 
-    // 맨위 추천장소 더미
-    const recommendations = {
-        '식당 & 카페': ['/images/main3.png', '/images/main4.png', '/images/main5.png'],
-        '가볼만한 곳': ['/images/main1.png', '/images/main2.png', '/images/main3.png'],
-        '축제, 공연': ['/images/main3.png', '/images/main5.png', '/images/main4.png'],
-    };
-
     return (
         <div className="d-flex flex-column min-vh-100">
             {/* 상단바 */}
             <TopBar />
             
             {/* 메인 컨테이너 */}
-            <Container className="mt-5 mb-5">
+            <Container className="mt-4">
+                
                 {/* 지금 가기 좋은 곳 */}
-                {isLoggedIn ? (
-                        <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
-                        {userInfo?.nickname || "Loading..."} 님을 위한 추천 </h4>
-                    ):(
-                        <h4 style={{ fontWeight: 'bold', color: '#000000', marginTop: '20px' }}>
-                        지금 가기 좋은 곳 </h4>
-                    )}
-                <div className="d-flex gap-3 mb-3">
-                    {['식당 & 카페', '가볼만한 곳', '축제, 공연'].map((category) => (
-                        <Button 
-                            key={category} 
-                            variant={selectedCategory === category ? 'dark' : 'outline-dark'} 
-                            onClick={() => setSelectedCategory(category)}
-                        >
-                            {category}
-                        </Button>
-                    ))}
-                </div>
-                <Row className="mb-4">
-                    {recommendations[selectedCategory].map((imgSrc, index) => (
-                        <Col key={index} md={4} className="mb-3">
-                            <Card>
-                                <Card.Img src={imgSrc} />
-                            </Card>
-                        </Col>
-                    ))}
-                </Row>
-
+                <RecomandPlaces />
                 {/* 중간 섹션 : 큐레이션, 큰 사진 슬라이드*/}
 
                 <Top5/>

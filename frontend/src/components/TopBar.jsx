@@ -10,7 +10,7 @@ import {
     Navbar,
     Nav,
     Dropdown,
-    Button,
+    Button
 } from "react-bootstrap";
 import "../css/Bar.css";
 import { useContext } from "react";
@@ -18,7 +18,6 @@ import { UserContext } from "../contexts/UserContext";
 import Swal from "sweetalert2";
 import axios from "axios";
 import qs from "qs";
-
 const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
@@ -237,7 +236,6 @@ const TopBar = () => {
                                                 />
                                             )}
                                         </Dropdown.Toggle>
-
                                         <Dropdown.Menu className="custom-dropdown">
                                             <Dropdown.Item
                                                 as={Link}

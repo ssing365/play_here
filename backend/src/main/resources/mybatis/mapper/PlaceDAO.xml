@@ -94,8 +94,6 @@
 		WHERE rNum BETWEEN #{start} AND #{end}
 	</select>
 	
-
-	
 	<select id="view" resultType="com.playhere.place.PlaceDTO">
 		SELECT * FROM place WHERE place_id = #{placeId}
 	</select>
@@ -109,7 +107,7 @@
 		WHERE ROWNUM <= 4
 	]]>
 	</select>
-	
+
 	<update id="placeLikeAdd" parameterType="java.lang.String">
 	    update place set likes = likes + 1 where place_id = #{placeId}
 	</update>
@@ -195,5 +193,4 @@
     </trim>
     ORDER BY place.place_id DESC
 </select>
-	
 </mapper>

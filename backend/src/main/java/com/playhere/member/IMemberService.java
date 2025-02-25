@@ -53,11 +53,4 @@ public interface IMemberService {
 	
 	// 아이디 찾기
 	public String findUserId(@Param("name") String name, @Param("email") String email);
-
-
-
-	
-	
-	
-
 }

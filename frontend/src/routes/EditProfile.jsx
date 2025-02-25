@@ -101,8 +101,7 @@ const EditProfile = () => {
                     withCredentials: true,
                 }
             );
-            console.log("수정 성공:", response.data);
-            
+            console.log("수정 성공:", response.data);            
             // Swal이 완료된 후 페이지 이동
             Swal.fire({
                 title: "수정 되었습니다.",

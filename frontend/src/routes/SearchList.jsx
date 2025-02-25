@@ -15,7 +15,6 @@ const SearchList = () => {
     // useLocation을 이용해 navigate로 전달된 state를 추출
     const location = useLocation();
 
-    const [showModal, setShowModal] = useState(false); // 모달 표시 상태
     const [places, setPlaces] = useState([]);
     const [searchCategory, setSearchCategory] = useState([]);
     const [searchLocation, setSearchLocation] = useState([]);

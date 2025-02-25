@@ -110,7 +110,6 @@ public class Place {
         }else return false;
     }
    
-    
 	@PostMapping("/placeLike.do")
 	public void placeLike(@RequestBody Map<String, String> params) {
 		
@@ -173,11 +172,5 @@ public class Place {
 		String userId = requestBody.get("userId");
 		String placeId = requestBody.get("placeId");
 		dao.InterestCancel(userId, placeId);
-		
 	}
-	
-
-
-	
-	
 }
