@@ -198,8 +198,9 @@ public class UserController {
     @Transactional
     @PutMapping("/user/{userId}/preferences")
     public ResponseEntity<Map<String, Integer>> updatePreferences(
-    		 @PathVariable String userId,
+    		 @PathVariable("userId") String userId,
     	     @RequestBody List<UserPreferenceDTO> preferences) {
+    	System.out.println("prefer"+preferences);
     	Map<String, Integer> response = new HashMap<>();
         try {
         	// 기존 선호도 삭제

@@ -120,7 +120,7 @@ const EditPreference = () => {
 
         try {
             const response = await fetch(
-                `/api/user/${userInfo.userId}/preferences`,
+                `http://localhost:8586/api/user/${userInfo?.userId}/preferences`,
                 {
                     method: "PUT",
                     headers: {

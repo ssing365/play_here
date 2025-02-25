@@ -116,7 +116,7 @@ def recommend_places(user_id: str):
         user_vector = vectorizer.transform([user_features])
 
         similarity_scores = cosine_similarity(user_vector, place_matrix)
-        content_recommendations = places.iloc[similarity_scores.argsort()[0][-30:][::-1]]  # 콘텐츠 기반 추천 20개
+        content_recommendations = places.iloc[similarity_scores.argsort()[0][-200:][::-1]]  # 콘텐츠 기반 추천 20개
 
         # 🔹 user_place_matrix 생성 (SVD 적용 가능하도록)
         user_place_matrix = user_interests.pivot(index="USER_ID", columns="PLACE_ID", values="PLACE_ID")
@@ -138,7 +138,7 @@ def recommend_places(user_id: str):
 
         # 🔹 SVD 추천이 없으면 콘텐츠 추천을 사용
         if svd_recommendations.empty:
-            recommended_places = content_recommendations.head(30)
+            recommended_places = content_recommendations.head(200)
         else:
             recommended_places = pd.concat([svd_recommendations, content_recommendations]).drop_duplicates(subset=["PLACE_ID"]).head(100)
 
@@ -154,7 +154,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://localhost:8080"],  # React & Spring Boot 허용
+    allow_origins=["http://localhost:5173", "http://localhost:8080", "http://localhost:8586"],  # React & Spring Boot 허용
     allow_credentials=True,
     allow_methods=["*"],  # 모든 HTTP 메서드 허용
     allow_headers=["*"],  # 모든 헤더 허용
