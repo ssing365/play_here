@@ -73,6 +73,8 @@ function Place() {
         }
     };
 
+    
+
     // 근처 장소
     const closePlace = async (longitude, latitude) => {
         try {
@@ -519,7 +521,7 @@ function Place() {
                     </Card>
 
                     {/* 근처 다른 장소 */}
-                    {place?.latitude == null || place?.longitude == null || place?.latitude == 0 || place?.longitude == 0 ? (
+                    {place?.latitude == null || place?.longitude == null ? (
                         <></>
                     ) : (
                         <>

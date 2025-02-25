@@ -91,10 +91,10 @@ public class Place {
 	
 	@GetMapping("/closePlace.do")
 	public List<PlaceDTO> closePlace(@RequestParam("longitude") double longitude, @RequestParam("latitude") double latitude,@RequestParam("placeId") String placeId) {
-		double longitude1 = longitude - 0.01;
-		double longitude2 = longitude + 0.01;
-		double latitude1 = latitude - 0.01;
-		double latitude2 = latitude + 0.01;
+		double longitude1 = longitude - 0.05;
+		double longitude2 = longitude + 0.05;
+		double latitude1 = latitude - 0.05;
+		double latitude2 = latitude + 0.05;
 		
 		return dao.closePlace(longitude1,longitude2,latitude1,latitude2,placeId);
 	}
