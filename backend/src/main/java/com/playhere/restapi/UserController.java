@@ -198,7 +198,7 @@ public class UserController {
     @Transactional
     @PutMapping("/user/{userId}/preferences")
     public ResponseEntity<Map<String, Integer>> updatePreferences(
-    		 @PathVariable String userId,
+    		 @PathVariable("userId") String userId,
     	     @RequestBody List<UserPreferenceDTO> preferences) {
     	Map<String, Integer> response = new HashMap<>();
         try {
