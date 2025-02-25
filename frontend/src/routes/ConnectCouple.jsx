@@ -44,7 +44,7 @@ const ConnectCouple = () => {
     <div>
       <TopBar />
       <Container className="mypage-container">
-        <Card className="mypage-card text-center">
+        <Card className="mypage-card text-center" style={{maxHeight: '500px'}}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
             {/* coupleCode가 "COUPLE"일 때 이미지 표시, 그렇지 않으면 FetchCoupleCode */}
             {coupleCode === "COUPLE" ? (

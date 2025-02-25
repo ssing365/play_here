@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterCouple = ({ coupleCode }) => {
-  const { userInfo, setUserInfo } = useContext(UserContext);
+  const { userInfo, updateUserInfo } = useContext(UserContext); // ✅ updateUserInfo 추가
   const [inputCode, setInputCode] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [inviterInfo, setInviterInfo] = useState(null);
@@ -14,6 +14,11 @@ const RegisterCouple = ({ coupleCode }) => {
 
   const showError = (title, text) => {
     Swal.fire({icon: "error", title, text});
+  };
+
+  // ✅ 성공 메시지도 Swal 모달로 통일
+  const showSuccess = (title, text) => {
+    Swal.fire({ icon: "success", title, text, confirmButtonText: "확인" });
   };
 
   useEffect(() => {
@@ -130,21 +135,30 @@ const RegisterCouple = ({ coupleCode }) => {
 
       const data = await response.json();
       if (response.ok) {
-        alert("커플 연결 성공!");
+        // ✅ 커플 연결 성공 메시지를 Swal로 변경
+        showSuccess("🎉 커플 연결 성공!", "커플 연결이 완료되었습니다. 이제 커플 캘린더 기능을 모두 이용할 수 있습니다.");
         setInputCode("");
         setIsCoupleConnected(true); // 커플 연결 성공 상태 변경
 
-        // ✅ userInfo 업데이트하여 FetchCoupleCode와 TopBar에 즉시 반영
-        setUserInfo((prev) => ({
-          ...prev,
+        // ✅ 디버깅용 콘솔 로그 추가
+        console.log("✅ [RegisterCouple] 커플 연결 성공: userInfo 업데이트 전");
+
+        // ✅ UserContext 업데이트 (TopBar 반영되도록 유도)
+        updateUserInfo({
+          ...userInfo,
           coupleCode: "COUPLE",
-        }));
+          coupleStatus: 1, //coupleStatus 함께 업데이트 
+        });
+
+        console.log("✅ [RegisterCouple] updateUserInfo 호출 완료!");
+
       } else {
-        alert(data.message || "커플 연결 실패!");
+        // ✅ 실패 메시지를 Swal로 변경
+        showError("커플 연결 실패", data.message || "커플 연결 중 문제가 발생했습니다. 다시 시도해주세요.");
       }
     } catch (error) {
       console.error("커플 연결 오류:", error);
-      alert("서버 오류 발생");
+      showError("서버 오류 발생", "커플 연결 중 오류가 발생했습니다. 나중에 다시 시도해주세요.");
     }
   };
 

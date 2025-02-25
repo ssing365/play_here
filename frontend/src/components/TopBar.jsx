@@ -23,10 +23,18 @@ const TopBar = () => {
     const remoteIp = import.meta.env.VITE_REMOTE_IP;
     const port = import.meta.env.VITE_PORT;
     // context에서 로그인 상태, 유저 정보 가져오기
-    const { userInfo, isLoggedIn, setIsLoggedIn } = useContext(UserContext);
+    const { userInfo, isLoggedIn, setIsLoggedIn, forceRender } = useContext(UserContext);
     const navigate = useNavigate();
     const location = useLocation();
     const [searchKeyword, setSearchKeyword] = useState("");
+
+    const [localUserInfo, setLocalUserInfo] = useState(userInfo);
+
+    useEffect(() => {
+        // ✅ userInfo가 변경되면 localUserInfo도 업데이트 (TopBar 리렌더링)
+        console.log("🔄 [TopBar] 리렌더링 감지됨! userInfo:", userInfo, "forceRender:", forceRender);
+        setLocalUserInfo(userInfo);
+    }, [userInfo, forceRender]);  // forceRender를 감지하여 변경되면 리렌더링
 
     // profilePicture가 존재하면 백엔드에서 이미지를 서빙하는 URL을 구성합니다.
     const profilePictureUrl =
@@ -111,6 +119,8 @@ const TopBar = () => {
         e.preventDefault();
         searchPlace(searchKeyword);
     };
+
+    
 
     return (
         <>
