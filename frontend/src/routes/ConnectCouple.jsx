@@ -12,7 +12,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 
 const ConnectCouple = () => {
   const { userInfo, isLoggedIn } = useContext(UserContext);
-  const [coupleCode, setCoupleCode] = useState(null);
+  const [coupleCode, setCoupleCode] = useState(userInfo?.coupleCode || null);
   const navigate = useNavigate();
   const location = useLocation();
  
@@ -32,7 +32,8 @@ const ConnectCouple = () => {
     }
 
     // 유저 정보에서 커플 코드 확인
-    if (userInfo?.coupleCode) {
+    // ✅ userInfo.coupleCode가 변경되면 coupleCode 업데이트
+    if (userInfo?.coupleCode !== coupleCode) {
       setCoupleCode(userInfo.coupleCode);
     }
   }, [isLoggedIn, userInfo, navigate, location]);
@@ -45,8 +46,17 @@ const ConnectCouple = () => {
       <Container className="mypage-container">
         <Card className="mypage-card text-center">
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
-            {/* 커플 코드가 COUPLE이 아니면 FetchCoupleCode 표시 */}
-            {coupleCode !== "COUPLE" && <FetchCoupleCode setCoupleCode={setCoupleCode} />}
+            {/* coupleCode가 "COUPLE"일 때 이미지 표시, 그렇지 않으면 FetchCoupleCode */}
+            {coupleCode === "COUPLE" ? (
+              <img 
+                src="/images/couple_connect_image.png" 
+                alt="커플 연결 이미지"
+                style={{ width: '300px', height: 'auto', marginBottom: '20px' }} 
+                onClick={() => navigate('/calendar')}
+              />
+            ) : (
+              <FetchCoupleCode setCoupleCode={setCoupleCode} />
+            )}
             <RegisterCouple coupleCode={coupleCode} />
           </div>
         </Card>

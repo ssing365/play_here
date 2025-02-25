@@ -5,7 +5,7 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 
 const RegisterCouple = ({ coupleCode }) => {
-  const { userInfo } = useContext(UserContext);
+  const { userInfo, setUserInfo } = useContext(UserContext);
   const [inputCode, setInputCode] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [inviterInfo, setInviterInfo] = useState(null);
@@ -133,6 +133,12 @@ const RegisterCouple = ({ coupleCode }) => {
         alert("커플 연결 성공!");
         setInputCode("");
         setIsCoupleConnected(true); // 커플 연결 성공 상태 변경
+
+        // ✅ userInfo 업데이트하여 FetchCoupleCode와 TopBar에 즉시 반영
+        setUserInfo((prev) => ({
+          ...prev,
+          coupleCode: "COUPLE",
+        }));
       } else {
         alert(data.message || "커플 연결 실패!");
       }
