@@ -147,9 +147,25 @@ const MyPageLikes = () => {
                         }
                     });
                 }
-                else{
+                if(check===0){
                     Swal.fire({
                         title: "이미 방문리스트에 존재합니다!",
+                        icon: "warning",
+    
+                        showCancelButton: true,
+                        confirmButtonColor: "#e91e63",
+                        cancelButtonColor: "#666",
+                        confirmButtonText: "캘린더 보러가기",
+                        cancelButtonText: "닫기",
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            navigate("/calendar");
+                        }
+                    });
+                }
+                if(check===0){
+                    Swal.fire({
+                        title: "방문지는 6개까지만 입력 가능합니다!",
                         icon: "warning",
     
                         showCancelButton: true,

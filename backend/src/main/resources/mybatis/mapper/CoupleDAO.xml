@@ -85,23 +85,26 @@
 	]]>
 	</select>
 	
-	<select id="LastVisit" resultType="com.playhere.couple.CoupleDTO">
-    <![CDATA[
+<select id="LastVisit" resultType="com.playhere.couple.CoupleDTO">
+  <![CDATA[
     SELECT * 
     FROM (
-        SELECT p.place_id, p.place_name, p.longitude, p.latitude
-        FROM place p
-        JOIN couple_visit cv ON p.place_id = cv.place_id
-        WHERE cv.couple_id = #{coupleId}
+      SELECT p.place_id, p.place_name, p.longitude, p.latitude
+      FROM place p
+      JOIN couple_visit cv ON p.place_id = cv.place_id
+      WHERE cv.couple_id = #{coupleId}
         AND cv.visit_date = (
-            SELECT MAX(visit_date)
-            FROM couple_visit
-            WHERE couple_id = #{coupleId} 
-            AND visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD') 
+          SELECT MAX(visit_date)
+          FROM couple_visit
+          WHERE couple_id = #{coupleId} 
+            AND visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD')
         )
+      ORDER BY DBMS_RANDOM.VALUE
     )
-    ]]>
-	</select>
+    WHERE ROWNUM <= 3
+  ]]>
+</select>
+
 	
 <select id="searchSchedule" resultType="java.util.Date">
     SELECT visit_date 

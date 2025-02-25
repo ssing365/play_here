@@ -225,13 +225,14 @@ const Calendar = () => {
             .replace(/\. /g, "-")
             .replace(".", "");
             setShowInput(false);
-        setPlaces([]); 
         lastVisit();
         setNewPlace("");
         visitList(formattedDate);
         if (coupleInfo) {
             diary(formattedDate);
         }
+        fetchSchedule(activeStartDate);
+        fetchDiaryWrited(activeStartDate);
     }, [selectedDate, coupleInfo]);
 
     // 일기 가져오기
@@ -275,7 +276,6 @@ const Calendar = () => {
                 "http://localhost:8586/visitList.do",
                 { visitDate: formattedDate, coupleId: coupleId }
             );
-            console.log(response1.data);
             setPlaces(response1.data); // 상태 업데이트
         } catch (error) {
             console.error("Error visit list :", error);
@@ -315,7 +315,6 @@ const Calendar = () => {
                 "http://localhost:8586/LastVisit.do",
                 { today: formattedDate, coupleId: coupleId }
             );
-            console.log("lastVisit:", response.data);
             setLastVisitPlace(response.data);
         } catch (error) {
             console.error("Error lastvisit list :", error);
@@ -325,60 +324,42 @@ const Calendar = () => {
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
+        if (!destination || destination.index === source.index) return;
+      
+        // 기존 places 배열을 복사하여 순서 변경 (낙관적 업데이트)
+        const updatedPlaces = Array.from(places);
+        const [removed] = updatedPlaces.splice(source.index, 1);
+        updatedPlaces.splice(destination.index, 0, removed);
+      
+        // UI에 바로 업데이트
+        setPlaces(updatedPlaces);
+      
+        // 업데이트된 순서에 따른 placeIds 배열 생성
+        const updatedPlaceIds = updatedPlaces.map((p) => p.placeId);
         const formattedDate = selectedDate
-            .toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            })
-            .replace(/\. /g, "-")
-            .replace(".", "");
-
-        // 드래그된 항목이 유효한 곳으로 드롭되지 않았다면, 아무런 동작을 하지 않음
-        if (!destination) {
-            return;
-        }
-
-        // 항목이 동일한 위치로 드래그된 경우
-        if (destination.index === source.index) {
-            return;
-        }
-
-        const response1 = await axios.post(
-            "http://localhost:8586/visitList.do",
-            { visitDate: formattedDate, coupleId: coupleId }
-        );
-
-        const placeIds = [
-            ...new Set(response1.data.map((item) => item.placeId)),
-        ];
-
-        // 🔹 placeIds 배열 복사
-        const updatedPlaceIds = [...placeIds];
-
-        // 🔹 기존 위치에서 아이템 제거
-        const [removed] = updatedPlaceIds.splice(source.index, 1);
-
-        // 🔹 새로운 위치에 추가
-        updatedPlaceIds.splice(destination.index, 0, removed);
-
-        // 백엔드에 순서 변경된 placeIds 전달
+          .toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })
+          .replace(/\. /g, "-")
+          .replace(".", "");
+      
         try {
-            const response = await axios.post(
-                "http://localhost:8586/updateVisitOrder.do",
-                {
-                    placeIds: updatedPlaceIds,
-                    coupleId: coupleId,
-                    visitDate: formattedDate,
-                }
-            );
-            console.log("순서 업데이트 성공:", response.data);
-            setPlaces([]);
-            visitList(formattedDate);
+          // 백엔드에 순서 변경된 placeIds 전송
+          await axios.post("http://localhost:8586/updateVisitOrder.do", {
+            placeIds: updatedPlaceIds,
+            coupleId: coupleId,
+            visitDate: formattedDate,
+          });
+          // 서버에서 새로운 데이터를 받아오더라도 UI에서 깜빡이지 않도록 상태를 덮어씌움
+          const response = await axios.post("http://localhost:8586/visitList.do", {
+            visitDate: formattedDate,
+            coupleId: coupleId,
+          });
+          setPlaces(response.data);
         } catch (error) {
-            console.error("순서 업데이트 실패:", error);
+          console.error("순서 업데이트 실패:", error);
+          // 실패 시 원래 상태로 복구하거나, 에러 처리를 할 수 있음
         }
-    };
+      };
+      
 
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
@@ -441,7 +422,6 @@ const Calendar = () => {
                 "http://localhost:8586/DiaryWrited.do",
                 { date: yearMonth, coupleId: coupleId }
             );
-            console.log("diaryWrited:",response.data);
             setDiaryWrited(response.data);
         } catch (error) {
             console.error("일기스케줄 데이터를 가져오는데 실패했습니다.", error);
@@ -451,15 +431,16 @@ const Calendar = () => {
     
 
     // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
-    useEffect(() => {
-        fetchSchedule(activeStartDate);
-        fetchDiaryWrited(activeStartDate);
-    }, [selectedDate]);
+    // useEffect(() => {
+    //     fetchSchedule(activeStartDate);
+    //     fetchDiaryWrited(activeStartDate);
+    // }, [selectedDate]);
 
     // 달력의 월/년이 변경될 때 호출되는 핸들러
     const handleActiveStartDateChange = async ({ activeStartDate }) => {
         setActiveStartDate(activeStartDate);
         fetchSchedule(activeStartDate);
+        fetchDiaryWrited(activeStartDate);
     };
 
     /* 일기, 방문지 추가시 달력에 점 표시 */
@@ -668,10 +649,37 @@ const Calendar = () => {
                         className="calendar-column d-flex flex-column justify-content-between"
                         style={{ position: "relative" }}
                     >
-                        <h4 className="mb-3">
-                            {userInfo ? userInfo.nickname : "Loading..."} ❤{" "}
-                            {coupleInfo ? coupleInfo.nickname : "Loading..."}
-                        </h4>
+                    <h4
+                    className="mb-3"
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "1fr auto 1fr",
+                        alignItems: "center",
+                        marginRight: "25px"
+                    }}
+                    >
+                    <span
+                        style={{
+                        textAlign: "right",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        }}
+                    >
+                        {userInfo ? userInfo.nickname : "Loading..."}
+                    </span>
+                    <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
+                    <span
+                        style={{
+                        textAlign: "left",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        }}
+                    >
+                        {coupleInfo ? coupleInfo.nickname : "Loading..."}
+                    </span>
+                    </h4>
 
                         {/* 검색창과 돋보기 아이콘을 함께 묶은 박스 */}
                         <div className="search-container d-flex align-items-center justify-content-end mb-3">
@@ -984,7 +992,7 @@ const Calendar = () => {
                                                         취소
                                                     </button>
                                                 </div>
-                                            ) : places?.length < 7 ||
+                                            ) : places?.length < 6 ||
                                               places?.length === undefined ? (
                                                 <a
                                                     href="#"
@@ -997,19 +1005,20 @@ const Calendar = () => {
                                                 </a>
                                             ) : (
                                                 <span className="text-muted">
-                                                    방문지는 7개까지만 입력
+                                                    방문지는 6개까지만 입력
                                                     가능합니다 :)
                                                 </span>
                                             )
                                         ) : (
                                             <span className="text-muted">
-                                                방문지는 7개까지만 입력
+                                                방문지는 6개까지만 입력
                                                 가능합니다 :)
                                             </span>
                                         )}
 
                                         <hr />
-                                        <br />
+                                        <span style={{ display: "block", height: "7px" }}></span>
+
 
                                         {selectedDate <= today ? (
                                             <>

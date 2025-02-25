@@ -345,60 +345,41 @@ const Map = () => {
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
+        if (!destination || destination.index === source.index) return;
+      
+        // 기존 places 배열을 복사하여 순서 변경 (낙관적 업데이트)
+        const updatedPlaces = Array.from(places);
+        const [removed] = updatedPlaces.splice(source.index, 1);
+        updatedPlaces.splice(destination.index, 0, removed);
+      
+        // UI에 바로 업데이트
+        setPlaces(updatedPlaces);
+      
+        // 업데이트된 순서에 따른 placeIds 배열 생성
+        const updatedPlaceIds = updatedPlaces.map((p) => p.placeId);
         const formattedDate = selectedDate
-            .toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            })
-            .replace(/\. /g, "-")
-            .replace(".", "");
-
-        // 드래그된 항목이 유효한 곳으로 드롭되지 않았다면, 아무런 동작을 하지 않음
-        if (!destination) {
-            return;
-        }
-
-        // 항목이 동일한 위치로 드래그된 경우
-        if (destination.index === source.index) {
-            return;
-        }
-
-        const response1 = await axios.post(
-            "http://localhost:8586/visitList.do",
-            { visitDate: formattedDate, coupleId: coupleId }
-        );
-
-        const placeIds = [
-            ...new Set(response1.data.map((item) => item.placeId)),
-        ];
-
-        // 🔹 placeIds 배열 복사
-        const updatedPlaceIds = [...placeIds];
-
-        // 🔹 기존 위치에서 아이템 제거
-        const [removed] = updatedPlaceIds.splice(source.index, 1);
-
-        // 🔹 새로운 위치에 추가
-        updatedPlaceIds.splice(destination.index, 0, removed);
-
-        // 백엔드에 순서 변경된 placeIds 전달
+          .toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })
+          .replace(/\. /g, "-")
+          .replace(".", "");
+      
         try {
-            const response = await axios.post(
-                "http://localhost:8586/updateVisitOrder.do",
-                {
-                    placeIds: updatedPlaceIds,
-                    coupleId: coupleId,
-                    visitDate: formattedDate,
-                }
-            );
-            console.log("순서 업데이트 성공:", response.data);
-            setPlaces([]);
-            visitList(formattedDate);
+          // 백엔드에 순서 변경된 placeIds 전송
+          await axios.post("http://localhost:8586/updateVisitOrder.do", {
+            placeIds: updatedPlaceIds,
+            coupleId: coupleId,
+            visitDate: formattedDate,
+          });
+          // 서버에서 새로운 데이터를 받아오더라도 UI에서 깜빡이지 않도록 상태를 덮어씌움
+          const response = await axios.post("http://localhost:8586/visitList.do", {
+            visitDate: formattedDate,
+            coupleId: coupleId,
+          });
+          setPlaces(response.data);
         } catch (error) {
-            console.error("순서 업데이트 실패:", error);
+          console.error("순서 업데이트 실패:", error);
+          // 실패 시 원래 상태로 복구하거나, 에러 처리를 할 수 있음
         }
-    };
+      };
 
     // API에서 장소 목록 가져오기
     useEffect(() => {
@@ -569,7 +550,7 @@ const Map = () => {
                         <div
                             id="map"
                             className="position-relative bg-secondary rounded-3"
-                            style={{ width: "100%", height: "100%" }}
+                            style={{ width: "100%", height: "90%"}}
                         ></div>
                     </Col>
                     <Col md={6} className="places-column">
@@ -792,7 +773,7 @@ const Map = () => {
                                                 취소
                                             </button>
                                         </div>
-                                    ) : places?.length < 7 ||
+                                    ) : places?.length < 6 ||
                                       places?.length === undefined ? (
                                         <a
                                             href="#"
@@ -805,13 +786,13 @@ const Map = () => {
                                         </a>
                                     ) : (
                                         <span className="text-muted">
-                                            방문지는 7개까지만 입력 가능합니다
+                                            방문지는 6개까지만 입력 가능합니다
                                             :)
                                         </span>
                                     )
                                 ) : (
                                     <span className="text-muted">
-                                        방문지는 7개까지만 입력 가능합니다 :)
+                                        방문지는 6개까지만 입력 가능합니다 :)
                                     </span>
                                 )}
                                 <hr />
