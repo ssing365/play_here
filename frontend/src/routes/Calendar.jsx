@@ -489,7 +489,7 @@ const Calendar = () => {
             setDiaryEntry("일기를 남겨주세요");
         }
         setEditDiary(false);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",

@@ -99,22 +99,26 @@ const FetchCoupleCode = ({ setCoupleCode }) => {
   return (<>
     <div className="text-center">
       <h4 style={{ marginBottom: '8px' }}>내 커플코드 </h4>
-      <span className="text-danger"
-        style={{ display: 'block', fontSize: '13px', marginBottom: '8px', lineHeight: '1.5' }}>
+      <h3 onClick={copyToClipboard} > <b>{coupleCode || '불러오는 중...'}</b> </h3>
+      <span className="text-secondary"
+        style={{ display: 'block', fontSize: '13px', marginBottom: '10px', lineHeight: '1.5' }}>
         * 커플코드 클릭시 클립보드에 복사됩니다 *
       </span>
-      <h3 onClick={copyToClipboard} style={{ marginBottom: '12px' }}>{coupleCode || '불러오는 중...'}</h3>
       {coupleCode && <p>남은 커플코드 유효시간: {timeRemaining}</p>}
+      
+      
 
-      <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+      <div className='mb-3' style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '10px' }}>
+      <div style={{ display: 'flex', alignItems: 'center', gap: '5px' }}>
       <Button 
           variant="secondary" 
           onClick={handleCopyLink} 
           style={{ display: 'inline-flex', alignItems: 'center' }}
         >
           초대링크 복사하기 
-          <CiShare2 style={{ fontSize: '16px', marginLeft: '5px', cursor: 'pointer' }} onClick={handleWebShare}/>
         </Button>
+        <CiShare2 style={{ fontSize: '20px', marginLeft: '5px', cursor: 'pointer' }} onClick={handleWebShare}/>
+      </div>
       </div>
     </div>
   </>);
