@@ -346,40 +346,47 @@ const Map = () => {
     const onDragEnd = async (result) => {
         const { destination, source } = result;
         if (!destination || destination.index === source.index) return;
-      
+
         // 기존 places 배열을 복사하여 순서 변경 (낙관적 업데이트)
         const updatedPlaces = Array.from(places);
         const [removed] = updatedPlaces.splice(source.index, 1);
         updatedPlaces.splice(destination.index, 0, removed);
-      
+
         // UI에 바로 업데이트
         setPlaces(updatedPlaces);
-      
+
         // 업데이트된 순서에 따른 placeIds 배열 생성
         const updatedPlaceIds = updatedPlaces.map((p) => p.placeId);
         const formattedDate = selectedDate
-          .toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })
-          .replace(/\. /g, "-")
-          .replace(".", "");
-      
+            .toLocaleDateString("ko-KR", {
+                year: "numeric",
+                month: "2-digit",
+                day: "2-digit",
+            })
+            .replace(/\. /g, "-")
+            .replace(".", "");
+
         try {
-          // 백엔드에 순서 변경된 placeIds 전송
-          await axios.post("http://localhost:8586/updateVisitOrder.do", {
-            placeIds: updatedPlaceIds,
-            coupleId: coupleId,
-            visitDate: formattedDate,
-          });
-          // 서버에서 새로운 데이터를 받아오더라도 UI에서 깜빡이지 않도록 상태를 덮어씌움
-          const response = await axios.post("http://localhost:8586/visitList.do", {
-            visitDate: formattedDate,
-            coupleId: coupleId,
-          });
-          setPlaces(response.data);
+            // 백엔드에 순서 변경된 placeIds 전송
+            await axios.post("http://localhost:8586/updateVisitOrder.do", {
+                placeIds: updatedPlaceIds,
+                coupleId: coupleId,
+                visitDate: formattedDate,
+            });
+            // 서버에서 새로운 데이터를 받아오더라도 UI에서 깜빡이지 않도록 상태를 덮어씌움
+            const response = await axios.post(
+                "http://localhost:8586/visitList.do",
+                {
+                    visitDate: formattedDate,
+                    coupleId: coupleId,
+                }
+            );
+            setPlaces(response.data);
         } catch (error) {
-          console.error("순서 업데이트 실패:", error);
-          // 실패 시 원래 상태로 복구하거나, 에러 처리를 할 수 있음
+            console.error("순서 업데이트 실패:", error);
+            // 실패 시 원래 상태로 복구하거나, 에러 처리를 할 수 있음
         }
-      };
+    };
 
     // API에서 장소 목록 가져오기
     useEffect(() => {
@@ -539,10 +546,42 @@ const Map = () => {
             <TopBar />
             <Container fluid className="back-container vh-100">
                 <Row className="couple-calendar-container">
-                    <Col
+                <h4
+                            className="mt-1 mb-1 text-center"
+                            style={{
+                                display: "flex",
+                                gridTemplateColumns: "1fr auto 1fr",
+                                alignItems: "center",
+                                marginRight: "25px"
+                            }}
+                            >
+                            <span
+                                style={{
+                                textAlign: "right",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                }}
+                            >
+                                {userInfo ? userInfo.nickname : "Loading..."}
+                            </span>
+                            <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
+                            <span
+                                style={{
+                                textAlign: "left",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                }}
+                            >
+                                {coupleInfo ? coupleInfo.nickname : "Loading..."}
+                            </span>
+                        </h4>
+                        <Col
                         md={6}
                         className="calendar-column d-flex flex-column justify-content-between"
                     >
+                       
                         {/* <div
                             ref={container}
                             style={{ width: "100%", height: "100%" }}
@@ -550,18 +589,20 @@ const Map = () => {
                         <div
                             id="map"
                             className="position-relative bg-secondary rounded-3"
-                            style={{ width: "100%", height: "90%"}}
+                            style={{ width: "100%", height: "90%" }}
                         ></div>
                     </Col>
                     <Col md={6} className="places-column">
                         {selectedDate && (
                             <>
                                 <h4 className="today-date-title">
-                                    {selectedDate.getMonth() + 1}월{" "}
-                                    {selectedDate.getDate()}일
+                                    <b>
+                                        {selectedDate.getMonth() + 1}월{" "}
+                                        {selectedDate.getDate()}일
+                                    </b>
                                 </h4>
                                 <div className="d-flex align-items-center mb-3">
-                                    <b>방문지 리스트</b>
+                                    <h5>방문지 리스트</h5>
                                     <Link
                                         to="/calendar"
                                         state={{ selectedDate }}
@@ -798,7 +839,7 @@ const Map = () => {
                                 <hr />
                                 <br />
                                 {places.length > 1 ? (
-                                    <>
+                                    <div className="ms-3">
                                         <h6>
                                             📏 총 직선 거리 : {totalDistance}km
                                         </h6>
@@ -836,7 +877,7 @@ const Map = () => {
                                         <h6>
                                             🚗 차량: {drivingTimeFormatted}{" "}
                                         </h6>
-                                    </>
+                                    </div>
                                 ) : (
                                     ""
                                 )}

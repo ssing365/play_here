@@ -29,6 +29,10 @@ function Place() {
     const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [placeId]);
+
+    useEffect(() => {
         if (!place || !place.latitude || !place.longitude) return; // place가 없으면 실행 X
 
         const container = document.getElementById("map");
