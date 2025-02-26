@@ -68,7 +68,7 @@ const Search = () => {
 
     // 📌 상세 페이지 이동 함수
     const goToDetailPage = (placeId) => {
-        navigate(`/place?id=${placeId}`);
+        navigate(`/place?id=${placeId}`, { state: { scrollToTop: true } });
     };
 
     // 맨위 추천장소 더미

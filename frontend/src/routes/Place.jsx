@@ -27,6 +27,11 @@ function Place() {
     const placeId = queryParams.get("id");
     const datepickerRef = useRef(null);
     const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
+    
+    // 맨 위쪽 보이게 하기
+    useEffect(() => {
+         window.scrollTo(0, 0);
+     }, [placeId]);
 
     useEffect(() => {
         if (!place || !place.latitude || !place.longitude) return; // place가 없으면 실행 X
