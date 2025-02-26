@@ -650,29 +650,47 @@ const Calendar = () => {
 
     useEffect(() => {
         const fetchRecommendations = async () => {
-            try {
-                const response = await axios.get(
-                    `http://127.0.0.1:8000/api/recommend/${userId}`
-                );
-                console.log("🟢 API 응답 데이터:", response.data);
-
-                if (!response.data || response.data.length === 0) {
-                    console.warn(
-                        "⚠️ API에서 추천 장소가 비어 있음! 기본 데이터 사용"
-                    );
-                    
-                } else {
-                    const randomIndex = Math.floor(Math.random() * response.data.length);
-        console.log("선택된 랜덤 인덱스:", randomIndex, response.data[randomIndex]);
-        setRecommendations(response.data[randomIndex]);
+          try {
+            const response = await axios.get(
+              `http://127.0.0.1:8000/api/recommend/${userId}`
+            );
+            console.log("🟢 API 응답 데이터:", response.data);
+      
+            if (!response.data || response.data.length === 0) {
+              console.warn("⚠️ API에서 추천 장소가 비어 있음! 기본 데이터 사용");
+            } else {
+              let validRecommendation = null;
+              let attempts = 0;
+              const totalItems = response.data.length;
+              
+              while (!validRecommendation && attempts < totalItems) {
+                const randomIndex = Math.floor(Math.random() * totalItems);
+                const candidate = response.data[randomIndex];
+                const imageUrl = candidate.IMAGE || candidate.image;
+                
+                // 🚨 값이 없거나 기본 placeholder 이미지면 제외
+                if (candidate.PREFERENCE_ID && imageUrl && !imageUrl.includes("via.placeholder")) {
+                  console.log("선택된 랜덤 인덱스:", randomIndex, candidate);
+                  validRecommendation = candidate;
+                  break;
                 }
-            } catch (error) {
-                console.error("🔴 추천 장소 요청 실패:", error);
-                setRecommendations([]);
+                attempts++;
+              }
+              
+              if (validRecommendation) {
+                setRecommendations(validRecommendation);
+              } else {
+                console.warn("⚠️ 유효한 이미지가 있는 추천 장소를 찾지 못했습니다. 기본값을 사용합니다.");
+                setRecommendations(response.data[0]);
+              }
             }
+          } catch (error) {
+            console.error("🔴 추천 장소 요청 실패:", error);
+            setRecommendations([]);
+          }
         };
         fetchRecommendations();
-    }, [userInfo]);
+      }, [userInfo]);
 
     useEffect(() => {
         if (recommendations && Object.keys(recommendations).length > 0) {
@@ -694,43 +712,42 @@ const Calendar = () => {
                 <Row className="couple-calendar-container">
                     {/* 왼쪽 커플 캘린더 */}
                     <h4
-                    className="mt-2 mb-2 text-center"
-                    style={{
-                        display: "flex",
-                        gridTemplateColumns: "1fr auto 1fr",
-                        alignItems: "center",
-                        marginRight: "25px"
-                    }}
-                    >
-                    <span
-                        style={{
-                        textAlign: "right",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        }}
-                    >
-                        {userInfo ? userInfo.nickname : "Loading..."}
-                    </span>
-                    <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
-                    <span
-                        style={{
-                        textAlign: "left",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        }}
-                    >
-                        {coupleInfo ? coupleInfo.nickname : "Loading..."}
-                    </span>
-                    </h4>
+                            className="mt-1 mb-1 text-center"
+                            style={{
+                                display: "flex",
+                                gridTemplateColumns: "1fr auto 1fr",
+                                alignItems: "center",
+                                marginRight: "25px"
+                            }}
+                            >
+                            <span
+                                style={{
+                                textAlign: "right",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                }}
+                            >
+                                {userInfo ? userInfo.nickname : "Loading..."}
+                            </span>
+                            <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
+                            <span
+                                style={{
+                                textAlign: "left",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                }}
+                            >
+                                {coupleInfo ? coupleInfo.nickname : "Loading..."}
+                            </span>
+                        </h4>
                     <Col
                         md={6}
                         className="calendar-column d-flex flex-column justify-content-between"
                         style={{ position: "relative" }}
                     >
-                    
-
+                        
                         {/* 검색창과 돋보기 아이콘을 함께 묶은 박스 */}
                         <div className="search-container d-flex align-items-center justify-content-end mb-3">
                             <Form.Control
@@ -1136,9 +1153,9 @@ const Calendar = () => {
   >
     {loading ?(
         <div className="loading-container">
-        <Spinner animation="border" variant="danger" />
-        <p>추천 장소를 불러오는 중...</p>
-    </div> ):(
+            <Spinner animation="border" variant="danger" />
+            <p>추천 장소를 불러오는 중...</p>
+        </div> ):(
     <div style={{ position: 'relative' }}>
       <Card.Img
         variant="top"
