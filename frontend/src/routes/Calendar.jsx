@@ -503,7 +503,7 @@ const Calendar = () => {
             .replace(/\. /g, "-")
             .replace(".", "");
 
-        if (noDiary) {
+        if (noDiary&&diaryText.trim()!=="") {
             await axios.post("http://localhost:8586/NewDiary.do", {
                 coupleId: coupleId,
                 diaryWriter: userId,
