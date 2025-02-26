@@ -51,16 +51,16 @@ public class CoupleController {
 	    String visitDate = (String) requestBody.get("visitDate");
 
 	    try {
-	        // placeIds 순서대로 couple_visit 테이블의 index를 업데이트
+	        // placeIds �닚�꽌��濡� couple_visit �뀒�씠釉붿쓽 index瑜� �뾽�뜲�씠�듃
 	        for (int index = 0; index < placeIds.size(); index++) {
 	            String placeId = placeIds.get(index);
 	            System.out.println("Received placeId: " + placeId);
 	            System.out.println(index);
-	            // index 업데이트 (예: place_id에 맞는 행을 찾아 index를 설정)
+	            // index �뾽�뜲�씠�듃 (�삁: place_id�뿉 留욌뒗 �뻾�쓣 李얠븘 index瑜� �꽕�젙)
 	            dao.updateVisitOrder(coupleId, placeId, index+1, visitDate);
 	        }
 	    } catch (Exception e) {
-	        // 예외 발생 시 로깅 및 처리
+	        // �삁�쇅 諛쒖깮 �떆 濡쒓퉭 諛� 泥섎━
 	        System.err.println("Error during updateVisitOrder: " + e.getMessage());
 	        e.printStackTrace();
 	    }
@@ -84,6 +84,15 @@ public class CoupleController {
 		
 		dao.DiaryEdit(couple_id, diary_writer, diary_date,content);
 	}
+	@PostMapping("/DiaryDelete.do")
+	public void DiaryDelete(@RequestBody CoupleDTO request) {
+		String diary_date = request.getDiaryDate();
+		String couple_id = request.getCoupleId();
+		String diary_writer = request.getDiaryWriter();
+		
+		dao.DiaryDelete(couple_id, diary_writer, diary_date);
+	}
+	
 	
 	@PostMapping("/NewDiary.do")
 	public void NewDiary(@RequestBody Map<String, String> requestBody) {

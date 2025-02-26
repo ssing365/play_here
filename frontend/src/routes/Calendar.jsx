@@ -141,6 +141,7 @@ const Calendar = () => {
                     console.log("일치하는 장소가 없습니다.");
                 }
             }
+            fetchSchedule(activeStartDate);
             setShowDropdown(false);
         }
     };
@@ -383,6 +384,7 @@ const Calendar = () => {
                 placeId: placeId,
             });
             visitList(formattedDate);
+            fetchSchedule(activeStartDate);
         } catch (error) {
             console.error("삭제 요청 중 오류 발생:", error);
         }
@@ -508,15 +510,26 @@ const Calendar = () => {
                 diaryDate: formattedDate,
                 content: diaryText,
             });
+            fetchDiaryWrited(activeStartDate);
             setNoDiary(false);
         } else {
             if (coupleId) {
+                if(diaryText.trim()!==""){
                 await axios.post("http://localhost:8586/DiaryEdit.do", {
                     coupleId: coupleId,
                     diaryWriter: userId,
                     diaryDate: formattedDate,
                     content: diaryText,
                 });
+            }
+            else{
+                    await axios.post("http://localhost:8586/DiaryDelete.do", {
+                        coupleId: coupleId,
+                        diaryWriter: userId,
+                        diaryDate: formattedDate
+                    });
+                    fetchDiaryWrited(activeStartDate);
+            }
             }
         }
         diary(formattedDate);
@@ -947,7 +960,7 @@ const Calendar = () => {
                                         </DragDropContext>
 
                                         {/* 장소 추가 버튼 (장소가 7개 미만일 때만 표시) */}
-                                        {places?.length < 7 ? (
+                                        {places?.length < 6 ? (
                                             showInput ? (
                                                 <div className="mt-2 d-flex align-items-center">
                                                     {/* 자동완성 input + dropdown */}
@@ -961,6 +974,7 @@ const Calendar = () => {
                                                         ref={containerRef}
                                                     >
                                                         <input
+                                                            autoFocus
                                                             ref={inputRef}
                                                             type="text"
                                                             value={newPlace}
