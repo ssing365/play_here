@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.playhere.couple.ICoupleRegisterService">
+
+    <!-- 커플 등록 -->
+    <insert id="createCouple" parameterType="map" useGeneratedKeys="true" keyProperty="coupleId" keyColumn="couple_id">
+    INSERT INTO couple (couple_id, user_id_1, user_id_2)
+    VALUES (COUPLE_SEQ.NEXTVAL, #{userId1}, #{userId2})
+	</insert>
+
+    <!-- member 테이블에 couple_id, couple_status 업데이트 -->
+    <update id="updateCoupleStatus" parameterType="map">
+        UPDATE member
+        SET couple_id = #{coupleId}, couple_status = 1
+        WHERE user_id = #{userId}
+    </update>
+
+</mapper>

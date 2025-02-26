@@ -55,9 +55,10 @@ const Top5 = () => {
     },[])
 
 
+    
     return (
         <>
-            <Carousel className="mb-4" indicators={false} controls={false}>
+            <Carousel className="mt-5 mb-5" indicators={false} controls={false}>
                 <Carousel.Item>
                     <Row>
                         {/* 왼쪽 설명은 고정 */}
@@ -85,7 +86,9 @@ const Top5 = () => {
                         <Col
                             md={8}
                             className="position-relative overflow-hidden"
-                            style={{ height: "500px" }}
+                            style={{ height: "500px",
+                                cursor:"pointer"
+                             }}
                         >
                             <AnimatePresence initial={false} custom={direction}>
                                 <motion.img
@@ -107,6 +110,9 @@ const Top5 = () => {
                                         duration: 0.5,
                                         ease: "easeInOut",
                                     }}
+                                    onClick={() =>
+                                        (window.location.href = `/place?id=${top5[index].placeId}`)
+                                    }
                                 />
                             </AnimatePresence>
                         </Col>

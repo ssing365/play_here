@@ -148,6 +148,8 @@ const RegisterPreference = () => {
                 </div>
                 <div className="text-muted mb-5">
                     🌟선호도는 1개 이상 선택해주세요
+                    <br />
+                    🌟선호도는 추후 마이페이지에서 수정 가능합니다:)
                 </div>
                 <div className="row">
                     <div className="col-12 col-lg-6">
@@ -250,7 +252,7 @@ const RegisterPreference = () => {
                             </button>
                             <br />
                             <button
-                                onClick={() => navigate(-1)}
+                                onClick={() => navigate("/register-complete")}
                                 className="btn btn-secondary mt-2"
                             >
                                 다음에 고르기

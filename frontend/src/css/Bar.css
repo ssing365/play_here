@@ -26,3 +26,9 @@ form .custom-input {
     color: #495057; /* 더 잘 보이도록 색상 진하게 */
     cursor: pointer;
 }
+
+.custom-dropdown .dropdown-item:active,
+.custom-dropdown .dropdown-item.active {
+    background-color: #ffe7e7; 
+    color:#333
+}

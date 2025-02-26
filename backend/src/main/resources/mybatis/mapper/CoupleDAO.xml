@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+	
+<mapper namespace="com.playhere.couple.ICoupleService">
+	<select id="coupleInfo" resultType="com.playhere.member.MemberDTO">
+	<![CDATA[
+		    SELECT user_id AS userId, 
+		        password, 
+		        name, 
+		        nickname, 
+		        email, 
+		        birth_date AS birthDate, 
+		        zipcode, 
+		        address, 
+		        detail_address AS detailAddress, 
+		        profile_picture AS profilePicture,
+		        couple_id AS coupleId, 
+		        couple_status AS coupleStatus, 
+		        account_status AS accountStatus, 
+		        created_at AS createdAt, 
+		        updated_at AS updatedAt FROM member 
+		    WHERE couple_id = #{coupleId} and user_id <> #{userId}
+		    
+	]]>
+	</select>
+	
+	<select id="visit" resultType="com.playhere.couple.CoupleDTO">
+		SELECT * from 
+		(select place_id, place_name, longitude, latitude from place) p 
+		join couple_visit on p.place_id = couple_visit.place_id
+		where couple_id = #{coupleId} and visit_date = TO_DATE(#{visitDate},'YYYY-MM-DD')
+		order by visit_index 
+	</select>
+	
+	<delete id="visitDelete">
+		delete from couple_visit where couple_id = #{coupleId} and place_id = #{placeId} and visit_date = TO_DATE(#{visitDate},'YYYY-MM-DD')
+	</delete>
+	
+	<update id="updateVisitOrder">
+    UPDATE couple_visit
+    SET visit_index = #{index}
+    WHERE couple_id = #{coupleId} AND place_id = #{placeId} and visit_date = TO_DATE(#{visitDate},'YYYY-MM-DD')
+	</update>
+	
+	<select id="Diary" resultType="com.playhere.couple.CoupleDTO">
+		select * from couple_diary
+		where couple_id = #{coupleId} and diary_date = TO_DATE(#{diaryDate},'YYYY-MM-DD') and diary_writer = #{diaryWriter}
+	</select>
+	
+	<update id="DiaryEdit">
+		update couple_diary set content = #{content}
+		where couple_id = #{coupleId} and diary_date = TO_DATE(#{diaryDate},'YYYY-MM-DD') and diary_writer = #{diaryWriter}
+	</update>
+	
+	<insert id="NewDiary">
+		insert into couple_diary values(DIARY_SEQ.nextval,#{diaryWriter}, #{coupleId}, #{content}, #{diaryDate})
+	</insert>
+	
+	<select id="SearchPlace" resultType="com.playhere.place.PlaceDTO">
+		select place_id, place_name, location from place
+	</select>
+	
+	<select id="Schedule" resultType="com.playhere.couple.CoupleDTO">
+	<![CDATA[
+		SELECT visit_date
+		FROM couple_visit
+		WHERE couple_id = #{coupleId}
+		  AND visit_date >= TO_DATE('2025-02-01','YYYY-MM-DD')
+		  AND visit_date < ADD_MONTHS(TO_DATE('2025-02-01','YYYY-MM-DD'), 1)
+		GROUP by visit_date
+	]]>
+	</select>
+</mapper>

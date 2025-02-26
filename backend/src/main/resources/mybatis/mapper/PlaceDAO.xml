@@ -5,9 +5,96 @@
 	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 	
 <mapper namespace="com.playhere.place.IPlaceService">
-	<select id="list" resultType="com.playhere.place.PlaceDTO">
-		SELECT * FROM place order by place_id desc
+
+	<select id="list" parameterType="com.playhere.place.ParameterDTO"
+        resultType="com.playhere.place.PlaceDTO">
+	    SELECT * FROM (
+		    SELECT p.*, rownum rNum FROM (
+		        SELECT DISTINCT place.*, pr.main_cate,
+		        	CASE 
+                    	WHEN i.user_id IS NOT NULL THEN 'liked' 
+                    	ELSE 'notLiked' 
+                	END AS likeStatus  
+		        FROM place
+		        LEFT JOIN place_preference pp ON place.place_id = pp.place_id
+		        LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
+		        LEFT JOIN interests i ON place.place_id = i.place_id 
+                 	AND i.user_id = #{userId}  <!-- 현재 userId 전달 -->
+		        <trim prefix="WHERE" prefixOverrides="AND |OR">  
+		            <!-- 검색어 필터 -->
+		            <if test="searchWord != null and searchWord.size() > 0">
+		                <foreach collection="searchWord" item="str" open="(" close=")" separator="or">
+		                    place_name LIKE '%' || #{str} || '%'
+		                </foreach>
+		            </if>
+		
+		            <!-- 지역 필터 -->
+		            <if test="searchLocation != null and searchLocation.size() > 0">
+		                <if test="searchWord != null and searchWord.size() > 0">AND</if>
+		                <foreach collection="searchLocation" item="str" open="(" close=")" separator="or">
+		                    location LIKE '%' || #{str} || '%'
+		                </foreach>
+		            </if>
+		            
+		            <if test="searchCategory != null and searchCategory.size() > 0">
+					    <if test="searchWord != null and searchWord.size() > 0 or searchLocation != null and searchLocation.size() > 0">AND</if>
+					    <foreach collection="searchCategory" item="str" open="(" close=")" separator="or">
+					        main_cate LIKE #{str}
+					    </foreach>
+					</if>
+
+		        </trim>
+		        ORDER BY place.place_id DESC
+		    ) p
+		)
+		WHERE rNum BETWEEN #{start} AND #{end}
 	</select>
+	
+	<select id="listLikes" parameterType="com.playhere.place.ParameterDTO"
+        resultType="com.playhere.place.PlaceDTO">
+	    SELECT * FROM (
+		    SELECT p.*, rownum rNum FROM (
+		        SELECT DISTINCT place.*, pr.main_cate,
+			        CASE 
+	                    WHEN i.user_id IS NOT NULL THEN 'liked' 
+	                    ELSE 'notLiked' 
+	                END AS likeStatus  
+		        FROM place
+		        LEFT JOIN place_preference pp ON place.place_id = pp.place_id
+		        LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
+		        LEFT JOIN interests i ON place.place_id = i.place_id 
+                 AND i.user_id = #{userId}  <!-- 현재 userId 전달 -->
+		        <trim prefix="WHERE" prefixOverrides="AND |OR">  
+		            <!-- 검색어 필터 -->
+		            <if test="searchWord != null and searchWord.size() > 0">
+		                <foreach collection="searchWord" item="str" open="(" close=")" separator="or">
+		                    place_name LIKE '%' || #{str} || '%'
+		                </foreach>
+		            </if>
+		
+		            <!-- 지역 필터 -->
+		            <if test="searchLocation != null and searchLocation.size() > 0">
+		                <if test="searchWord != null and searchWord.size() > 0">AND</if>
+		                <foreach collection="searchLocation" item="str" open="(" close=")" separator="or">
+		                    location LIKE '%' || #{str} || '%'
+		                </foreach>
+		            </if>
+		            
+		            <if test="searchCategory != null and searchCategory.size() > 0">
+					    <if test="searchWord != null and searchWord.size() > 0 or searchLocation != null and searchLocation.size() > 0">AND</if>
+					    <foreach collection="searchCategory" item="str" open="(" close=")" separator="or">
+					        main_cate LIKE #{str}
+					    </foreach>
+					</if>
+
+		        </trim>
+		        ORDER BY place.likes DESC
+		    ) p
+		)
+		WHERE rNum BETWEEN #{start} AND #{end}
+	</select>
+	
+
 	
 	<select id="view" resultType="com.playhere.place.PlaceDTO">
 		SELECT * FROM place WHERE place_id = #{placeId}
@@ -20,7 +107,7 @@
 	    update place set likes = likes + 1 where place_id = #{placeId}
 	</update>
 	
-	<update id="placeLikeCancle" parameterType="java.lang.String">
+	<update id="placeLikeCancel" parameterType="java.lang.String">
 	    update place set likes = likes - 1 where place_id = #{placeId}
 	</update>
 
@@ -29,7 +116,7 @@
 	    insert into interests values(INTEREST_SEQ.nextval, #{userId}, #{placeId})
 	</insert>
 	
-	<delete id="InterestCancle">
+	<delete id="InterestCancel">
 	    delete from interests where user_id = #{userId} and place_id = #{placeId}
 	</delete>
 
@@ -63,5 +150,59 @@
 	        (SELECT COUNT(*) FROM couple_visit WHERE couple_id = #{coupleId} AND visit_date = #{visitDate}) + 1
 	    )
 	</insert>
+
+
+	<select id="CheckCalendar" resultType="int">
+		select count(*) from couple_visit
+		where couple_id = #{coupleId} and place_id = #{placeId} and visit_date = #{visitDate}
+	</select>
+	
+	<select id="listAll" parameterType="com.playhere.place.ParameterDTO"
+        resultType="com.playhere.place.PlaceDTO">
+    SELECT DISTINCT place.*, pr.main_cate  
+    FROM place
+    LEFT JOIN place_preference pp ON place.place_id = pp.place_id
+    LEFT JOIN preference pr ON pp.preference_id = pr.preference_id
+    <trim prefix="WHERE" prefixOverrides="AND |OR">  
+        <!-- 검색어 필터 -->
+        <if test="searchWord != null and searchWord.size() > 0">
+            <foreach collection="searchWord" item="str" open="(" close=")" separator="or">
+                place_name LIKE '%' || #{str} || '%'
+            </foreach>
+        </if>
+        
+        <!-- 지역 필터 -->
+        <if test="searchLocation != null and searchLocation.size() > 0">
+            <if test="searchWord != null and searchWord.size() > 0">AND</if>
+            <foreach collection="searchLocation" item="str" open="(" close=")" separator="or">
+                location LIKE '%' || #{str} || '%'
+            </foreach>
+        </if>
+        
+        <!-- 카테고리 필터 -->
+        <if test="searchCategory != null and searchCategory.size() > 0">
+            <if test="(searchWord != null and searchWord.size() > 0) or (searchLocation != null and searchLocation.size() > 0)">AND</if>
+            <foreach collection="searchCategory" item="str" open="(" close=")" separator="or">
+                main_cate LIKE #{str}
+            </foreach>
+        </if>
+    </trim>
+    ORDER BY place.place_id DESC
+</select>
+	
+	<select id="getWeeklyEvents" parameterType="java.util.List"  resultType="com.playhere.place.PlaceDTO">
+		SELECT p.place_name, p.location, p.descript, p.time, p.link, p.image
+        FROM place p
+    JOIN place_preference pp ON p.place_id = pp.place_id
+    JOIN preference pr ON pp.preference_id = pr.preference_id
+    WHERE p.place_id IN 
+    <foreach item="placeId" collection="list" open="("
+     separator="," close=")"> #{placeId}</foreach>
+     
+    AND pp.preference_id IN (21, 22)
+    <!-- <foreach collection=""></foreac> -->
+	</select>
+	
+	
 
 </mapper>
