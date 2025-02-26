@@ -200,6 +200,7 @@ public class UserController {
     public ResponseEntity<Map<String, Integer>> updatePreferences(
     		 @PathVariable("userId") String userId,
     	     @RequestBody List<UserPreferenceDTO> preferences) {
+    	System.out.println("prefer"+preferences);
     	Map<String, Integer> response = new HashMap<>();
         try {
         	// 기존 선호도 삭제
@@ -217,7 +218,7 @@ public class UserController {
 
     // 현재 선호도 조회 API
     @GetMapping("/user/{userId}/preferences")
-    public ResponseEntity<List<Integer>> getUserPreferences(@PathVariable("userId")  String userId) {
+    public ResponseEntity<List<Integer>> getUserPreferences(@PathVariable("userId") String userId) {
         List<Integer> prefList = memberService.getUserPreferences(userId);
         return ResponseEntity.ok(prefList);
     }

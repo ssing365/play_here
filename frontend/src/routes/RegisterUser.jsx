@@ -143,7 +143,6 @@ const RegisterUser = () => {
         //id 형식 실시간 검증하기
         //바뀐 부분
         if (name === "user_id") {
-
             // 아이디가 변경되면 중복확인 상태를 초기화
             setIsUserIdChecked(false);
 
@@ -207,25 +206,38 @@ const RegisterUser = () => {
         }
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
-  
+
         // 필수 입력 필드 검증 (기존 필드 + 새로운 필드)
         const requiredFields = [
-            'user_id', 'password', 'confirmPassword', 'name', 
-            'nickname', 'email', 'birth_date', 'postcode', 
-            'address', 'detailAddress'
+            "user_id",
+            "password",
+            "confirmPassword",
+            "name",
+            "nickname",
+            "email",
+            "birth_date",
+            "postcode",
+            "address",
+            "detailAddress",
         ];
 
         for (const field of requiredFields) {
-        if (!formData[field].trim()) {
-            alert(`${field === 'birth_date' ? '생년월일' : 
-                field === 'postcode' ? '우편번호' :
-                field === 'detailAddress' ? '상세주소' :
-                field} 항목을 입력해 주세요.`);
-            return;
-        }
+            if (!formData[field].trim()) {
+                alert(
+                    `${
+                        field === "birth_date"
+                            ? "생년월일"
+                            : field === "postcode"
+                            ? "우편번호"
+                            : field === "detailAddress"
+                            ? "상세주소"
+                            : field
+                    } 항목을 입력해 주세요.`
+                );
+                return;
+            }
         }
 
         // 생년월일 연도 4자리 검증
@@ -234,31 +246,36 @@ const RegisterUser = () => {
             alert("생년월일의 연도는 4자리여야 합니다.");
             return;
         }
-        
+
         // 아이디 중복 확인 체크
         if (!isUserIdChecked) {
-        alert("아이디 중복 확인을 해주세요.");
-        return;
+            alert("아이디 중복 확인을 해주세요.");
+            return;
         }
-    
+
         // 기존 검증 로직
-        
+
         // 아이디 형식 재검증
         if (!/^[a-zA-Z0-9]{6,20}$/.test(formData.user_id)) {
-        alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
-        return;
+            alert("아이디는 6~20자 이내, 영문과 숫자만 작성해야 합니다.");
+            return;
         }
         // 비밀번호 형식 재검증
-        if (!/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(formData.password)) {
-        alert("비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다.");
-        return;
+        if (
+            !/^(?=.*[a-zA-Z])(?=.*[0-9])(?=.*[\W_])(?!.*\s).{8,20}$/.test(
+                formData.password
+            )
+        ) {
+            alert(
+                "비밀번호는 8~20자 이내 영문, 숫자, 특수문자를 포함해야 하며 공백을 포함할 수 없습니다."
+            );
+            return;
         }
         //비밀번호와 비밀번호 확인 일치 여부 검증
         if (formData.password !== formData.confirmPassword) {
-        alert("비밀번호가 일치하지 않습니다.");
-        return;
+            alert("비밀번호가 일치하지 않습니다.");
+            return;
         }
-
 
         // JSON으로 변환할 데이터에서 profile_picture 제거
         const { profile_picture, ...formDataWithoutFile } = formData;
@@ -349,9 +366,13 @@ const RegisterUser = () => {
 
     return (
         <Container>
-            <Row className="justify-content-md-center">
+            <Row className="justify-content-md-center mt-3">
                 <Col md={6}>
-                    <h2 className="mb-4">회원가입</h2>
+                    <h4>회원가입</h4>
+                    <h3 className="mb-4">
+                        {" "}
+                        <b>정보입력</b>{" "}
+                    </h3>
                     <Form onSubmit={handleSubmit}>
                         <Row>
                             <Col md={8}>
@@ -361,7 +382,8 @@ const RegisterUser = () => {
                                     className="mb-3"
                                 >
                                     <Form.Label>
-                                        아이디 <span className="text-danger">*</span>
+                                        아이디{" "}
+                                        <span className="text-danger">*</span>
                                     </Form.Label>
                                     <div className="d-flex">
                                         <Form.Control
@@ -378,7 +400,10 @@ const RegisterUser = () => {
                                         <Button
                                             variant="outline-secondary"
                                             className="ms-2"
-                                            style={{ whiteSpace: "nowrap" }}
+                                            style={{
+                                                whiteSpace: "nowrap",
+                                                color: "black",
+                                            }}
                                             onClick={checkUserId}
                                             disabled={
                                                 !/^[a-zA-Z0-9]{6,20}$/.test(
@@ -391,11 +416,18 @@ const RegisterUser = () => {
                                     </div>
                                     {/* 오류 메세지 또는 중복 확인 메세지 출력 */}
                                     {errors.user_id ? (
-                                        <Form.Text className="text-danger">{errors.user_id}</Form.Text>
+                                        <Form.Text className="text-danger">
+                                            {errors.user_id}
+                                        </Form.Text>
                                     ) : (
                                         userIdMessage && (
                                             <Form.Text
-                                                className={userIdMessage === "사용가능한 아이디 입니다." ? "text-success" : "text-danger"}
+                                                className={
+                                                    userIdMessage ===
+                                                    "사용가능한 아이디 입니다."
+                                                        ? "text-success"
+                                                        : "text-danger"
+                                                }
                                             >
                                                 {userIdMessage}
                                             </Form.Text>
@@ -615,9 +647,19 @@ const RegisterUser = () => {
                                 required
                             />
                         </Form.Group>
-                        <Button variant="primary" type="submit">
-                            가입하기
-                        </Button>
+                        <div className="d-flex justify-content-center mt-4 mb-4">
+                            <Button
+                                style={{
+                                    backgroundColor: "#e91e63",
+                                    borderColor: "#e91e63",
+                                    width: "200px",
+                                    height: "50px",
+                                }}
+                                type="submit"
+                            >
+                                가입하기
+                            </Button>
+                        </div>
                     </Form>
                 </Col>
             </Row>

@@ -61,7 +61,7 @@ const FindIdModal = ({ modalRef }) => {
                     <div className="modal-body">
                         <input type="text" className="form-control mb-2" placeholder="이름 입력" value={name} onChange={(e) => setName(e.target.value)} />
                         <input type="email" className="form-control mb-2" placeholder="이메일 입력" value={email} onChange={(e) => setEmail(e.target.value)} />
-                        <button className="btn btn-primary w-100" onClick={handleFindId}>아이디 찾기</button>
+                        <button className="btn btn-primary w-100" style={{backgroundColor:"#e91e63", borderColor:"#e91e63"}} onClick={handleFindId}>아이디 찾기</button>
                         {foundId && <p className="mt-2">여기놀자 회원 아이디: <strong>{foundId}</strong></p>}
                         {error && <p className="mt-2 text-danger">{error}</p>}
                     </div>

@@ -94,8 +94,6 @@
 		WHERE rNum BETWEEN #{start} AND #{end}
 	</select>
 	
-
-	
 	<select id="view" resultType="com.playhere.place.PlaceDTO">
 		SELECT * FROM place WHERE place_id = #{placeId}
 	</select>
@@ -107,9 +105,10 @@
 		and latitude between #{latitude1} and #{latitude2}
 		ORDER BY DBMS_RANDOM.VALUE)
 		WHERE ROWNUM <= 4
+		AND place_id <> #{placeId}
 	]]>
 	</select>
-	
+
 	<update id="placeLikeAdd" parameterType="java.lang.String">
 	    update place set likes = likes + 1 where place_id = #{placeId}
 	</update>
@@ -158,6 +157,11 @@
 	    )
 	</insert>
 	
+	<select id="CountCalendar">
+		select count(*) from couple_visit
+		where couple_id = #{coupleId} and visit_date = #{visitDate}
+	</select>
+	
 	<select id="CheckCalendar" resultType="int">
 		select count(*) from couple_visit
 		where couple_id = #{coupleId} and place_id = #{placeId} and visit_date = #{visitDate}
@@ -195,5 +199,4 @@
     </trim>
     ORDER BY place.place_id DESC
 </select>
-	
 </mapper>

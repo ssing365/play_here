@@ -86,14 +86,17 @@ public class Place {
 		return dao.view(PlaceId);
 	}
 	
+	
+	
+	
 	@GetMapping("/closePlace.do")
-	public List<PlaceDTO> closePlace(@RequestParam("longitude") double longitude, @RequestParam("latitude") double latitude) {
-		double longitude1 = longitude - 0.01;
-		double longitude2 = longitude + 0.01;
-		double latitude1 = latitude - 0.01;
-		double latitude2 = latitude + 0.01;
+	public List<PlaceDTO> closePlace(@RequestParam("longitude") double longitude, @RequestParam("latitude") double latitude,@RequestParam("placeId") String placeId) {
+		double longitude1 = longitude - 0.05;
+		double longitude2 = longitude + 0.05;
+		double latitude1 = latitude - 0.05;
+		double latitude2 = latitude + 0.05;
 		
-		return dao.closePlace(longitude1,longitude2,latitude1,latitude2);
+		return dao.closePlace(longitude1,longitude2,latitude1,latitude2,placeId);
 	}
 	
 	
@@ -107,7 +110,6 @@ public class Place {
         }else return false;
     }
    
-    
 	@PostMapping("/placeLike.do")
 	public void placeLike(@RequestBody Map<String, String> params) {
 		
@@ -151,17 +153,18 @@ public class Place {
 		String visitDateStr = requestBody.get("visitDate");
 		LocalDate localDate = LocalDate.parse(visitDateStr.split("T")[0]); // "T" 이후 시간 제거
 		Date visitDate = Date.valueOf(localDate); // java.sql.Date 변환
-		if(dao.CheckCalendar(placeId, coupleId, visitDate)==1) {
-			return "0";
+		if(dao.CountCalendar(coupleId, visitDate)==6) {
+			return "6";
 		}
 		else {
-			System.out.println("visitDateStr: " + visitDateStr); // 원본 문자열 확인
-			System.out.println("localDate: " + localDate); // LocalDate 변환 결과
-			System.out.println("visitDate (sql.Date): " + visitDate); // 최종 변환된 값
-			
-			dao.addCalendar(placeId, coupleId, visitDate);
-			return "1";
+			if(dao.CheckCalendar(placeId, coupleId, visitDate)==1) {
+				return "0";
 			}
+			else {
+				dao.addCalendar(placeId, coupleId, visitDate);
+				return "1";
+			}
+		}
 	
 	}
 	
@@ -170,11 +173,5 @@ public class Place {
 		String userId = requestBody.get("userId");
 		String placeId = requestBody.get("placeId");
 		dao.InterestCancel(userId, placeId);
-		
 	}
-	
-
-
-	
-	
 }

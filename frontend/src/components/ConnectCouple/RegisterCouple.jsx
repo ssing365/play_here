@@ -170,18 +170,18 @@ const RegisterCouple = ({ coupleCode }) => {
             className="my-3 text-center"
             placeholder="연결할 커플코드를 입력하세요"
             value={inputCode}
-            style={{ maxWidth: '400px', width: '100%' }}
+            style={{ maxWidth: '400px', width: '100%', height:"60px", fontSize:"20px"}}
             onChange={(e) => setInputCode(e.target.value)}
             disabled={isCoupleConnected} // 연결 성공 시 입력 비활성화
           />
-          <Button className="menu-btn" style={{ width: '400px' }} onClick={handleCheckCouple} disabled={isCoupleConnected}>
+          <Button className="menu-btn mt-3" style={{ width: '400px' }} onClick={handleCheckCouple} disabled={isCoupleConnected}>
             💛 커플 연결하기 💛
           </Button>
         </>
       ) : (
         <div className="text-center mt-3">
           <h4>🎉 커플 연결을 축하합니다! 🎉</h4>
-          <Button className="menu-btn mt-2" style={{ width: '400px' }} onClick={() => navigate('/calendar')}>
+          <Button className="menu-btn mt-5" style={{ width: '400px' }} onClick={() => navigate('/calendar')}>
             📅 커플 캘린더 가기 📅
           </Button>
         </div>

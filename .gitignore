@@ -8,3 +8,10 @@
 node_modules/
 .env
 dist/
+venv/
+**/venv/
+**venv/
+**/**/venv
+venv/
+backend/venv/
+frontend/backend/venv/

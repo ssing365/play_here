@@ -23,7 +23,7 @@ const Diary = ({
                         <div>
                             <Form.Control
                                 as="textarea"
-                                rows={3}
+                                rows={2}
                                 value={diaryText}
                                 onChange={(e) => setDiaryText(e.target.value)}
                                 onKeyPress={(e) => {
@@ -35,7 +35,7 @@ const Diary = ({
                                 autoFocus
                             />
                             <div className="d-flex justify-content-end mt-2">
-                                <Button onClick={saveDiary} className="add-btn">
+                                <Button onClick={saveDiary} className="add-btn" size="sm">
                                     저장
                                 </Button>
                             </div>

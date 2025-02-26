@@ -40,7 +40,6 @@ export const UserProvider = ({ children }) => {
     if (isLoading) {  // 추가
         return null;
     }
-
     return (
         <UserContext.Provider value={{ userInfo, setUserInfo, updateUserInfo, isLoggedIn, setIsLoggedIn, forceRender }}>
             {children}

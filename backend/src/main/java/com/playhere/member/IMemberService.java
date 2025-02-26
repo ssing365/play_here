@@ -53,14 +53,8 @@ public interface IMemberService {
 	
 	// 아이디 찾기
 	public String findUserId(@Param("name") String name, @Param("email") String email);
+
 	
 	// 현재 사용자의 커플 ID 조회
     public Integer getCoupleId(@Param("userId") String userId);
-
-
-
-	
-	
-	
-
 }

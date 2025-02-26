@@ -26,7 +26,6 @@ public class PlaceDTO {
    private String mainCate;
    private List<String> hashtag;
    private String likeStatus;
-	
 	public void setHashtag(String hashtagStr) {
 		if (hashtagStr != null) {
 			this.hashtag = Arrays.asList(hashtagStr.split(","));

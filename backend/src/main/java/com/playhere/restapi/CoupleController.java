@@ -1,12 +1,14 @@
 package com.playhere.restapi;
 
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.playhere.couple.CoupleDTO;
@@ -102,8 +104,16 @@ public class CoupleController {
 	public List<CoupleDTO> Schedule(@RequestBody Map<String, String> requestBody) {
 		String date = requestBody.get("date");
 		String coupleId = requestBody.get("coupleId");
-		System.out.println(date);
+		System.out.println("date:"+date);
 		return dao.Schedule(date,coupleId);
+	}
+	
+	@PostMapping("/DiaryWrited.do")
+	public List<CoupleDTO> DiaryWrited(@RequestBody Map<String, String> requestBody) {
+		String date = requestBody.get("date");
+		String coupleId = requestBody.get("coupleId");
+		System.out.println(date);
+		return dao.DiaryWrited(date,coupleId);
 	}
 	
 	@PostMapping("/LastVisit.do")
@@ -112,5 +122,15 @@ public class CoupleController {
 		String today = requestBody.get("today");
 		return dao.LastVisit(coupleId,today);
 	}
+	
+	@PostMapping("/searchSchedule.do")
+	public List<CoupleDTO> searchSchedule(@RequestBody Map<String, Object> requestBody) {
+	    String coupleId = String.valueOf(requestBody.get("coupleId"));
+	    List<String> searchWord = (List<String>) requestBody.get("searchWord");
+	    return dao.searchSchedule(coupleId, searchWord);
+	}
+
+
+
 	
 }

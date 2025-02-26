@@ -187,10 +187,7 @@ const Login = () => {
                     <KakaoLoginButton />
                 </div>
                 <div className="naver__btn">
-                    <NaverLoginButton onClick={(e) => {
-                        e.preventDefault();
-                        alert("구현중입니다.");
-                    }} />
+                    <NaverLoginButton />
                 </div>
             </div>
         </>

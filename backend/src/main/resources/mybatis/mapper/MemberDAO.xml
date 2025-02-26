@@ -102,14 +102,12 @@
 	    SET couple_status = #{coupleStatus}, couple_id = #{coupleId,jdbcType=INTEGER}
 	    WHERE user_id = #{userId}
 	</update>
-	
+		
 	<update id="updateCoupleStatus2to0">
 	    UPDATE member 
 	    SET couple_status = 0 
 	    WHERE couple_status = 2
 	</update>
-
-	
 
     <!-- 선호도 수정  -->
     <update id="updateUserPreferences">
@@ -127,7 +125,6 @@
 	    DELETE FROM user_preference WHERE user_id = #{userId}
 	</delete>
 	
-	
 	<!-- 커플 아이디로 파트너 찾기  -->
 	<select id="findPartnerByCoupleId" parameterType="map" resultType="com.playhere.member.MemberDTO">
 	    SELECT * FROM member
@@ -138,12 +135,11 @@
 	<select id="findUserId" parameterType="map" resultType="string">
 	    SELECT user_id FROM member WHERE name = #{name} AND email = #{email}
 	</select>
-	
+
 	<select id="getCoupleId" resultType="Integer">
 	    SELECT couple_id 
 	    FROM member 
 	    WHERE user_id = #{userId}
 	</select>
-	
 	
 </mapper>

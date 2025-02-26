@@ -1,20 +1,22 @@
-import { useState, useContext, useEffect, useRef } from "react";
+
+import React, { useState, useContext, useEffect, useRef } from "react";
 import TopBar from "../components/TopBar";
 import Diary from "../components/Calendar/Diary";
 import Cal from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../css/Calendar.css";
 import { FaSearch } from "react-icons/fa";
-import { Button, Form, Row, Col, Card, Container } from "react-bootstrap";
+import { Button, Form, Row, Col, Card, Container, Spinner } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
+import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import { UserContext } from "../contexts/UserContext";
 import axios from "axios";
 import PlaceDetailOffcanvas from "../components/PlaceDetailOffcanvas";
+import Swal from "sweetalert2";
 
 const Calendar = () => {
     const [date, setDate] = useState(new Date());
-    const [showSearch, setShowSearch] = useState(false);
     const [searchTerm, setSearchTerm] = useState("");
     const [selectedDate, setSelectedDate] = useState(new Date());
     const [places, setPlaces] = useState([]);
@@ -26,9 +28,17 @@ const Calendar = () => {
     const [noDiary, setNoDiary] = useState(false);
     const today = new Date();
     const location = useLocation();
+    const [diaryWrited, setDiaryWrited] = useState([]);
     const [schedule, setSchedule] = useState([]);
     const [activeStartDate, setActiveStartDate] = useState(new Date());
     const [lastVisitPlace, setLastVisitPlace] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    const [matchedDates, setMatchedDates] = useState([]);
+    const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
+    const [searchSelectedDate, setSearchSelectedDate] = useState(null);
+
+    const [recommendations, setRecommendations] = useState([]);
 
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
@@ -68,8 +78,6 @@ const Calendar = () => {
                 const response = await axios.get(
                     "http://localhost:8586/SearchPlace.do"
                 );
-                console.log("Fetched places:", response.data);
-                // API 응답이 배열이라고 가정
                 setPlaceList(response.data);
             } catch (error) {
                 console.error("Error fetching places:", error);
@@ -145,7 +153,6 @@ const Calendar = () => {
         addPlace({ placeId: place.placeId, placeName: place.placeName });
     };
 
-    
     // 장소 추가 함수
     const addPlace = async (placeObj) => {
         const formattedDate = selectedDate
@@ -221,16 +228,16 @@ const Calendar = () => {
             })
             .replace(/\. /g, "-")
             .replace(".", "");
-        setPlaces([]); 
+            setShowInput(false);
         lastVisit();
+        setNewPlace("");
         visitList(formattedDate);
         if (coupleInfo) {
             diary(formattedDate);
         }
+        fetchSchedule(activeStartDate);
+        fetchDiaryWrited(activeStartDate);
     }, [selectedDate, coupleInfo]);
-
-
-      
 
     // 일기 가져오기
     const diary = async (formattedDate) => {
@@ -273,15 +280,31 @@ const Calendar = () => {
                 "http://localhost:8586/visitList.do",
                 { visitDate: formattedDate, coupleId: coupleId }
             );
-            console.log(response1.data);
             setPlaces(response1.data); // 상태 업데이트
         } catch (error) {
             console.error("Error visit list :", error);
         }
     };
 
+    useEffect(() => {
+        if (newPlace.trim() === "") {
+          setFilteredPlaces([]);
+          setShowDropdown(false);
+        } else {
+          const filtered = placeList.filter((p) =>
+            // 검색어(newPlace)가 포함된 곳만 남기고
+            p.placeName.toLowerCase().includes(newPlace.toLowerCase()) &&
+            // 이미 추가된 장소(places)에 같은 placeId가 없는 것만 필터링
+            !places.some((added) => String(added.placeId) === String(p.placeId))
+          );
+          setFilteredPlaces(filtered);
+          setShowDropdown(filtered.length > 0);
+        }
+      }, [newPlace, placeList, places]);
+      
+    
     //지난 방문지
-    const lastVisit = async() => {
+    const lastVisit = async () => {
         const today = new Date();
         const formattedDate = today
             .toLocaleDateString("ko-KR", {
@@ -292,75 +315,55 @@ const Calendar = () => {
             .replace(/\. /g, "-")
             .replace(".", "");
         try {
-        const response = await axios.post(
-            "http://localhost:8586/LastVisit.do",
-            { today: formattedDate, coupleId: coupleId }
-        );
-        console.log("lastVisit:",response.data);
-        setLastVisitPlace(response.data);
-        }catch (error) {
+            const response = await axios.post(
+                "http://localhost:8586/LastVisit.do",
+                { today: formattedDate, coupleId: coupleId }
+            );
+            setLastVisitPlace(response.data);
+        } catch (error) {
             console.error("Error lastvisit list :", error);
         }
-        
     };
 
     /* 방문지 리스트 드래그 */
     const onDragEnd = async (result) => {
         const { destination, source } = result;
+        if (!destination || destination.index === source.index) return;
+      
+        // 기존 places 배열을 복사하여 순서 변경 (낙관적 업데이트)
+        const updatedPlaces = Array.from(places);
+        const [removed] = updatedPlaces.splice(source.index, 1);
+        updatedPlaces.splice(destination.index, 0, removed);
+      
+        // UI에 바로 업데이트
+        setPlaces(updatedPlaces);
+      
+        // 업데이트된 순서에 따른 placeIds 배열 생성
+        const updatedPlaceIds = updatedPlaces.map((p) => p.placeId);
         const formattedDate = selectedDate
-            .toLocaleDateString("ko-KR", {
-                year: "numeric",
-                month: "2-digit",
-                day: "2-digit",
-            })
-            .replace(/\. /g, "-")
-            .replace(".", "");
-
-        // 드래그된 항목이 유효한 곳으로 드롭되지 않았다면, 아무런 동작을 하지 않음
-        if (!destination) {
-            return;
-        }
-
-        // 항목이 동일한 위치로 드래그된 경우
-        if (destination.index === source.index) {
-            return;
-        }
-
-        const response1 = await axios.post(
-            "http://localhost:8586/visitList.do",
-            { visitDate: formattedDate, coupleId: coupleId }
-        );
-
-        const placeIds = [
-            ...new Set(response1.data.map((item) => item.placeId)),
-        ];
-
-        // 🔹 placeIds 배열 복사
-        const updatedPlaceIds = [...placeIds];
-
-        // 🔹 기존 위치에서 아이템 제거
-        const [removed] = updatedPlaceIds.splice(source.index, 1);
-
-        // 🔹 새로운 위치에 추가
-        updatedPlaceIds.splice(destination.index, 0, removed);
-
-        // 백엔드에 순서 변경된 placeIds 전달
+          .toLocaleDateString("ko-KR", { year: "numeric", month: "2-digit", day: "2-digit" })
+          .replace(/\. /g, "-")
+          .replace(".", "");
+      
         try {
-            const response = await axios.post(
-                "http://localhost:8586/updateVisitOrder.do",
-                {
-                    placeIds: updatedPlaceIds,
-                    coupleId: coupleId,
-                    visitDate: formattedDate,
-                }
-            );
-            console.log("순서 업데이트 성공:", response.data);
-            setPlaces([]);
-            visitList(formattedDate);
+          // 백엔드에 순서 변경된 placeIds 전송
+          await axios.post("http://localhost:8586/updateVisitOrder.do", {
+            placeIds: updatedPlaceIds,
+            coupleId: coupleId,
+            visitDate: formattedDate,
+          });
+          // 서버에서 새로운 데이터를 받아오더라도 UI에서 깜빡이지 않도록 상태를 덮어씌움
+          const response = await axios.post("http://localhost:8586/visitList.do", {
+            visitDate: formattedDate,
+            coupleId: coupleId,
+          });
+          setPlaces(response.data);
         } catch (error) {
-            console.error("순서 업데이트 실패:", error);
+          console.error("순서 업데이트 실패:", error);
+          // 실패 시 원래 상태로 복구하거나, 에러 처리를 할 수 있음
         }
-    };
+      };
+      
 
     /* 방문지 삭제 */
     const deletePlace = async (placeId) => {
@@ -397,35 +400,57 @@ const Calendar = () => {
     const [editId, setEditId] = useState(null);
     const [editText, setEditText] = useState("");
 
-     // 백엔드에서 schedule 데이터를 가져오는 함수
-  const fetchSchedule = async (date) => {
-    const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, '0');
-    const yearMonth = `${year}-${month}`;
-    try {
-      const response = await axios.post("http://localhost:8586/Schedule.do", { date: yearMonth, coupleId : coupleId });
-      console.log(yearMonth, response.data);
-      setSchedule(response.data);
-    } catch (error) {
-      console.error("스케줄 데이터를 가져오는데 실패했습니다.", error);
-    }
-  };
+    // 백엔드에서 schedule 데이터를 가져오는 함수
+    const fetchSchedule = async (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const yearMonth = `${year}-${month}`;
+        try {
+            const response = await axios.post(
+                "http://localhost:8586/Schedule.do",
+                { date: yearMonth, coupleId: coupleId }
+            );
+            setSchedule(response.data);
+        } catch (error) {
+            console.error("스케줄 데이터를 가져오는데 실패했습니다.", error);
+        }
+    };
 
-  // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
-  useEffect(() => {
-    fetchSchedule(activeStartDate);
-  }, [selectedDate]);
+    // 백엔드에서 diaryWrited 데이터를 가져오는 함수
+    const fetchDiaryWrited = async (date) => {
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, "0");
+        const yearMonth = `${year}-${month}`;
+        try {
+            const response = await axios.post(
+                "http://localhost:8586/DiaryWrited.do",
+                { date: yearMonth, coupleId: coupleId }
+            );
+            setDiaryWrited(response.data);
+        } catch (error) {
+            console.error("일기스케줄 데이터를 가져오는데 실패했습니다.", error);
+        }
+    };
 
-  // 달력의 월/년이 변경될 때 호출되는 핸들러
-  const handleActiveStartDateChange = async ({ activeStartDate }) => {
-    setActiveStartDate(activeStartDate);
-    fetchSchedule(activeStartDate);
-  };
     
+
+    // 컴포넌트 마운트 시 초기 activeStartDate 기준 schedule 데이터 불러오기
+    // useEffect(() => {
+    //     fetchSchedule(activeStartDate);
+    //     fetchDiaryWrited(activeStartDate);
+    // }, [selectedDate]);
+
+    // 달력의 월/년이 변경될 때 호출되는 핸들러
+    const handleActiveStartDateChange = async ({ activeStartDate }) => {
+        setActiveStartDate(activeStartDate);
+        fetchSchedule(activeStartDate);
+        fetchDiaryWrited(activeStartDate);
+    };
+
     /* 일기, 방문지 추가시 달력에 점 표시 */
     const tileContent = ({ date }) => {
-        const isVisitDate = schedule.some(dto => {
-          // dto 객체 내의 visitDate 속성 값을 사용합니다.
+        // 방문지 점 표시
+        const isVisitDate = schedule.some((dto) => {
           const visitDate = new Date(dto.visitDate);
           return (
             visitDate.getFullYear() === date.getFullYear() &&
@@ -434,10 +459,30 @@ const Calendar = () => {
           );
         });
       
-        return isVisitDate ? <span className="calendar-dot"></span> : null;
+        // 일기 점 표시 (일기 데이터의 날짜 필드가 diaryDate라고 가정)
+        const isDiaryDate = diaryWrited.some((dto) => {
+          const diaryDate = new Date(dto.diaryDate);
+          return (
+            diaryDate.getFullYear() === date.getFullYear() &&
+            diaryDate.getMonth() === date.getMonth() &&
+            diaryDate.getDate() === date.getDate()
+          );
+        });
+      
+        if (!isVisitDate && !isDiaryDate) return null;
+      
+        return (
+          <div className="tile-dot-wrapper">
+            {isVisitDate && (
+              <span className="calendar-dot calendar-visit-dot" title="방문지"></span>
+            )}
+            {isDiaryDate && (
+              <span className="calendar-dot calendar-diary-dot" title="일기"></span>
+            )}
+          </div>
+        );
       };
       
-    
 
     /** 일기 저장 */
     const saveDiary = async () => {
@@ -447,7 +492,7 @@ const Calendar = () => {
             setDiaryEntry("일기를 남겨주세요");
         }
         setEditDiary(false);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -477,6 +522,151 @@ const Calendar = () => {
         diary(formattedDate);
     };
 
+    const goToNextMatch = () => {
+        if (matchedDates.length === 0) return;
+        const nextIndex = (currentMatchIndex + 1) % matchedDates.length;
+        setCurrentMatchIndex(nextIndex);
+        setSelectedDate(new Date(matchedDates[nextIndex]));
+    };
+
+    const goToPrevMatch = () => {
+        if (matchedDates.length === 0) return;
+        const prevIndex =
+            (currentMatchIndex - 1 + matchedDates.length) % matchedDates.length;
+        setCurrentMatchIndex(prevIndex);
+        setSelectedDate(new Date(matchedDates[prevIndex]));
+    };
+
+    const handleSearch = async () => {
+        const searchWord = searchTerm ? searchTerm.split(" ") : [];
+        console.log("handleSearch 호출됨", searchWord);
+        if (!searchTerm) {
+            setMatchedDates([]);
+            Swal.fire({
+                icon: "info",
+                text: "검색어를 입력해주세요.",
+                timer: 1200,
+                showConfirmButton: false,
+            });
+            return;
+        }
+
+        try {
+            const response = await axios.post(
+                "http://localhost:8586/searchSchedule.do",
+                {
+                    searchWord: searchWord,
+                    coupleId: coupleInfo?.coupleId,
+                }
+            );
+            // 백엔드가 { visitDate: [...] }가 아니라 단순히 배열을 반환할 경우:
+            const dates = Array.isArray(response.data)
+                ? response.data
+                : [response.data];
+
+            console.log("검색 응답:", response.data);
+
+            // ISO 문자열에서 시간대 콜론 제거 후 Date 객체로 변환
+            const parsedDates = dates.filter(Boolean).map((dateStr) => {
+                const fixedDateStr = dateStr.replace(
+                    /(\+\d{2}):(\d{2})$/,
+                    "$1$2"
+                );
+                const d = new Date(fixedDateStr);
+                if (isNaN(d.getTime())) {
+                    console.error(
+                        "Invalid date string:",
+                        dateStr,
+                        "=>",
+                        fixedDateStr
+                    );
+                }
+                return d;
+            });
+
+            setMatchedDates(parsedDates);
+            setCurrentMatchIndex(0);
+            if (parsedDates.length === 0) {
+                Swal.fire({
+                    icon: "info",
+                    text: `'${searchTerm}'와 일치하는 장소가 없습니다.`,
+                    timer: 1000,
+                    showConfirmButton: false,
+                });
+                return;
+            }
+            if (parsedDates.length > 0) {
+                setSearchSelectedDate(parsedDates[0]);
+                setSelectedDate(parsedDates[0]);
+            }
+        } catch (error) {
+            console.error("검색 결과 가져오기 오류:", error);
+        }
+        goToNextMatch();
+    };
+
+    const searchWord = React.useMemo(() => {
+        return searchTerm
+            ? searchTerm.split(" ").filter((word) => word.trim() !== "")
+            : [];
+    }, [searchTerm]);
+
+    const highlightText = (text, keywords) => {
+        if (!keywords || keywords.length === 0) return text;
+
+        // 정규식에서 특별한 의미를 갖는 문자를 이스케이프합니다.
+        const escapedKeywords = keywords.map((keyword) =>
+            keyword.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
+        );
+
+        const regex = new RegExp(`(${escapedKeywords.join("|")})`, "gi");
+        const parts = text.split(regex);
+        return parts.map((part, index) =>
+            regex.test(part) ? (
+                <span
+                    key={index}
+                    style={{ backgroundColor: "#FFE0E0", fontWeight: "bold" }}
+                >
+                    {part}
+                </span>
+            ) : (
+                part
+            )
+        );
+    };
+
+    useEffect(() => {
+        const fetchRecommendations = async () => {
+            try {
+                const response = await axios.get(
+                    `http://127.0.0.1:8000/api/recommend/${userId}`
+                );
+                console.log("🟢 API 응답 데이터:", response.data);
+
+                if (!response.data || response.data.length === 0) {
+                    console.warn(
+                        "⚠️ API에서 추천 장소가 비어 있음! 기본 데이터 사용"
+                    );
+                    
+                } else {
+                    const randomIndex = Math.floor(Math.random() * response.data.length);
+        console.log("선택된 랜덤 인덱스:", randomIndex, response.data[randomIndex]);
+        setRecommendations(response.data[randomIndex]);
+                }
+            } catch (error) {
+                console.error("🔴 추천 장소 요청 실패:", error);
+                setRecommendations([]);
+            }
+        };
+        fetchRecommendations();
+    }, [userInfo]);
+
+    useEffect(() => {
+        if (recommendations && Object.keys(recommendations).length > 0) {
+          setLoading(false);
+        }
+      }, [recommendations]);
+
     return (
         <>
             {/** OFFCANVAS */}
@@ -490,14 +680,43 @@ const Calendar = () => {
             <Container fluid className="back-container vh-100">
                 <Row className="couple-calendar-container">
                     {/* 왼쪽 커플 캘린더 */}
+                    <h4
+                    className="mt-2 mb-2 text-center"
+                    style={{
+                        display: "flex",
+                        gridTemplateColumns: "1fr auto 1fr",
+                        alignItems: "center",
+                        marginRight: "25px"
+                    }}
+                    >
+                    <span
+                        style={{
+                        textAlign: "right",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        }}
+                    >
+                        {userInfo ? userInfo.nickname : "Loading..."}
+                    </span>
+                    <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
+                    <span
+                        style={{
+                        textAlign: "left",
+                        overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        whiteSpace: "nowrap",
+                        }}
+                    >
+                        {coupleInfo ? coupleInfo.nickname : "Loading..."}
+                    </span>
+                    </h4>
                     <Col
                         md={6}
                         className="calendar-column d-flex flex-column justify-content-between"
+                        style={{ position: "relative" }}
                     >
-                        <h4 className="mb-3">
-                            {userInfo ? userInfo.nickname : "Loading..."} ❤{" "}
-                            {coupleInfo ? coupleInfo.nickname : "Loading..."}
-                        </h4>
+                    
 
                         {/* 검색창과 돋보기 아이콘을 함께 묶은 박스 */}
                         <div className="search-container d-flex align-items-center justify-content-end mb-3">
@@ -507,20 +726,47 @@ const Calendar = () => {
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
                                 className="calendar__search-input me-2"
+                                onKeyPress={(e) => {
+                                    if (e.key === "Enter") {
+                                        console.log(e.key);
+                                        handleSearch();
+                                    }
+                                }}
                             />
                             <FaSearch
                                 className="search-icon"
-                                onClick={() => setShowSearch(!showSearch)}
+                                onClick={handleSearch}
+                                // onClick={() => setShowSearch(!showSearch)}
                             />
+                        </div>
+                        <div>
+                            {matchedDates.length > 0 && (
+                                <div className="search-navigation d-flex justify-content-end mb-3 me-4">
+                                    <ArrowLeft onClick={goToPrevMatch} />
+
+                                    <span className="mx-2">
+                                        검색된 날짜 {currentMatchIndex + 1}/
+                                        {matchedDates.length}
+                                    </span>
+                                    <ArrowRight onClick={goToNextMatch} />
+                                </div>
+                            )}
                         </div>
 
                         <Cal
-                            onChange={setDate}
+                            onChange={(value) => {
+                                setSelectedDate(value);
+                                // 사용자가 직접 날짜 선택 시 searchSelectedDate 초기화
+                                setSearchSelectedDate(null);
+                            }}
                             value={selectedDate}
                             onClickDay={(value) => {
                                 setSelectedDate(value);
+                                setSearchSelectedDate(null);
                             }}
-                            onActiveStartDateChange={handleActiveStartDateChange}
+                            onActiveStartDateChange={
+                                handleActiveStartDateChange
+                            }
                             className="couple-calendar flex-grow-1"
                             tileContent={tileContent}
                         />
@@ -547,11 +793,14 @@ const Calendar = () => {
                                 selectedDate && (
                                     <>
                                         <h4 className="today-date-title">
+                                            <b>
                                             {selectedDate.getMonth() + 1}월{" "}
                                             {selectedDate.getDate()}일
+                                            </b>
+                                            
                                         </h4>
                                         <div className="d-flex align-items-center mb-3">
-                                            <b>방문지 리스트</b>
+                                            <h5>방문지 리스트</h5>
                                             <Link
                                                 to="/map"
                                                 state={{
@@ -655,10 +904,10 @@ const Calendar = () => {
                                                                                 />
                                                                             ) : (
                                                                                 <span className="me-2 p-1">
-                                                                                    {
-                                                                                        place.placeName
-                                                                                    }{" "}
-                                                                                    {/* ✅ 장소 이름 표시 */}
+                                                                                    {highlightText(
+                                                                                        place.placeName,
+                                                                                        searchWord
+                                                                                    )}
                                                                                 </span>
                                                                             )}
                                                                             {/* 상세보기 버튼 추가 */}
@@ -783,7 +1032,7 @@ const Calendar = () => {
                                                         취소
                                                     </button>
                                                 </div>
-                                            ) : places?.length < 7 ||
+                                            ) : places?.length < 6 ||
                                               places?.length === undefined ? (
                                                 <a
                                                     href="#"
@@ -796,19 +1045,20 @@ const Calendar = () => {
                                                 </a>
                                             ) : (
                                                 <span className="text-muted">
-                                                    방문지는 7개까지만 입력
+                                                    방문지는 6개까지만 입력
                                                     가능합니다 :)
                                                 </span>
                                             )
                                         ) : (
                                             <span className="text-muted">
-                                                방문지는 7개까지만 입력
+                                                방문지는 6개까지만 입력
                                                 가능합니다 :)
                                             </span>
                                         )}
 
                                         <hr />
-                                        <br />
+                                        <span style={{ display: "block", height: "7px" }}></span>
+
 
                                         {selectedDate <= today ? (
                                             <>
@@ -832,43 +1082,79 @@ const Calendar = () => {
                                                     <Col>
                                                         <h6>
                                                             <b>
-                                                                지난 데이트
-                                                                방문지
+                                                                지난번 이곳은 어떠셨나요?
                                                             </b>
                                                         </h6>
                                                         <ul className="list-group mb-3">
-                                                        {lastVisitPlace.map(
-                                                            (place, index) => (
-                                                                <li
-                                                                    key={index}
-                                                                    className="list-group-item"
-                                                                >
-                                                                    {place.placeName}
-                                                                </li>
-                                                            )
-                                                        )}
-                                                    </ul>
+                                                            {lastVisitPlace.map(
+                                                                (
+                                                                    place,
+                                                                    index
+                                                                ) => (
+                                                                    <li
+                                                                        key={
+                                                                            index
+                                                                        }
+                                                                        className="prev-list-group-item"
+                                                                    >• {" "}
+                                                                        {
+                                                                            place.placeName
+                                                                        }
+                                                                    </li>
+                                                                )
+                                                            )}
+                                                        </ul>
                                                     </Col>
                                                     <Col>
-                                                        <h6>
-                                                            <b>
-                                                                이날은 여기서
-                                                                놀아볼까요?
-                                                            </b>
-                                                        </h6>
-                                                        <Card className="p-5">
-                                                            <Card.Img
-                                                                variant="top"
-                                                                src="../../public/images/main1.png"
-                                                            />
-                                                            <Card.Body>
-                                                                <Card.Title>
-                                                                    서귀포
-                                                                    감귤농장
-                                                                </Card.Title>
-                                                            </Card.Body>
-                                                        </Card>
-                                                    </Col>
+                                                    <Col>
+  <h6 className="mb-3">
+    <strong>이날은 여기서 놀아볼까요?</strong>
+  </h6>
+  
+    <Card
+    className="shadow-sm border-0"
+    style={{
+      borderRadius: '12px',
+      overflow: 'hidden',
+      maxWidth: '300px', // 카드 폭을 제한합니다.
+      margin: '0 auto'  // 중앙 정렬
+    }}
+  >
+    {loading ?(
+        <div className="loading-container">
+        <Spinner animation="border" variant="danger" />
+        <p>추천 장소를 불러오는 중...</p>
+    </div> ):(
+    <div style={{ position: 'relative' }}>
+      <Card.Img
+        variant="top"
+        src={recommendations.IMAGE || recommendations.image}
+        style={{ height: '200px', objectFit: 'cover', cursor:"pointer" }}
+        onClick={()=>{window.location.href = `/place?id=${recommendations.PLACE_ID}`}}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+          padding: '8px 12px'
+        }}
+      >
+        <Card.Title className="mb-0" style={{ color: '#fff', fontSize: '16px', cursor:"pointer" }}
+        onClick={()=>{window.location.href = `/place?id=${recommendations.PLACE_ID}`}}>
+          {recommendations.PLACE_NAME || recommendations.place_name}
+        </Card.Title>
+      </div>
+    </div>
+
+  )}
+  </Card>
+ 
+  
+</Col>
+
+</Col>
                                                 </Row>
                                             </>
                                         )}

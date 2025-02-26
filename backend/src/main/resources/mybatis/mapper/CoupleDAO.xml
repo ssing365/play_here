@@ -68,28 +68,63 @@
 		SELECT visit_date
 		FROM couple_visit
 		WHERE couple_id = #{coupleId}
-		  AND visit_date >= TO_DATE('2025-02-01','YYYY-MM-DD')
-		  AND visit_date < ADD_MONTHS(TO_DATE('2025-02-01','YYYY-MM-DD'), 1)
+		  AND visit_date >= TO_DATE(#{date},'YYYY-MM')
+		  AND visit_date < ADD_MONTHS(TO_DATE(#{date},'YYYY-MM'), 1)
 		GROUP by visit_date
 	]]>
 	</select>
 	
-	<select id="LastVisit" resultType="com.playhere.couple.CoupleDTO">
-    <![CDATA[
+	<select id="DiaryWrited" resultType="com.playhere.couple.CoupleDTO">
+	<![CDATA[
+		SELECT diary_date
+		FROM couple_diary
+		WHERE couple_id = #{coupleId}
+		  AND diary_date >= TO_DATE(#{date},'YYYY-MM')
+		  AND diary_date < ADD_MONTHS(TO_DATE(#{date},'YYYY-MM'), 1)
+		GROUP by diary_date
+	]]>
+	</select>
+	
+<select id="LastVisit" resultType="com.playhere.couple.CoupleDTO">
+  <![CDATA[
     SELECT * 
     FROM (
-        SELECT p.place_id, p.place_name, p.longitude, p.latitude
-        FROM place p
-        JOIN couple_visit cv ON p.place_id = cv.place_id
-        WHERE cv.couple_id = #{coupleId}
+      SELECT p.place_id, p.place_name, p.longitude, p.latitude
+      FROM place p
+      JOIN couple_visit cv ON p.place_id = cv.place_id
+      WHERE cv.couple_id = #{coupleId}
         AND cv.visit_date = (
-            SELECT MAX(visit_date)
-            FROM couple_visit
-            WHERE couple_id = #{coupleId} 
-            AND visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD') 
+          SELECT MAX(visit_date)
+          FROM couple_visit
+          WHERE couple_id = #{coupleId} 
+            AND visit_date <= TO_DATE(#{today}, 'YYYY-MM-DD')
         )
+      ORDER BY DBMS_RANDOM.VALUE
     )
-    ]]>
-	</select>
+    WHERE ROWNUM <= 3
+  ]]>
+</select>
+
+	
+<select id="searchSchedule" resultType="java.util.Date">
+    SELECT visit_date 
+    FROM (
+      SELECT place.place_name AS place_name, couple_visit.visit_date AS visit_date 
+      FROM couple_visit 
+      JOIN place ON couple_visit.place_id = place.place_id
+      WHERE couple_id = #{coupleId}
+      <if test="searchWord != null and searchWord.size() > 0">
+        AND (
+          <foreach collection="searchWord" item="str" separator=" OR ">
+            place.place_name LIKE '%' || TO_CHAR(#{str}) || '%'
+          </foreach>
+        )
+      </if>
+    )
+    GROUP BY visit_date
+
+</select>
+
+
 
 </mapper>
