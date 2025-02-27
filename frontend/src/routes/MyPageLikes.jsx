@@ -163,7 +163,7 @@ const MyPageLikes = () => {
                         }
                     });
                 }
-                if(check===0){
+                if(check===6){
                     Swal.fire({
                         title: "방문지는 6개까지만 입력 가능합니다!",
                         icon: "warning",

@@ -54,6 +54,11 @@
 		update couple_diary set content = #{content}
 		where couple_id = #{coupleId} and diary_date = TO_DATE(#{diaryDate},'YYYY-MM-DD') and diary_writer = #{diaryWriter}
 	</update>
+
+	<delete id="DiaryDelete">
+		delete from couple_diary 
+		where couple_id = #{coupleId} and diary_date = TO_DATE(#{diaryDate},'YYYY-MM-DD') and diary_writer = #{diaryWriter}
+	</delete>
 	
 	<insert id="NewDiary">
 		insert into couple_diary values(DIARY_SEQ.nextval,#{diaryWriter}, #{coupleId}, #{content}, #{diaryDate})
