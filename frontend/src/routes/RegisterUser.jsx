@@ -375,6 +375,7 @@ const RegisterUser = () => {
                                     </Form.Label>
                                     <div className="d-flex">
                                         <Form.Control
+                                        autocomplete="off"
                                             type="text"
                                             placeholder="아이디"
                                             name="user_id"
@@ -520,6 +521,7 @@ const RegisterUser = () => {
                                 이름 <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
+                            autocomplete="off"
                                 type="text"
                                 placeholder="이름"
                                 name="name"
@@ -535,6 +537,7 @@ const RegisterUser = () => {
                                 별명 <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
+                            autocomplete="off"
                                 type="text"
                                 placeholder="별명"
                                 name="nickname"
@@ -550,6 +553,7 @@ const RegisterUser = () => {
                                 이메일 <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
+                            autocomplete="off"
                                 type="email"
                                 placeholder="이메일"
                                 name="email"

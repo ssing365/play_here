@@ -141,6 +141,7 @@ const Calendar = () => {
                     console.log("일치하는 장소가 없습니다.");
                 }
             }
+            fetchDiaryWrited(activeStartDate);
             fetchSchedule(activeStartDate);
             setShowDropdown(false);
         }
