@@ -6,7 +6,7 @@ import Cal from "react-calendar";
 import "react-calendar/dist/Calendar.css";
 import "../css/Calendar.css";
 import { FaSearch } from "react-icons/fa";
-import { Button, Form, Row, Col, Card, Container } from "react-bootstrap";
+import { Button, Form, Row, Col, Card, Container, Spinner } from "react-bootstrap";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import { ArrowLeft, ArrowRight } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
@@ -32,10 +32,13 @@ const Calendar = () => {
     const [schedule, setSchedule] = useState([]);
     const [activeStartDate, setActiveStartDate] = useState(new Date());
     const [lastVisitPlace, setLastVisitPlace] = useState([]);
+    const [loading, setLoading] = useState(true);
 
     const [matchedDates, setMatchedDates] = useState([]);
     const [currentMatchIndex, setCurrentMatchIndex] = useState(0);
     const [searchSelectedDate, setSearchSelectedDate] = useState(null);
+
+    const [recommendations, setRecommendations] = useState([]);
 
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo } = useContext(UserContext);
@@ -489,7 +492,7 @@ const Calendar = () => {
             setDiaryEntry("일기를 남겨주세요");
         }
         setEditDiary(false);
-        const formattedDate = date
+        const formattedDate = selectedDate
             .toLocaleDateString("ko-KR", {
                 year: "numeric",
                 month: "2-digit",
@@ -632,6 +635,56 @@ const Calendar = () => {
         );
     };
 
+    useEffect(() => {
+        const fetchRecommendations = async () => {
+          try {
+            const response = await axios.get(
+              `http://127.0.0.1:8000/api/recommend/${userId}`
+            );
+            console.log("🟢 API 응답 데이터:", response.data);
+      
+            if (!response.data || response.data.length === 0) {
+              console.warn("⚠️ API에서 추천 장소가 비어 있음! 기본 데이터 사용");
+            } else {
+              let validRecommendation = null;
+              let attempts = 0;
+              const totalItems = response.data.length;
+              
+              while (!validRecommendation && attempts < totalItems) {
+                const randomIndex = Math.floor(Math.random() * totalItems);
+                const candidate = response.data[randomIndex];
+                const imageUrl = candidate.IMAGE || candidate.image;
+                
+                // 🚨 값이 없거나 기본 placeholder 이미지면 제외
+                if (candidate.PREFERENCE_ID && imageUrl && !imageUrl.includes("via.placeholder")) {
+                  console.log("선택된 랜덤 인덱스:", randomIndex, candidate);
+                  validRecommendation = candidate;
+                  break;
+                }
+                attempts++;
+              }
+              
+              if (validRecommendation) {
+                setRecommendations(validRecommendation);
+              } else {
+                console.warn("⚠️ 유효한 이미지가 있는 추천 장소를 찾지 못했습니다. 기본값을 사용합니다.");
+                setRecommendations(response.data[0]);
+              }
+            }
+          } catch (error) {
+            console.error("🔴 추천 장소 요청 실패:", error);
+            setRecommendations([]);
+          }
+        };
+        fetchRecommendations();
+      }, [userInfo]);
+
+    useEffect(() => {
+        if (recommendations && Object.keys(recommendations).length > 0) {
+          setLoading(false);
+        }
+      }, [recommendations]);
+
     return (
         <>
             {/** OFFCANVAS */}
@@ -645,43 +698,43 @@ const Calendar = () => {
             <Container fluid className="back-container vh-100">
                 <Row className="couple-calendar-container">
                     {/* 왼쪽 커플 캘린더 */}
+                    <h4
+                            className="mt-1 mb-1 text-center"
+                            style={{
+                                display: "flex",
+                                gridTemplateColumns: "1fr auto 1fr",
+                                alignItems: "center",
+                                marginRight: "25px"
+                            }}
+                            >
+                            <span
+                                style={{
+                                textAlign: "right",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                }}
+                            >
+                                {userInfo ? userInfo.nickname : "Loading..."}
+                            </span>
+                            <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
+                            <span
+                                style={{
+                                textAlign: "left",
+                                overflow: "hidden",
+                                textOverflow: "ellipsis",
+                                whiteSpace: "nowrap",
+                                }}
+                            >
+                                {coupleInfo ? coupleInfo.nickname : "Loading..."}
+                            </span>
+                        </h4>
                     <Col
                         md={6}
                         className="calendar-column d-flex flex-column justify-content-between"
                         style={{ position: "relative" }}
                     >
-                    <h4
-                    className="mb-3"
-                    style={{
-                        display: "grid",
-                        gridTemplateColumns: "1fr auto 1fr",
-                        alignItems: "center",
-                        marginRight: "25px"
-                    }}
-                    >
-                    <span
-                        style={{
-                        textAlign: "right",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        }}
-                    >
-                        {userInfo ? userInfo.nickname : "Loading..."}
-                    </span>
-                    <span style={{ textAlign: "center", margin: "0 10px"}}>❤</span>
-                    <span
-                        style={{
-                        textAlign: "left",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                        whiteSpace: "nowrap",
-                        }}
-                    >
-                        {coupleInfo ? coupleInfo.nickname : "Loading..."}
-                    </span>
-                    </h4>
-
+                        
                         {/* 검색창과 돋보기 아이콘을 함께 묶은 박스 */}
                         <div className="search-container d-flex align-items-center justify-content-end mb-3">
                             <Form.Control
@@ -757,11 +810,14 @@ const Calendar = () => {
                                 selectedDate && (
                                     <>
                                         <h4 className="today-date-title">
+                                            <b>
                                             {selectedDate.getMonth() + 1}월{" "}
                                             {selectedDate.getDate()}일
+                                            </b>
+                                            
                                         </h4>
                                         <div className="d-flex align-items-center mb-3">
-                                            <b>방문지 리스트</b>
+                                            <h5>방문지 리스트</h5>
                                             <Link
                                                 to="/map"
                                                 state={{
@@ -1043,8 +1099,7 @@ const Calendar = () => {
                                                     <Col>
                                                         <h6>
                                                             <b>
-                                                                지난 데이트
-                                                                방문지
+                                                                지난번 이곳은 어떠셨나요?
                                                             </b>
                                                         </h6>
                                                         <ul className="list-group mb-3">
@@ -1068,25 +1123,55 @@ const Calendar = () => {
                                                         </ul>
                                                     </Col>
                                                     <Col>
-                                                        <h6>
-                                                            <b>
-                                                                이날은 여기서
-                                                                놀아볼까요?
-                                                            </b>
-                                                        </h6>
-                                                        <Card className="p-5">
-                                                            <Card.Img
-                                                                variant="top"
-                                                                src="../../public/images/main1.png"
-                                                            />
-                                                            <Card.Body>
-                                                                <Card.Title>
-                                                                    서귀포
-                                                                    감귤농장
-                                                                </Card.Title>
-                                                            </Card.Body>
-                                                        </Card>
-                                                    </Col>
+                                                    <Col>
+  <h6 className="mb-3">
+    <strong>이날은 여기서 놀아볼까요?</strong>
+  </h6>
+  
+    <Card
+    className="shadow-sm border-0"
+    style={{
+      borderRadius: '12px',
+      overflow: 'hidden',
+      maxWidth: '300px', // 카드 폭을 제한합니다.
+      margin: '0 auto'  // 중앙 정렬
+    }}
+  >
+    {loading ?(
+        <div className="loading-container">
+            <Spinner animation="border" variant="danger" />
+            <p>추천 장소를 불러오는 중...</p>
+        </div> ):(
+    <div style={{ position: 'relative' }}>
+      <Card.Img
+        variant="top"
+        src={recommendations.IMAGE || recommendations.image}
+        style={{ height: '200px', objectFit: 'cover', cursor:"pointer" }}
+        onClick={()=>{window.location.href = `/place?id=${recommendations.PLACE_ID}`}}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          bottom: 0,
+          width: '100%',
+          background: 'linear-gradient(to top, rgba(0,0,0,0.7), transparent)',
+          padding: '8px 12px'
+        }}
+      >
+        <Card.Title className="mb-0" style={{ color: '#fff', fontSize: '16px', cursor:"pointer" }}
+        onClick={()=>{window.location.href = `/place?id=${recommendations.PLACE_ID}`}}>
+          {recommendations.PLACE_NAME || recommendations.place_name}
+        </Card.Title>
+      </div>
+    </div>
+
+  )}
+  </Card>
+ 
+  
+</Col>
+
+</Col>
                                                 </Row>
                                             </>
                                         )}

@@ -163,7 +163,10 @@ const Login = () => {
                     /
                     <span
                         className="find-pwd"
-                        onClick={() => navigate("/find-pwd")}
+                        onClick={(e) => {
+                            e.preventDefault();
+                            alert("구현중인 기능입니다.");
+                        }}
                     >
                         비밀번호 찾기
                     </span>

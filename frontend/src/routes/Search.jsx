@@ -6,9 +6,10 @@ import RecomandPlaces from "../components/Main/RecomandPlaces";
 import '../index.css';
 import "bootstrap/dist/css/bootstrap.min.css";
 import { Button, Container, Row, Col, Card } from "react-bootstrap";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useContext } from "react";
 import { UserContext } from '../contexts/UserContext';
+import { useNavigate } from "react-router-dom";
 
 const Search = () => {
     // 카테고리 default
@@ -17,9 +18,12 @@ const Search = () => {
     // 주간 날짜 뽑기
     const [selectedDate, setSelectedDate] = useState(new Date().getDate());
     const [weekDates, setWeekDates] = useState([]);
+    //행사정보
+    const [events, setEvents] = useState({});
     
     // context에서 로그인 상태, 유저 정보 가져오기
     const { userInfo, isLoggedIn } = useContext(UserContext);
+    const navigate = useNavigate(); // 페이지 이동 함수
 
     // 날짜 출력
     useEffect(() => {
@@ -27,21 +31,45 @@ const Search = () => {
         const dates = Array.from({ length: 7 }, (_, i) => {
             const date = new Date(today);
             date.setDate(today.getDate() + i);
-            return date;
+            return {
+                fullDate: date, // 실제 Date 객체 저장
+                displayDate: date.getDate(), // UI에서 보여줄 날짜
+            };
         });
         setWeekDates(dates);
     }, []);
 
     // 주간 행사 더미
-    const events = {
-        [selectedDate]: [{ name: '행사 1', img: '/images/main1.png' }, { name: '행사 2', img: '/images/main2.png' }, { name: '행사 3', img: '/images/main4.png' }],
-        [selectedDate+1] : [{ name: '행사 A', img: '/images/main2.png' }, { name: '행사 B', img: '/images/main3.png' }, { name: '행사 C', img: '/images/main5.png' }],
-        [selectedDate+2] : [{ name: '행사 D', img: '/images/main3.png' }, { name: '행사 I', img: '/images/main4.png' }, { name: '행사 N', img: '/images/main3.png' }],
-        [selectedDate+3] : [{ name: '행사 E', img: '/images/main4.png' }, { name: '행사 J', img: '/images/main5.png' }, { name: '행사 O', img: '/images/main2.png' }],
-        [selectedDate+4] : [{ name: '행사 F', img: '/images/main5.png' }, { name: '행사 K', img: '/images/main1.png' }, { name: '행사 P', img: '/images/main1.png' }],
-        [selectedDate+5] : [{ name: '행사 G', img: '/images/main1.png' }, { name: '행사 L', img: '/images/main2.png' }, { name: '행사 Q', img: '/images/main4.png' }],
-        [selectedDate+6] : [{ name: '행사 H', img: '/images/main2.png' }, { name: '행사 M', img: '/images/main3.png' }, { name: '행사 R', img: '/images/main5.png' }],
-    }
+    // 🎯 API에서 행사 데이터 가져오기
+    useEffect(() => {
+        fetch("http://localhost:8586/api/events/weekly")
+            .then(response => response.json())
+            .then(data => {
+                const eventMap = {};
+
+                data.forEach(event => {
+                    const eventDate = new Date(event.startDate).getDate(); // 시작 날짜 기준으로 매칭
+                    if (!eventMap[eventDate]) eventMap[eventDate] = [];
+                    eventMap[eventDate].push({ 
+                        id : event.placeId,
+                        name: event.placeName, 
+                        location: event.placeNameOnMap,
+                        img: event.image === "이미지 없음" ? "/images/여기놀자.svg" : event.image, 
+                        date: event.startDate + " ~ " + event.endDate ,
+                        startDate: event.startDate, // Date 객체로 변환
+                        endDate: event.endDate , // Date 객체로 변환
+                    });
+                });
+
+                setEvents(eventMap);
+            })
+            .catch(error => console.error("행사정보 api 오류:", error));
+    }, []);
+
+    // 📌 상세 페이지 이동 함수
+    const goToDetailPage = (placeId) => {
+        navigate(`/place?id=${placeId}`, { state: { scrollToTop: true } });
+    };
 
     return (
         <div className="d-flex flex-column min-vh-100">
@@ -64,7 +92,7 @@ const Search = () => {
                         <h5><strong>이번 주 행사</strong></h5>
                         <div className="d-flex justify-content-between mb-2" style={{backgroundColor:"#FFC7C7", borderRadius:"10px", }}>
                             {weekDates.map((dateObj) => {
-                                const date = dateObj.getDate();
+                                const date = dateObj.fullDate.getDate();
                                 return (
                                     <div key={date} className="text-center">
                                         <div
@@ -87,21 +115,67 @@ const Search = () => {
                             })}
                         </div>
                         <Row>
-                            {(events[selectedDate] || []).slice(0, 3).map((item, index) => (
-                                <Col md={12} key={index} className="d-flex align-items-center mb-3">
-                                    {console.log(events[selectedDate])}
-                                    <img 
-                                        src={item.img} 
-                                        alt={item.name} 
-                                        className="rounded"
-                                        style={{ objectFit: 'cover', width: '150px', height: '150px' }} 
-                                    />
-                                    <div className="ms-3">
-                                        <h6><strong>{item.name}</strong></h6>
-                                        <p>행사 정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 행사정보 </p>
-                                    </div>
-                                </Col>
-                            ))}
+                            {(() => {
+                                // const eventList = events[selectedDate] || []; // 현재 선택한 날짜의 행사 목록
+                                const selectedFullDate = useMemo(() => {
+                                    // 선택한 날짜가 주간 캘린더(weekDates) 중에서 몇 번째인지 확인
+                                    const selectedIndex = weekDates.findIndex(dateObj => dateObj.displayDate === selectedDate);
+                                    
+                                    if (selectedIndex === -1) return null; // 선택한 날짜가 주간 범위에 없을 경우 예외 처리
+
+                                    // ✅ 선택한 날짜의 정확한 연/월/일 가져오기
+                                    const selectedDateObj = weekDates[selectedIndex].fullDate;
+
+                                    // ✅ YYYY-MM-DD 형식으로 변환
+                                    const year = selectedDateObj.getFullYear();
+                                    const month = (selectedDateObj.getMonth() + 1).toString().padStart(2, "0"); 
+                                    const day = selectedDateObj.getDate().toString().padStart(2, "0"); 
+
+                                    return `${year}-${month}-${day}`;
+                                }, [selectedDate, weekDates]); // ✅ selectedDate & weekDates가 변경될 때만 실행
+
+                                console.log("📌 선택한 날짜 (최종):", selectedFullDate);
+
+                                // 🎯 현재 날짜보다 종료 날짜(endDate)가 큰 행사 리스트 찾기 (이미 끝난 행사 제외)
+                                let possibleEvents = [];
+                                Object.values(events).forEach(dayEvents => {
+                                    dayEvents.forEach(event => {
+                                        const eventStartDate = new Date(event.startDate + "T00:00:00"); // `T00:00:00` 추가하여 한국시간 기준 Date 객체 생성
+                                        const eventEndDate = new Date(event.endDate + "T23:59:59"); // 끝나는 날까지 포함되도록 23:59:59 설정
+                                        const selectedDateObj = new Date(selectedFullDate + "T00:00:00"); // 선택한 날짜 변환
+
+                                        
+                                        if (eventStartDate <= selectedDateObj && eventEndDate >= selectedDateObj) {
+                                            possibleEvents.push(event);
+                                        }
+                                    });
+                                });
+
+                                // 🎯 StartDate(시작일) 기준으로 정렬 (최신 행사 순서대로 정렬)
+                                possibleEvents.sort((a, b) => new Date(b.startDate) - new Date(a.startDate));
+
+                                // 🎯 상위 3개 이벤트만 선택
+                                let filledEvents = possibleEvents.slice(0, 3);
+
+                                return filledEvents.map((item, index) => (
+                                    <Col md={12} key={index} className="d-flex align-items-center mb-3"
+                                        style={{ cursor: item.id ? "pointer" : "default" }} 
+                                        onClick={() => item.id && goToDetailPage(item.id)}
+                                    >
+                                        <img 
+                                            src={item.img} 
+                                            alt={item.name} 
+                                            className="rounded"
+                                            style={{ objectFit: 'cover', width: '150px', height: '150px' }} 
+                                        />
+                                        <div className="ms-3">
+                                            <h6><strong>{item.name}</strong></h6>
+                                            <p>{item.location}</p>
+                                            <p>{item.date}</p>
+                                        </div>
+                                    </Col>
+                                ));
+                            })()}
                         </Row>
                     </Col>
 

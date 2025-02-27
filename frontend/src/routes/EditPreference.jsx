@@ -102,16 +102,34 @@ const EditPreference = () => {
     };
 
     const handleSubmit = async () => {
-        //선택된 선호도 ID들을 배열로 변환하기
-        const selectedPreferences = Object.values(selected).flat();
-        if (selectedPreferences.length === 0) {
+
+        // 🔹 필수 카테고리 목록 가져오기
+        const requiredCategories = categories.map(category => category.title);
+
+        // 🔹 각 필수 카테고리에서 적어도 하나 이상의 아이템이 선택되었는지 확인
+        const missingCategories = requiredCategories.filter(title => 
+            !selected[title] || selected[title].length === 0
+        );
+
+        if (missingCategories.length > 0) {
             Swal.fire({
-                text: "최소 한 개 이상의 선호도를 선택해주세요!",
-                timer: 1500,
+                text: `다음 카테고리에서 최소 하나 이상 선택해주세요: ${missingCategories.join(", ")}`,
+                timer: 2000,
                 confirmButtonColor: "#e91e63",
             });
             return;
         }
+
+        //선택된 선호도 ID들을 배열로 변환하기
+        const selectedPreferences = Object.values(selected).flat();
+        // if (selectedPreferences.length === 0) {
+        //     Swal.fire({
+        //         text: "최소 한 개 이상의 선호도를 선택해주세요!",
+        //         timer: 1500,
+        //         confirmButtonColor: "#e91e63",
+        //     });
+        //     return;
+        // }
 
         const preferencesToSend = selectedPreferences.map((preferenceId) => ({
             userId: userInfo?.userId, // 각 선호도에 userId 추가
@@ -168,7 +186,7 @@ const EditPreference = () => {
                     </h4>
                 </div>
                 <div className="text-muted mb-5">
-                    🌟선호도는 1개 이상 선택해주세요
+                  🌟선호도는 <strong>카테고리 당 1개 이상</strong> 선택해주세요
                 </div>
                 <div className="row">
                     <div className="col-12 col-lg-6">
@@ -186,6 +204,8 @@ const EditPreference = () => {
                                     <h5 className="category-title">
                                         {category.title}
                                     </h5>
+                                    <span className="text-danger">
+                                        * 최소 1개 이상 선택 </span>
                                     <div className="d-flex flex-wrap">
                                         {category.items.map((item) => (
                                             <div
@@ -231,6 +251,9 @@ const EditPreference = () => {
                                     <h5 className="category-title">
                                         {category.title}
                                     </h5>
+                                    <span className="text-danger">
+                                        * 최소 1개 이상 선택 
+                                    </span>
                                     <div className="d-flex flex-wrap">
                                         {category.items.map((item) => (
                                             <div
@@ -274,7 +297,7 @@ const EditPreference = () => {
                                 onClick={() => navigate(-1)}
                                 className="btn btn-secondary mt-2"
                             >
-                                다음에 고르기
+                                다음에 수정하기
                             </button>
                         </div>
                     </div>

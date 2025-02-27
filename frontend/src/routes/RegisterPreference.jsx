@@ -68,11 +68,6 @@ const RegisterPreference = () => {
         });
     };
 
-    //다음에 고르기를 누르면 회원가입 성공 페이지로 이동
-    const handleSkip = () => {
-         navigate("/register-complete");
-    };
-
     const handleSubmit = async () => {
         if (!userId) {
             alert("회원 정보를 확인할 수 없습니다.");
@@ -80,16 +75,33 @@ const RegisterPreference = () => {
             return;
         }
 
-        //선택된 선호도 ID들을 배열로 변환하기
-        const selectedPreferences = Object.values(selected).flat();
-        if (selectedPreferences.length === 0) {
+        // 🔹 필수 카테고리 목록 가져오기
+        const requiredCategories = categories.map(category => category.title);
+
+        // 🔹 각 필수 카테고리에서 적어도 하나 이상의 아이템이 선택되었는지 확인
+        const missingCategories = requiredCategories.filter(title => 
+            !selected[title] || selected[title].length === 0
+        );
+
+        if (missingCategories.length > 0) {
             Swal.fire({
-                text: "최소 한 개 이상의 선호도를 선택해주세요!",
-                timer: 1500,
+                text: `다음 카테고리에서 최소 하나 이상 선택해주세요: ${missingCategories.join(", ")}`,
+                timer: 2000,
                 confirmButtonColor: "#e91e63",
             });
             return;
         }
+
+        //선택된 선호도 ID들을 배열로 변환하기
+        const selectedPreferences = Object.values(selected).flat();
+        // if (selectedPreferences.length === 0) {
+        //     Swal.fire({
+        //         text: "최소 한 개 이상의 선호도를 선택해주세요!",
+        //         timer: 1500,
+        //         confirmButtonColor: "#e91e63",
+        //     });
+        //     return;
+        // }
 
         const preferencesToSend = selectedPreferences.map((preferenceId) => ({
             userId: userId, // 각 선호도에 userId 추가
@@ -147,7 +159,7 @@ const RegisterPreference = () => {
                     </h4>
                 </div>
                 <div className="text-muted mb-5">
-                    🌟선호도는 1개 이상 선택해주세요
+                    🌟선호도는 <strong>카테고리 당 1개 이상</strong> 선택해주세요
                     <br />
                     🌟선호도는 추후 마이페이지에서 수정 가능합니다:)
                 </div>
@@ -165,8 +177,10 @@ const RegisterPreference = () => {
                                     className="category-section"
                                 >
                                     <h5 className="category-title">
-                                        {category.title}
+                                        {category.title} 
                                     </h5>
+                                    <span className="text-danger">
+                                    * 최소 1개 이상 선택 </span>
                                     <div className="d-flex flex-wrap">
                                         {category.items.map((item) => (
                                             <div
@@ -212,6 +226,8 @@ const RegisterPreference = () => {
                                     <h5 className="category-title">
                                         {category.title}
                                     </h5>
+                                    <span className="text-danger">
+                                    * 최소 1개 이상 선택 </span>
                                     <div className="d-flex flex-wrap">
                                         {category.items.map((item) => (
                                             <div
@@ -249,13 +265,6 @@ const RegisterPreference = () => {
                                 onClick={handleSubmit}
                             >
                                 선택완료
-                            </button>
-                            <br />
-                            <button
-                                onClick={() => navigate("/register-complete")}
-                                className="btn btn-secondary mt-2"
-                            >
-                                다음에 고르기
                             </button>
                         </div>
                     </div>

@@ -29,6 +29,10 @@ function Place() {
     const defaultImage = "/images/여기놀자.svg"; // 기본 이미지 URL
 
     useEffect(() => {
+        window.scrollTo(0, 0);
+    }, [placeId]);
+
+    useEffect(() => {
         if (!place || !place.latitude || !place.longitude) return; // place가 없으면 실행 X
 
         const container = document.getElementById("map");
@@ -72,6 +76,8 @@ function Place() {
             console.error("Error fetching place:", error);
         }
     };
+
+    
 
     // 근처 장소
     const closePlace = async (longitude, latitude) => {
@@ -487,30 +493,34 @@ function Place() {
                                 )}
                             </p>
 
-                            {place?.latitude && place?.longitude ? (
-                                <div
-                                    id="map"
-                                    className="position-relative bg-secondary rounded-3"
-                                    style={{ height: "350px" }}
-                                >
-                                    <Button
-                                        variant="outline-light"
-                                        className="position-absolute top-2 end-2"
-                                    >
-                                        <MapPin size={20} /> 길찾기
-                                    </Button>
-                                    {/* 지도 렌더링 컴포넌트 또는 로직 */}
-                                </div>
-                            ) : (
-                                <div
-                                    className="d-flex align-items-center justify-content-center bg-secondary rounded-3"
-                                    style={{ height: "350px" }}
-                                >
-                                    <p className="text-white m-0">
-                                        업체에서 제공한 위치 정보가 없습니다.
-                                    </p>
-                                </div>
-                            )}
+                            {(!isNaN(Number(place?.latitude)) &&
+  !isNaN(Number(place?.longitude)) &&
+  Number(place?.latitude) !== 0 &&
+  Number(place?.longitude) !== 0) ? (
+  <div
+    id="map"
+    className="position-relative bg-secondary rounded-3"
+    style={{ height: "350px" }}
+  >
+    <Button
+      variant="outline-light"
+      className="position-absolute top-2 end-2"
+    >
+      <MapPin size={20} /> 길찾기
+    </Button>
+    {/* 지도 렌더링 컴포넌트 또는 로직 */}
+  </div>
+) : (
+  <div
+    className="d-flex align-items-center justify-content-center bg-secondary rounded-3"
+    style={{ height: "350px" }}
+  >
+    <p className="text-white m-0">
+      업체에서 제공한 위치 정보가 없습니다.
+    </p>
+  </div>
+)}
+
                         </Card.Body>
                     </Card>
 
