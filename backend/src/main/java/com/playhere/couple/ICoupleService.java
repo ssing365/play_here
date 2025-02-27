@@ -29,6 +29,9 @@ public interface ICoupleService {
          @Param("diaryWriter") String diary_writer, 
          @Param("diaryDate") String diary_date,
          @Param("content") String content);
+   public void DiaryDelete(@Param("coupleId") String couple_id,
+		   @Param("diaryWriter") String diary_writer, 
+		   @Param("diaryDate") String diary_date);
    public List<PlaceDTO> SearchPlace();
    public List<CoupleDTO> Schedule(@Param("date") String date,@Param("coupleId") String coupleId);
    public List<CoupleDTO> DiaryWrited(@Param("date") String date,@Param("coupleId") String coupleId);

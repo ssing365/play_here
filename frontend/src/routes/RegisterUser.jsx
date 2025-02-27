@@ -217,22 +217,16 @@ const RegisterUser = () => {
             "name",
             "nickname",
             "email",
-            "birth_date",
             "postcode",
             "address",
-            "detailAddress",
         ];
 
         for (const field of requiredFields) {
             if (!formData[field].trim()) {
                 alert(
                     `${
-                        field === "birth_date"
-                            ? "생년월일"
-                            : field === "postcode"
+                            field === "postcode"
                             ? "우편번호"
-                            : field === "detailAddress"
-                            ? "상세주소"
                             : field
                     } 항목을 입력해 주세요.`
                 );
@@ -240,12 +234,6 @@ const RegisterUser = () => {
             }
         }
 
-        // 생년월일 연도 4자리 검증
-        const birthYear = new Date(formData.birth_date).getFullYear();
-        if (birthYear.toString().length !== 4) {
-            alert("생년월일의 연도는 4자리여야 합니다.");
-            return;
-        }
 
         // 아이디 중복 확인 체크
         if (!isUserIdChecked) {
@@ -387,6 +375,7 @@ const RegisterUser = () => {
                                     </Form.Label>
                                     <div className="d-flex">
                                         <Form.Control
+                                        autocomplete="off"
                                             type="text"
                                             placeholder="아이디"
                                             name="user_id"
@@ -532,6 +521,7 @@ const RegisterUser = () => {
                                 이름 <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
+                            autocomplete="off"
                                 type="text"
                                 placeholder="이름"
                                 name="name"
@@ -547,6 +537,7 @@ const RegisterUser = () => {
                                 별명 <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
+                            autocomplete="off"
                                 type="text"
                                 placeholder="별명"
                                 name="nickname"
@@ -562,6 +553,7 @@ const RegisterUser = () => {
                                 이메일 <span className="text-danger">*</span>
                             </Form.Label>
                             <Form.Control
+                            autocomplete="off"
                                 type="email"
                                 placeholder="이메일"
                                 name="email"
@@ -574,7 +566,7 @@ const RegisterUser = () => {
                         {/* 생년월일 */}
                         <Form.Group controlId="formBirthDate" className="mb-3">
                             <Form.Label>
-                                생년월일 <span className="text-danger">*</span>
+                                생년월일
                             </Form.Label>
                             <Form.Control
                                 type="date"
@@ -582,7 +574,6 @@ const RegisterUser = () => {
                                 value={formData.birth_date}
                                 onChange={handleChange}
                                 max="9999-12-31"
-                                required
                             />
                         </Form.Group>
 
@@ -635,7 +626,7 @@ const RegisterUser = () => {
                             className="mb-3"
                         >
                             <Form.Label>
-                                상세주소 <span className="text-danger">*</span>
+                                상세주소
                             </Form.Label>
                             <Form.Control
                                 type="text"
@@ -644,7 +635,6 @@ const RegisterUser = () => {
                                 value={formData.detailAddress}
                                 onChange={handleChange}
                                 ref={detailAddressRef}
-                                required
                             />
                         </Form.Group>
                         <div className="d-flex justify-content-center mt-4 mb-4">

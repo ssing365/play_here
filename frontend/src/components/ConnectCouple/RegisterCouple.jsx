@@ -181,7 +181,7 @@ const RegisterCouple = ({ coupleCode }) => {
       ) : (
         <div className="text-center mt-3">
           <h4>🎉 커플 연결을 축하합니다! 🎉</h4>
-          <Button className="menu-btn mt-5" style={{ width: '400px' }} onClick={() => navigate('/calendar')}>
+          <Button className="menu-btn mt-5" style={{ width: '400px' }} onClick={() => window.location.href='/calendar'}>
             📅 커플 캘린더 가기 📅
           </Button>
         </div>
